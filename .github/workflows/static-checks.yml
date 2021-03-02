@@ -12,6 +12,10 @@ jobs:
           php-version: 7.4
           extensions: mbstring, iconv, intl, mysql, zip
           tools: phpunit, composer
+      - name: Setup Node with NPM
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
       - name: Start mysql service
         run: sudo /etc/init.d/mysql start
       - name: Configure mysql
@@ -31,3 +35,7 @@ jobs:
         run: sudo apt install aspell aspell-en
       - name: Run phpunit tests
         run: cd SETUP/tests && phpunit
+      - name: Run js unit tests
+        run: npm install
+        run: npm run lint
+        run: npm run test
