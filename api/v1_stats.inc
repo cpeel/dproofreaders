@@ -124,7 +124,7 @@ function api_v1_stats_site_projects_stages($method, $data, $query_params)
 }
 
 //---------------------------------------------------------------------------
-// stats/site/rounds
+// stats/site/rounds/pages
 
 function render_round_stats($round_id)
 {
@@ -141,7 +141,7 @@ function render_round_stats($round_id)
     ];
 }
 
-function api_v1_stats_site_rounds($method, $data, $query_params)
+function api_v1_stats_site_rounds_pages($method, $data, $query_params)
 {
     global $Round_for_round_id_;
 
@@ -154,9 +154,9 @@ function api_v1_stats_site_rounds($method, $data, $query_params)
 }
 
 //---------------------------------------------------------------------------
-// stats/site/rounds/:roundid
+// stats/site/rounds/:roundid/pages
 
-function api_v1_stats_site_round($method, $data, $query_params)
+function api_v1_stats_site_round_pages($method, $data, $query_params)
 {
     $round = $data[":roundid"];
 

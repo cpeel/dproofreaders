@@ -934,6 +934,9 @@ paths:
       tags:
       - stats
       description: Gets the site statistics for all rounds
+        <br>
+        <b>deprecated, use /stats/site/rounds/pages instead</b>
+      deprecated: true
       responses:
         200:
           description: Requested round statistics
@@ -942,13 +945,16 @@ paths:
               schema:
                 type: object
                 additionalProperties:
-                  $ref: '#/components/schemas/round_stats'
+                  $ref: '#/components/schemas/round_page_stats'
 
   /stats/site/rounds/{roundid}:
     get:
       tags:
       - stats
-      description: Gets the site statistics for a round
+      description: Gets the page statistics for a specific round
+        <br>
+        <b>deprecated, use /stats/site/rounds/{roundid}/pages instead</b>
+      deprecated: true
       parameters:
       - name: roundid
         in: path
@@ -962,7 +968,42 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/round_stats'
+                $ref: '#/components/schemas/round_page_stats'
+
+  /stats/site/rounds/pages:
+    get:
+      tags:
+      - stats
+      description: Gets the page statistics for all rounds
+      responses:
+        200:
+          description: Requested page statistics by round
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  $ref: '#/components/schemas/round_page_stats'
+
+  /stats/site/rounds/{roundid}/pages:
+    get:
+      tags:
+      - stats
+      description: Gets the page statistics for a specific round
+      parameters:
+      - name: roundid
+        in: path
+        description: Round ID
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Requested page statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/round_page_stats'
 
 components:
   securitySchemes:
@@ -1263,7 +1304,7 @@ components:
       description: Project statistics by state/stage
         Keys are state/stage ID, values are the number of projects in that state
 
-    round_stats:
+    round_page_stats:
       type: object
       properties:
         today_goal:
@@ -1287,7 +1328,7 @@ components:
         positive_users:
           type: integer
           readOnly: true
-      description: Statistics for a round
+      description: Page statistics for a round
 
     wordlist:
       type: array

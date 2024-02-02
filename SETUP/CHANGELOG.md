@@ -9,6 +9,10 @@ first before upgrading to R202102 or later releases.**
 
 ## R......
 
+* The `v1/stats/site/rounds` and `v1/stats/site/rounds/:roundid` API endpoints
+  are deprecated and will be removed in a future release. Users should change
+  to using `v1/stats/site/rounds/pages` and `v1/stats/site/rounds/:roundid/pages`
+  respectively.
 * Session management by cookie has been removed in lieu of PHP-based sessions
   which have been the DP code default since before 2004 (cpeel)
 
