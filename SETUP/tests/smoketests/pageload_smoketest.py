@@ -511,7 +511,7 @@ def start_server(host_port: str):
     # is less elegant, but easier in practice.
     with open(SERVER_LOG, "w+") as logfile:
         return Popen(
-            ['php', '-S', host_port],
+            ['php', '-d', 'error_reporting=32767', '-d', 'display_errors=On', '-S', host_port],
             bufsize=1,
             stdin=DEVNULL,
             stdout=DEVNULL,
