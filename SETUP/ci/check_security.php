@@ -14,7 +14,6 @@ $basedir = $argv[1] ?? "../../";
 $ok_system_calls = [
     "crontab/CleanUploadsTrash.inc",
     "locale/translators/index.php",
-    "pinc/archiving.inc",
     "pinc/forum_interface_phpbb3.inc",
     "pinc/languages.inc",
     "pinc/phpbb3.inc",
