@@ -644,6 +644,7 @@ def main() -> int:
     p = argparse.ArgumentParser()
     p.add_argument('-n', '--no-server', action='store_true')
     p.add_argument('-v', '--verbose', action='store_true')
+    p.add_argument('-j', '--run-cronjobs', action='store_true')
     p.add_argument('-u', '--username', type=str, required=True)
     p.add_argument('-p', '--password', type=str, required=True)
     p.add_argument('-k', '--api-key', type=str, required=True)
@@ -703,24 +704,25 @@ def main() -> int:
             ret = 1
             break
 
-    for test in CRON_JOBS:
-        print(f"Cronjob: {test}")
-        cmd_result = run(
-            [
-                "php",
-                os.path.join(config['code_dir'], "crontab", "run_background_job.php"),
-                test,
-                "true"
-            ],
-            stdout=PIPE,
-            stderr=STDOUT,
-            encoding='utf-8'
-        )
-        if cmd_result.returncode != 0 or not 'Succeeded: true' in cmd_result.stdout or test_failed([cmd_result.stdout]):
-            print(f'Return code: {cmd_result.returncode}')
-            print(f'Output:\n', cmd_result.stdout)
-            ret = 1
-            break
+    if args.run_cronjobs:
+        for test in CRON_JOBS:
+            print(f"Cronjob: {test}")
+            cmd_result = run(
+                [
+                    "php",
+                    os.path.join(config['code_dir'], "crontab", "run_background_job.php"),
+                    test,
+                    "true"
+                ],
+                stdout=PIPE,
+                stderr=STDOUT,
+                encoding='utf-8'
+            )
+            if cmd_result.returncode != 0 or not 'Succeeded: true' in cmd_result.stdout or test_failed([cmd_result.stdout]):
+                print(f'Return code: {cmd_result.returncode}')
+                print(f'Output:\n', cmd_result.stdout)
+                ret = 1
+                break
 
     if not args.no_server:
         php_server.send_signal(signal.SIGINT)
