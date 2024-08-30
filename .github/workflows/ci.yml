@@ -123,7 +123,11 @@ jobs:
         run: sudo apt --fix-broken install aspell aspell-en
       - name: Setup smoke test environment
         run: SETUP/tests/smoketests/smoketest_setup.sh
-      - name: Run pageload smoketest
+      - name: Run pageload smoketest -- as Admin
         run: |
             SETUP/tests/smoketests/pageload_smoketest.py \
                 -u admin -p admin_pass -k admin_key
+      - name: Run pageload smoketest -- as Proofreader
+        run: |
+            SETUP/tests/smoketests/pageload_smoketest.py \
+                -u teststeel -p teststeel_pass -k teststeel_key

@@ -363,13 +363,11 @@ TOOLS_PROOFERS_TESTS = [
     {'path': 'tools/proofers/text_frame_std.php?projectid=projectID5e23a810ef693&proj_state=P3.proj_unavail&imagefile=001.png&page_state=P3.page_saved'},
     {'path': 'tools/proofers/images_index.php?project=projectID5e23a810ef693'},
     {'path': 'tools/proofers/mktable.php'},
-    # TODO make non-empty
     {'path': 'tools/proofers/my_projects.php'},
     {'path': 'tools/proofers/my_projects.php?round_view=available'},
     {'path': 'tools/proofers/my_projects.php?round_view=recent'},
     {'path': 'tools/proofers/my_projects.php?round_view=active'},
     {'path': 'tools/proofers/my_projects.php?round_view=posted'},
-    # TODO make non-empty
     {'path': 'tools/proofers/my_suggestions.php'},
     {'path': 'tools/proofers/my_suggestions.php?round_view=impact'},
     {'path': 'tools/proofers/my_suggestions.php?round_view=familiar'},

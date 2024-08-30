@@ -1,4 +1,14 @@
 {
-    "admin": {"id": 1, "password": "$argon2id$v=19$m=65536,t=4,p=1$bElGVnhFNXpOZXZONUdaOA$gazVDNwh/og8aFAvtKCizQkFw3k2Q6l5E2WV26UxAaA", "email": "a@example.com"},
-    "teststeel": {"id": 110, "password": "", "email": ""}
+    "admin":
+    {
+        "id": 1,
+        "password": "$argon2id$v=19$m=65536,t=4,p=1$bElGVnhFNXpOZXZONUdaOA$gazVDNwh/og8aFAvtKCizQkFw3k2Q6l5E2WV26UxAaA",
+        "email": "a@example.com"
+    },
+    "teststeel":
+    {
+        "id": 110,
+        "password": "$2y$10$1CVfqW.4DD6xA/XWqPBa0etEV0tZJ0foZYAi9lZLZ18xm1IhUE9hy",
+        "email": "teststeel@example.com"
+    }
 }
