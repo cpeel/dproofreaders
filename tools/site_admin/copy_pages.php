@@ -41,14 +41,14 @@ if (is_array($from_image_)) {
 
 $action = get_enumerated_param($_POST, 'action', 'showform', ['showform', 'showagain', 'check', 'docopy']);
 $page_name_handling = get_enumerated_param($_POST, 'page_name_handling', null, ['PRESERVE_PAGE_NAMES', 'RENUMBER_PAGES'], true);
-$transfer_notifications = get_integer_param($_POST, 'transfer_notifications', 0, 0, 1);
-$add_deletion_reason = get_integer_param($_POST, 'add_deletion_reason', 0, 0, 1);
-$merge_wordcheck_data = get_integer_param($_POST, 'merge_wordcheck_data', 0, 0, 1);
+$transfer_notifications = get_bool_param($_POST, 'transfer_notifications', false);
+$add_deletion_reason = get_bool_param($_POST, 'add_deletion_reason', false);
+$merge_wordcheck_data = get_bool_param($_POST, 'merge_wordcheck_data', false);
 $repeat_project = get_enumerated_param($_POST, 'repeat_project', null, ['TO', 'FROM', 'NONE'], true);
 
 switch ($action) {
     case 'showform':
-        display_form(
+        display_copy_pages_form(
             $projectid_,
             $from_image_,
             $page_name_handling,
@@ -61,7 +61,7 @@ switch ($action) {
         break;
 
     case 'showagain':
-        display_form(
+        display_copy_pages_form(
             $projectid_,
             $from_image_,
             $page_name_handling,
@@ -74,7 +74,7 @@ switch ($action) {
         break;
 
     case 'check':
-        do_stuff(
+        copy_pages(
             $projectid_,
             $from_image_,
             $page_name_handling,
@@ -100,7 +100,7 @@ switch ($action) {
         break;
 
     case 'docopy':
-        do_stuff(
+        copy_pages(
             $projectid_,
             $from_image_,
             $page_name_handling,
@@ -145,15 +145,15 @@ switch ($action) {
         break;
 }
 
-function display_form(
-    $projectid_,
-    $from_image_,
-    $page_name_handling,
-    $transfer_notifications,
-    $add_deletion_reason,
-    $merge_wordcheck_data,
-    $repeat_project,
-    $repeating
+function display_copy_pages_form(
+    ?array $projectid_,
+    ?array $from_image_,
+    ?string $page_name_handling,
+    bool $transfer_notifications,
+    bool $add_deletion_reason,
+    bool $merge_wordcheck_data,
+    ?string $repeat_project,
+    bool $repeating
 ) {
     echo "<form method='post'>\n";
     echo "<table class='copy'>\n";
@@ -233,7 +233,7 @@ function display_form(
 
 // Display table row with a fieldset containing a pair of radio buttons, one selected.
 // NB $input_name must be a valid HTML ID (i.e. no spaces and shouldn't start with a number)
-function do_radio_button_pair($prompt, $input_name, $repeating, $first_is_checked)
+function do_radio_button_pair(string $prompt, string $input_name, bool $repeating, bool $first_is_checked)
 {
     if (!$repeating || $first_is_checked) {
         $checked1 = 'CHECKED';
@@ -257,34 +257,34 @@ function do_radio_button_pair($prompt, $input_name, $repeating, $first_is_checke
 }
 
 function display_hiddens(
-    $projectid_,
-    $from_image_,
-    $page_name_handling,
-    $transfer_notifications,
-    $add_deletion_reason,
-    $merge_wordcheck_data
+    array $projectid_,
+    array $from_image_,
+    string $page_name_handling,
+    bool $transfer_notifications,
+    bool $add_deletion_reason,
+    bool $merge_wordcheck_data
 ) {
     echo "\n<input type='hidden' name='from_image_[lo]'        value='" . attr_safe($from_image_['lo']) . "'>";
     echo "\n<input type='hidden' name='from_image_[hi]'        value='" . attr_safe($from_image_['hi']) . "'>";
     echo "\n<input type='hidden' name='projectid_[from]'       value='" . attr_safe($projectid_['from']) . "'>";
     echo "\n<input type='hidden' name='projectid_[to]'         value='" . attr_safe($projectid_['to']) . "'>";
     echo "\n<input type='hidden' name='page_name_handling'     value='" . attr_safe($page_name_handling) . "'>";
-    echo "\n<input type='hidden' name='transfer_notifications' value='" . attr_safe($transfer_notifications) . "'>";
-    echo "\n<input type='hidden' name='add_deletion_reason'    value='" . attr_safe($add_deletion_reason) . "'>";
-    echo "\n<input type='hidden' name='merge_wordcheck_data'   value='" . attr_safe($merge_wordcheck_data) . "'>";
+    echo "\n<input type='hidden' name='transfer_notifications' value='" . ($transfer_notifications ? 1 : 0) . "'>";
+    echo "\n<input type='hidden' name='add_deletion_reason'    value='" . ($add_deletion_reason ? 1 : 0) . "'>";
+    echo "\n<input type='hidden' name='merge_wordcheck_data'   value='" . ($merge_wordcheck_data ? 1 : 0) . "'>";
 }
 
-function do_stuff(
-    $projectid_,
-    $from_image_,
-    $page_name_handling,
-    $transfer_notifications,
-    $add_deletion_reason,
-    $merge_wordcheck_data,
-    $just_checking
+function copy_pages(
+    ?array $projectid_,
+    ?array $from_image_,
+    string $page_name_handling,
+    bool $transfer_notifications,
+    bool $add_deletion_reason,
+    bool $merge_wordcheck_data,
+    bool $just_checking
 ) {
     if (is_null($projectid_)) {
-        error_and_die("No projectid data supplied to do_stuff()");
+        throw new RuntimeException("No projectid data supplied to copy_pages()");
     }
 
     $project_obj = [
@@ -293,18 +293,18 @@ function do_stuff(
     ];
 
     if ($projectid_['from'] == $projectid_['to']) {
-        error_and_die("You can't copy a project into itself.");
+        throw new RuntimeException("You can't copy a project into itself.");
     }
 
     foreach (['from', 'to'] as $which) {
         $project = $project_obj[$which];
 
         if (!$project->check_pages_table_exists($message)) {
-            error_and_die("Project {$project->projectid}: $message");
+            throw new RuntimeException("Project {$project->projectid}: $message");
         }
 
         if (!$project->is_utf8) {
-            error_and_die("Project table {$project->projectid} is not UTF-8.");
+            throw new RuntimeException("Project table {$project->projectid} is not UTF-8.");
         }
 
         $sql = "DESCRIBE {$project->projectid}";
@@ -358,7 +358,7 @@ function do_stuff(
         echo "</h3>";
 
         if ($which == 'from' && $n_pages == 0) {
-            error_and_die("Project {$project->projectid} has no page data to extract");
+            throw new RuntimeException("Project {$project->projectid} has no page data to extract");
         }
 
         echo "<table class='copy'>";
@@ -410,15 +410,15 @@ function do_stuff(
             $hi_i = array_search($hi, $all_image_values);
 
             if ($lo_i === false) {
-                error_and_die("Project {$project->projectid} does not have a page with image='$lo'");
+                throw new RuntimeException("Project {$project->projectid} does not have a page with image='$lo'");
             }
 
             if ($hi_i === false) {
-                error_and_die("Project {$project->projectid} does not have a page with image='$hi'");
+                throw new RuntimeException("Project {$project->projectid} does not have a page with image='$hi'");
             }
 
             if ($lo_i > $hi_i) {
-                error_and_die("Low end of range ($lo) is greater than high end ($hi)");
+                throw new RuntimeException("Low end of range ($lo) is greater than high end ($hi)");
             }
 
             $n_pages_to_copy = 1 + $hi_i - $lo_i;
@@ -477,7 +477,7 @@ function do_stuff(
             $c_dst_start_b = 1 + intval($max_dst_base);
         }
     } else {
-        error_and_die("Bad \$page_name_handling");
+        throw new ValueError("Bad \$page_name_handling");
     }
 
     // The c_ prefix means that it only pertains to *copied* pages.
@@ -520,7 +520,7 @@ function do_stuff(
             echo html_safe("    $clashing_image_value\n");
         }
         echo "</pre>\n";
-        error_and_die(_("Aborting due to page name collisions!"));
+        throw new RuntimeException(_("Aborting due to page name collisions!"));
     }
 
     $clashing_fileid_values = array_intersect($c_dst_fileid_, $all_fileid_values_['to']);
@@ -534,7 +534,7 @@ function do_stuff(
             echo html_safe("    $clashing_fileid_value\n");
         }
         echo "</pre>\n";
-        error_and_die(_("Aborting due to page name collisions!"));
+        throw new RuntimeException(_("Aborting due to page name collisions!"));
     }
 
     echo "<p>";
@@ -596,7 +596,7 @@ function do_stuff(
     echo "<p>" . _("Changing into projects directory:");
     echo " (<code>cd " . html_safe($projects_dir) . "</code>)" . "</p>\n";
     if (! chdir($projects_dir)) {
-        error_and_die("Unable to 'cd " . html_safe($projects_dir) . "'");
+        throw new RuntimeException("Unable to 'cd " . html_safe($projects_dir) . "'");
     }
 
     $items_array = [];
@@ -663,7 +663,7 @@ function do_stuff(
             $n = DPDatabase::affected_rows();
             echo sprintf(_("%d rows inserted."), $n) . "\n";
             if ($n != 1) {
-                error_and_die("unexpected number of rows inserted");
+                throw new RuntimeException("unexpected number of rows inserted");
             }
         }
 
@@ -741,7 +741,7 @@ function do_stuff(
     }
 }
 
-function str_max(& $arr)
+function str_max(array & $arr)
 {
     $max_so_far = null;
     foreach ($arr as $s) {
@@ -750,10 +750,4 @@ function str_max(& $arr)
         }
     }
     return $s;
-}
-
-function error_and_die($message)
-{
-    echo "<p class='error'>" . html_safe($message) . "</p>";
-    exit();
 }

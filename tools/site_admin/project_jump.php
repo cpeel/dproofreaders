@@ -29,22 +29,22 @@ echo "<p>" . _("Jump a project to a specific state.") . "</p>\n";
 
 switch ($action) {
     case 'showform':
-        display_form("showform", $projectid, $new_state);
+        display_project_jump_form("showform", $projectid, $new_state);
         break;
 
     case 'check':
-        do_stuff($projectid, $new_state, true);
-        display_form("check", $projectid, $new_state);
+        jump_project($projectid, $new_state, true);
+        display_project_jump_form("check", $projectid, $new_state);
         break;
 
     case 'dojump':
-        do_stuff($projectid, $new_state, false);
+        jump_project($projectid, $new_state, false);
         echo "\n\n" . return_to_project_page_link($projectid) . "\n";
         break;
 }
 
 
-function display_form($action, $projectid, $new_state)
+function display_project_jump_form(string $action, ?string $projectid, ?string $new_state)
 {
     echo "<form method='post'>\n";
     echo "<table>\n";
@@ -84,7 +84,7 @@ function display_form($action, $projectid, $new_state)
     echo "</form>";
 }
 
-function do_stuff($projectid, $new_state, $just_checking)
+function jump_project(string $projectid, string $new_state, bool $just_checking)
 {
     global $pguser;
     $project = new Project($projectid);
@@ -96,11 +96,11 @@ function do_stuff($projectid, $new_state, $just_checking)
     // ----------------------
 
     if ($project->state == $new_state) {
-        error_and_die("Project is already in {$new_state}");
+        throw new RuntimeException("Project is already in {$new_state}");
     }
 
     if (!$project->pages_table_exists) {
-        error_and_die("Project does not have a pages table and cannot be jumped to a new state");
+        throw new RuntimeException("Project does not have a pages table and cannot be jumped to a new state");
     }
 
     if ($just_checking) {
@@ -133,11 +133,4 @@ function do_stuff($projectid, $new_state, $just_checking)
         'Project jumped to correct state'
     );
     echo "</pre>";
-}
-
-function error_and_die($message)
-{
-    echo "</pre>";
-    echo "<p class='error'>" . html_safe($message) . "</p>";
-    die();
 }

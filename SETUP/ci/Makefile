@@ -1,8 +1,8 @@
-.PHONY: all less security_checks best_practice_checks static_checks lint_charsuites lint_css lint_code lint less tests shellcheck
+.PHONY: all less security_checks best_practice_checks static_checks code_style lint_charsuites lint_css lint_code lint less tests shellcheck
 
 SELF_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
 
-all: security_checks best_practice_checks lint static_checks
+all: lint code_style static_checks security_checks best_practice_checks
 
 #----------------------------------------------------------------------------
 # Security checks
@@ -21,6 +21,12 @@ static_checks:
 	cd $(SELF_DIR)../../ && ./vendor/bin/phpstan --memory-limit=512M
 
 #----------------------------------------------------------------------------
+# Code style checks
+code_style:
+	cd $(SELF_DIR)../../ && ./vendor/bin/php-cs-fixer check
+	cd $(SELF_DIR)../../ && npm run format-check
+
+#----------------------------------------------------------------------------
 # File linting
 lint_charsuites:
 	$(SELF_DIR)lint_charsuites.php
@@ -31,8 +37,9 @@ lint_css:
 lint_code:
 	$(SELF_DIR)lint_php_files.sh
 	$(SELF_DIR)lint_json_files.sh
+	cd $(SELF_DIR)../../ && npm run lint
 
-lint: lint_charsuites lint_css lint_code
+lint: lint_code lint_css lint_charsuites
 
 #----------------------------------------------------------------------------
 # CSS compilation
