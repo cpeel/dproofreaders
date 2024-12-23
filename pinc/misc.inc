@@ -51,10 +51,8 @@ function array_extract_field(array $array, string $field): array
 }
 
 /**
- * Return $array[$key], or $default.
- * If the result is non-null and not an array, wrap it up as a single value array
+ * Return $array[$key] as an array if not already, otherwise $default.
  *
- * null             -> null
  * []               -> []
  * "foo"            -> ["foo"]
  * ["bar"]          -> ["bar"]
