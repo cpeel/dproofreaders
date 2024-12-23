@@ -59,14 +59,11 @@ function array_extract_field(array $array, string $field): array
  * "foo"            -> ["foo"]
  * ["bar"]          -> ["bar"]
  * ["foo" => "bar"] -> ["foo" => "bar"]
- *
- * @param mixed $default
- * @return mixed
  */
-function array_get_as_array(?array $array, string $key, $default)
+function array_get_as_array(array $array, string $key, array $default): array
 {
     $value = $array[$key] ?? $default;
-    if (!is_null($value) && !is_array($value)) {
+    if ($value && !is_array($value)) {
         $value = [$value];
     }
     return $value;
@@ -79,12 +76,10 @@ function array_get_as_array(?array $array, string $key, $default)
  *
  * @param string[] $valid_fields
  **/
-function array_remove_invalid_fields(array &$array, ?array $valid_fields): void
+function array_remove_invalid_fields(array &$array, array $valid_fields): void
 {
-    if (!is_null($valid_fields)) {
-        foreach (array_diff(array_keys($array), $valid_fields) as $field) {
-            unset($array[$field]);
-        }
+    foreach (array_diff(array_keys($array), $valid_fields) as $field) {
+        unset($array[$field]);
     }
 }
 

@@ -7,7 +7,7 @@
  * - true - parameter was set to "true" or an empty string (for ?flagname)
  * - false - parameter was set to "false"
  */
-function get_flag_value($query_params, $flagname)
+function get_flag_value(array $query_params, string $flagname): ?bool
 {
     if (!isset($query_params[$flagname])) {
         return null;

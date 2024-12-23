@@ -8,10 +8,10 @@ include_once("api_common.inc");
 
 //---------------------------------------------------------------------------
 // queues -- list queues, optionally filtered by round
-function api_v1_queues($method, $data, $query_params)
+function api_v1_queues(string $method, array $data, array $query_params): array
 {
     $roundid = $query_params["roundid"] ?? null;
-    $round = !is_null($roundid) ? validate_round($roundid, null) : null;
+    $round = !is_null($roundid) ? validate_round($roundid, []) : null;
 
     $show = get_enumerated_param($query_params, "show", "all", ["enabled", "populated", "all"]);
 
@@ -55,7 +55,7 @@ function api_v1_queues($method, $data, $query_params)
 
 //---------------------------------------------------------------------------
 // queues/:queueid -- return release queue info
-function api_v1_queue($method, $data, $query_params)
+function api_v1_queue(string $method, array $data, array $query_params): array
 {
     $queue = $data[":queueid"];
 
@@ -64,11 +64,11 @@ function api_v1_queue($method, $data, $query_params)
 
 //---------------------------------------------------------------------------
 // queue/:queueid/stats -- return release queue stats
-function api_v1_queue_stats($method, $data, $query_params)
+function api_v1_queue_stats(string $method, array $data, array $query_params): array
 {
     $queue = $data[":queueid"];
 
-    $round = validate_round($queue["round_id"], null);
+    $round = validate_round($queue["round_id"], []);
     $name = $queue["name"];
 
     return fetch_queue_stats_data($round, $name);
@@ -76,7 +76,7 @@ function api_v1_queue_stats($method, $data, $query_params)
 
 //---------------------------------------------------------------------------
 // queue/:queueid/projects -- list projects in release queue
-function api_v1_queue_projects($method, $data, $query_params)
+function api_v1_queue_projects(string $method, array $data, array $query_params): array
 {
     $queue = $data[":queueid"];
     $unheld_only = (bool) get_flag_value($query_params, "unheld_only");
@@ -96,7 +96,7 @@ function api_v1_queue_projects($method, $data, $query_params)
     $return_fields = array_get_as_array($query_params, "field", $valid_return_fields);
     $return_fields = array_intersect($return_fields, $valid_return_fields);
 
-    $round = validate_round($queue["round_id"], null);
+    $round = validate_round($queue["round_id"], []);
 
     $output = [];
     foreach (fetch_queue_projects_data($round, $queue["project_selector"], $unheld_only) as $proj_data) {
