@@ -12,7 +12,8 @@ include_once($relPath.'forum_interface.inc');
 // get a Spanish mail because one of the site admins is Spanish).
 function send_activate_mail($email, $real_name, $reg_token, $username, $u_intlang)
 {
-    global $code_url, $site_name;
+    $code_url = SiteConfig::$code_url;
+    $site_name = SiteConfig::$site_name;
 
     $activate = "Please activate your account at the $site_name site!";
 
@@ -48,9 +49,13 @@ function send_activate_mail($email, $real_name, $reg_token, $username, $u_intlan
 
 function send_welcome_mail($email, $real_name, $username)
 {
-    global $code_url, $site_url;
-    global $site_name, $site_abbreviation, $ELR_round;
-    global $general_help_email_addr;
+    global $ELR_round;
+
+    $code_url = SiteConfig::$code_url;
+    $site_name = SiteConfig::$site_name;
+    $site_abbreviation = SiteConfig::$site_abbreviation;
+    $site_url = SiteConfig::$site_url;
+    $general_help_email_addr = SiteConfig::$general_help_email_addr;
 
     $welcome = "Welcome to the $site_name Site!";
 
