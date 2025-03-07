@@ -311,8 +311,6 @@ class BadWordAccumulator
  */
 function get_bad_words_via_external_checker($input_words_w_freq, $languages)
 {
-    global $aspell_executable, $aspell_prefix;
-
     $tmp_file_text = join("\n", array_keys($input_words_w_freq));
 
     $messages = [];
@@ -320,15 +318,15 @@ function get_bad_words_via_external_checker($input_words_w_freq, $languages)
     foreach ($languages as $language) {
         $langcode = langcode2_for_langname($language);
         if ($langcode) {
-            $dict_file = "$aspell_prefix/lib/aspell/$langcode.multi";
+            $dict_file = SiteConfig::$aspell_prefix . "/lib/aspell/$langcode.multi";
             if (is_file($dict_file)) {
                 // run aspell using this language
 
                 $process = new Process([
-                    $aspell_executable,
+                    SiteConfig::$aspell_executable,
                     "list",
                     "--prefix",
-                    $aspell_prefix,
+                    SiteConfig::$aspell_prefix,
                     "-d",
                     $dict_file,
                     "--encoding",
@@ -869,8 +867,7 @@ function get_project_word_file($projectid, $code)
  */
 function get_site_word_paths()
 {
-    global $dyn_dir, $dyn_url;
-    return ["$dyn_dir/words", "$dyn_url/words"];
+    return [SiteConfig::$dyn_dir . "/words", SiteConfig::$dyn_url . "/words"];
 }
 
 /**

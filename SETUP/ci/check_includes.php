@@ -11,7 +11,6 @@ $basedir = $argv[1] ?? "../../";
 $ok_not_includes_base = [
     // Settings files
     "pinc/site_vars.php",
-    "pinc/udb_user.php",
     // Simple redirects
     "stats/default.php",
     "faq/default.php",
