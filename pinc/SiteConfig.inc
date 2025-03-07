@@ -142,3 +142,21 @@ class SiteConfig
 }
 
 SiteConfig::load(__DIR__ . "/site_vars.php");
+
+if (php_sapi_name() == "cli" && ($argv[1] ?? "") == "show") {
+    try {
+        $variable = $argv[2] ?? "";
+
+        $ro = new ReflectionObject(new SiteConfig());
+        try {
+            $ro->getProperty($variable);
+        } catch (ReflectionException $exception) {
+            throw new RuntimeException("'$variable' is not a valid configuration setting");
+        }
+
+        echo SiteConfig::$$variable . "\n";
+    } catch (Exception $exception) {
+        fwrite(STDERR, $exception->getMessage() . "\n");
+        exit(1);
+    }
+}
