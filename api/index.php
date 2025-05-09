@@ -207,14 +207,8 @@ function api_send_pagination_header($query_params, $total_rows, $per_page, $page
 
 function handle_cors_headers()
 {
-    // Enable CORS for some sites
-    $allowed_origins = [
-        "https://editor.swagger.io",
-    ];
-    $origin = @$_SERVER["HTTP_ORIGIN"];
-    if (in_array($origin, $allowed_origins)) {
-        header("Access-Control-Allow-Origin: $origin");
-    }
+    // Enable CORS for all sites
+    header("Access-Control-Allow-Origin: *");
 
     // Set the headers we accept from the client
     $allowed_headers = [

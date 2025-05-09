@@ -35,7 +35,7 @@ if (!headers_sent()) {
         // unlike other params it does not fallback to default-src
         "frame-ancestors 'self'",
     ];
-    header("Content-Security-Policy: " . join("; ", $policies), false);
+    #header("Content-Security-Policy: " . join("; ", $policies), false);
 }
 
 // If we don't have a database connection, don't try to resume the session.
