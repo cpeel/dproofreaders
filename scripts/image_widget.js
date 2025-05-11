@@ -62,7 +62,7 @@ function makeImageWidget(container, userSettings, widgetText) {
     let sine = 0;
     let cosine = 1;
 
-    let contentWidth, contentHeight, imageWidth, imDivWidth, vertOffset;
+    let contentWidth, contentHeight, imageWidth, imageHeight, imDivWidth, imDivHeight, vertOffset;
 
     let unset = true;
     function initScroll() {
@@ -81,7 +81,7 @@ function makeImageWidget(container, userSettings, widgetText) {
         image.style.width = `${10 * percent}px`;
         image.style.height = "auto";
 
-        let imageHeight, xOffset, yOffset, imDivHeight;
+        let xOffset, yOffset;
         if (sine != 0) {
             // rotated 90 or 270 degrees
             imageWidth = image.height;
@@ -220,6 +220,136 @@ function makeImageWidget(container, userSettings, widgetText) {
 
     percent = userSettings.zoomPercent ?? 100;
     setZoom();
+
+    // touch handlers:  handle 1-finger drag and 2-finger pinch-to-zoom
+    //
+    const activeTouches = []; // 0 is no action, 1 is dragging, 2 is drag/scaling, 3 or more is no action
+
+    function copyTouch({ identifier, pageX, pageY }) {
+        // make a copy of the touch data structure just to be memory safe when adding to lists
+        return { identifier, pageX, pageY };
+    }
+
+    function touchStart(e) {
+        // cancel the pointer event -- we'll handle this
+        pointerUp();
+
+        // Get the new touches -- add them to the list
+        e.preventDefault(); // tell the OS not to try to handle it
+        const touches = e.changedTouches;
+        for (let i = 0; i < touches.length; i++) {
+            activeTouches.push(copyTouch(touches[i]));
+        }
+    }
+
+    function touchMove(e) {
+        // one or more of the touches have moved.  What happens depends
+        // on how many touches there are
+        e.preventDefault();
+        const touches = e.changedTouches;
+        if (activeTouches.length == 1) {
+            // one touch -- drag the image
+            content.scrollLeft += activeTouches[0].pageX - touches[0].pageX;
+            content.scrollTop += activeTouches[0].pageY - touches[0].pageY;
+            activeTouches.splice(0, 1, copyTouch(touches[0]));
+        } else if (activeTouches.length == 2) {
+            // two touches -- scale/drag the image
+            //
+            // Note that the list of changed touches may only contain one point,
+            // if the other one stayed the same.  So we initialize our variables
+            // based on the idea that neither has changed, and we update the ones
+            // that have
+            //
+            let prevAx = activeTouches[0].pageX;
+            let prevAy = activeTouches[0].pageY;
+            let newAx = prevAx;
+            let newAy = prevAy;
+
+            let prevBx = activeTouches[1].pageX;
+            let prevBy = activeTouches[1].pageY;
+            let newBx = prevBx;
+            let newBy = prevBy;
+
+            // There is no guarantee that the changed touch point list is in the same order
+            // each time we receive it, so we have to match up the IDs
+            if (touches.length >= 1) {
+                if (touches[0].identifier == activeTouches[0].identifier) {
+                    newAx = touches[0].pageX;
+                    newAy = touches[0].pageY;
+                    activeTouches.splice(0, 1, copyTouch(touches[0]));
+                } else {
+                    newBx = touches[0].pageX;
+                    newBy = touches[0].pageY;
+                    activeTouches.splice(1, 1, copyTouch(touches[0]));
+                }
+            }
+            if (touches.length >= 2) {
+                if (touches[1].identifier == activeTouches[0].identifier) {
+                    newAx = touches[1].pageX;
+                    newAy = touches[1].pageY;
+                    activeTouches.splice(0, 1, copyTouch(touches[1]));
+                } else {
+                    newBx = touches[1].pageX;
+                    newBy = touches[1].pageY;
+                    activeTouches.splice(1, 1, copyTouch(touches[1]));
+                }
+            }
+
+            // see how the centre point between the two touch points has moved during the gesture.
+            let prevCx = 0.5 * (prevAx + prevBx);
+            let prevCy = 0.5 * (prevAy + prevBy);
+            let newCx = 0.5 * (newAx + newBx);
+            let newCy = 0.5 * (newAy + newBy);
+
+            // Figure out where the previous touch centre point is relative to the center of the page
+            // image.
+            let imageRect = imageDiv.getBoundingClientRect();
+            let deltaX = prevCx - imageRect.width * 0.5 - imageRect.left;
+            let deltaY = prevCy - imageRect.height * 0.5 - imageRect.top;
+
+            // see how the distance between the touchpoints has changed to figure out the scale delta
+            let newDist = Math.sqrt((newAx - newBx) * (newAx - newBx) + (newAy - newBy) * (newAy - newBy));
+            let prevDist = Math.sqrt((prevAx - prevBx) * (prevAx - prevBx) + (prevAy - prevBy) * (prevAy - prevBy));
+            let scaleDelta = newDist / prevDist;
+
+            // Now scroll the div to try to keep the same point on the image under the point halfway between
+            // the two touch points, doing tracking and scaling simultaneously
+            let newDivWidth = Math.max(2 * (contentWidth - 60) + imageWidth * scaleDelta, imageWidth * scaleDelta);
+            let newDivHeight = Math.max(2 * (contentHeight - 60) + imageHeight * scaleDelta, imageHeight * scaleDelta);
+            let newPointX = newDivWidth * 0.5 + deltaX * scaleDelta;
+            let newPointY = newDivHeight * 0.5 + deltaY * scaleDelta;
+
+            // apply the translation
+            let contentRect = content.getBoundingClientRect();
+            content.scrollLeft = newPointX - newCx + contentRect.left;
+            content.scrollTop = newPointY - newCy + contentRect.top;
+
+            // apply the scaling
+            percent *= scaleDelta;
+            setDrawSave();
+        }
+    }
+
+    function touchEnd(e) {
+        // if the user lifts one or more fingers, remove them from the touch list
+        e.preventDefault();
+        const touches = e.changedTouches;
+        for (let i = 0; i < touches.length; i++) {
+            // count backwards so list indexes don't change when there is a deletion
+            for (let j = activeTouches.length - 1; j >= 0; j--) {
+                if (activeTouches[j].identifier == touches[i].identifier) {
+                    activeTouches.splice(j, 1);
+                }
+            }
+        }
+    }
+
+    imageDiv.addEventListener("touchstart", touchStart);
+    imageDiv.addEventListener("touchend", touchEnd);
+    imageDiv.addEventListener("touchcancel", touchEnd);
+    imageDiv.addEventListener("touchmove", touchMove);
+
+    // end of touch section
 
     const controlBar = document.createElement("div");
     controlBar.classList.add("simple_bar", "top_settings_box");
