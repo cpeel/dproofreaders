@@ -1,6 +1,12 @@
-/*global ajax codeUrl viewSplitter makeProofImageWidget makeProofTextWidget makeUrl constructToolBox hide show */
+/*global ajax codeUrl makeUrl hide show */
 /* eslint no-use-before-define: "warn" */
 /* eslint camelcase: "off" */
+
+import { makeProofTextWidget } from "../../scripts/text_widget.js";
+import { makeProofImageWidget } from "../../scripts/image_widget.js";
+import { viewSplitter } from "../../scripts/view_splitter_2b.js";
+import { constructToolBox } from "../../scripts/toolbox.js";
+import translate from "../../scripts/gettext.js";
 
 window.addEventListener("DOMContentLoaded", async () => {
     const url = new URL(window.location.href);
@@ -10,8 +16,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     let pageName = params.get("imagefile");
     let pageState = params.get("page_state");
     const topDiv = document.getElementById("proofreading_interface");
-    const proofText = JSON.parse(topDiv.dataset.proof_text);
-    const widgetText = JSON.parse(topDiv.dataset.widget_text);
+    const forumURL = JSON.parse(topDiv.dataset.forum_url);
 
     function setUrl() {
         url.search = params;
@@ -41,14 +46,14 @@ window.addEventListener("DOMContentLoaded", async () => {
         const dictionaries = await ajax("GET", "v1/dictionaries");
 
         const container = document.getElementById("text_div");
-        const imageWidget = makeProofImageWidget(imageContainer, proofSettings, widgetText, proofText);
+        const imageWidget = makeProofImageWidget(imageContainer, proofSettings);
 
         function syncScroll(s) {
             imageWidget.setScroll(s);
         }
 
-        const textWidget = makeProofTextWidget(container, projectId, proofSettings, dictionaries, projectInfo.languages, proofText, widgetText);
-        const theSplitter = viewSplitter(imageTextDiv, proofSettings, widgetText);
+        const textWidget = makeProofTextWidget(container, projectId, proofSettings, dictionaries, projectInfo.languages);
+        const theSplitter = viewSplitter(imageTextDiv, proofSettings);
         theSplitter.mainSplit.onResize.add(textWidget.reLayout);
         theSplitter.mainSplit.onResize.add(imageWidget.reSize);
         theSplitter.setSplitDirCallback.push(textWidget.setup, imageWidget.reset);
@@ -78,9 +83,9 @@ window.addEventListener("DOMContentLoaded", async () => {
                     const user = roundInfo.username;
                     let userString;
                     if (user == "" || roundInfo.forum_user_id == null) {
-                        userString = user == "" ? proofText.noUser : user;
+                        userString = user == "" ? translate.pgettext("no user", "none") : user;
                     } else {
-                        const link = makeUrl(`${proofText.forumURL}/ucp.php`, { i: "pm", mode: "compose", u: roundInfo.forum_user_id }, "comments");
+                        const link = makeUrl(`${forumURL}/ucp.php`, { i: "pm", mode: "compose", u: roundInfo.forum_user_id }, "comments");
                         userString = `<a href='${link}'>${user}</a>`;
                     }
                     return `${roundInfo.round_id}: ${userString}`;
@@ -203,7 +208,7 @@ window.addEventListener("DOMContentLoaded", async () => {
         });
 
         exitButton.addEventListener("click", async () => {
-            if (confirm(proofText.qStopProof)) {
+            if (confirm(translate.gettext("Are you sure you want to stop proofreading?"))) {
                 disableAction();
                 try {
                     await maybeReportWC();
@@ -252,7 +257,7 @@ window.addEventListener("DOMContentLoaded", async () => {
         });
 
         revertToSavedButton.addEventListener("click", async () => {
-            if (confirm(proofText.qRevert)) {
+            if (confirm(translate.gettext("Are you sure you want to revert to your last save?"))) {
                 disableAction();
                 await resumePage();
                 enableAction();
@@ -260,7 +265,7 @@ window.addEventListener("DOMContentLoaded", async () => {
         });
 
         abandonButton.addEventListener("click", async () => {
-            if (confirm(proofText.qReturn)) {
+            if (confirm(translate.gettextx("This will discard all changes you have made on this page. Are you sure you want to return this page to the current round?"))) {
                 disableAction();
                 try {
                     await ajaxPage("PUT", "abandon");
@@ -288,7 +293,7 @@ window.addEventListener("DOMContentLoaded", async () => {
         document.getElementById("submit_bad_report").addEventListener("click", async () => {
             let reasonName = document.getElementById("reason_selector").value;
             if (reasonName == "") {
-                alert(proofText.selectAReason);
+                alert(translate.gettext("Please select a reason"));
                 return;
             }
             disableAction();

@@ -1,7 +1,6 @@
 /* global ajax*/
-/* exported makeValidator */
 
-function makeValidator(projectId, quill) {
+export function makeValidator(projectId, quill) {
     // more difficult to do this by quill formatting because characters can be
     // more than one js 16-bit character.
     function drawValidate(invalidChars, text) {

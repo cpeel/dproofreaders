@@ -1,7 +1,8 @@
 /* global splitControl codeUrl */
-/* exported viewSplitter */
 
-var viewSplitter = function (container, userSettings, widgetText) {
+import translate from "./gettext.js";
+
+export var viewSplitter = function (container, userSettings) {
     // userSettings.splitVertical ??= true; if poss.
     userSettings.splitVertical ?? (userSettings.splitVertical = true);
 
@@ -25,8 +26,8 @@ var viewSplitter = function (container, userSettings, widgetText) {
         return iButton;
     }
 
-    const splitVerticalButton = imageButton(widgetText.splitVertical, "codicon--split-horizontal.svg");
-    const splitHorizontalButton = imageButton(widgetText.splitHorizontal, "codicon--split-vertical.svg");
+    const splitVerticalButton = imageButton(translate.gettext("Change to vertical layout"), "codicon--split-horizontal.svg");
+    const splitHorizontalButton = imageButton(translate.gettext("Change to horizontal layout"), "codicon--split-vertical.svg");
 
     const setSplitDirCallback = [];
 

@@ -1,8 +1,25 @@
-/* global Quill makePreview makeWordchecker makeValidator actionButton makeLabel makeCheckBox makeRadio */
-/* exported makeTextWidget */
-/* exported makeProofTextWidget */
-/* exported makeQuizTextWidget */
+/* global Quill actionButton makeLabel makeCheckBox makeRadio */
 /* eslint no-use-before-define: "warn" */
+
+import { makePreview } from "./show_format.js";
+import { makeWordchecker } from "./word_check.js";
+import { makeValidator } from "./validator.js";
+import translate from "./gettext.js";
+
+const fonts = {
+    "dp_sans_mono": {
+        "name": "DP Sans Mono",
+        "face": "'DP Sans Mono', monospace"
+    },
+    "dejavu_sans_mono": {
+        "name": "DejaVu Sans Mono",
+        "face": "'DejaVu Sans Mono', monospace"
+    },
+    "default": {
+        "name": translate.gettext("Browser default"),
+        "face": "monospace"
+    }
+};
 
 function editOperations(quill) {
     return {
@@ -43,7 +60,7 @@ function editOperations(quill) {
     };
 }
 
-function makeBasicTextWidget(editBox, userSettings, widgetText) {
+function makeBasicTextWidget(editBox, userSettings) {
     const quill = new Quill(editBox, {
         modules: { toolbar: false },
         history: {
@@ -64,7 +81,7 @@ function makeBasicTextWidget(editBox, userSettings, widgetText) {
     userSettings.fontSize ?? (userSettings.fontSize = "12pt");
 
     function setFontFace() {
-        qlEditor.style.fontFamily = widgetText.fonts[userSettings.fontId].face;
+        qlEditor.style.fontFamily = fonts[userSettings.fontId].face;
     }
 
     userSettings.textWrap ?? (userSettings.textWrap = false);
@@ -87,8 +104,8 @@ function makeBasicTextWidget(editBox, userSettings, widgetText) {
     };
 }
 
-function makeQuizTextWidget(editBox, userSettings, widgetText) {
-    const { quill, setText, setFontSize, setFontFace, setWrap } = makeBasicTextWidget(editBox, userSettings, widgetText);
+export function makeQuizTextWidget(editBox, userSettings) {
+    const { quill, setText, setFontSize, setFontFace, setWrap } = makeBasicTextWidget(editBox, userSettings);
     const { surroundSelection, transformSelection, replaceSelection, getText } = editOperations(quill);
 
     setFontSize();
@@ -104,7 +121,7 @@ function makeQuizTextWidget(editBox, userSettings, widgetText) {
     };
 }
 
-function makeTextWidget(container, userSettings, widgetText) {
+export function makeTextWidget(container, userSettings) {
     const controlBar = document.createElement("div");
     controlBar.classList.add("simple_bar", "top_settings_box");
 
@@ -115,7 +132,7 @@ function makeTextWidget(container, userSettings, widgetText) {
 
     const extraSettings = document.createElement("div");
 
-    const doneButton = actionButton(widgetText.done);
+    const doneButton = actionButton(translate.gettext("Done"));
 
     const editBox = document.createElement("div");
     editBox.classList.add("stretch-box", "overflow-hidden");
@@ -136,7 +153,7 @@ function makeTextWidget(container, userSettings, widgetText) {
         setFontSize: basicSetFontSize,
         setFontFace,
         setWrap: basicSetWrap,
-    } = makeBasicTextWidget(editBox, userSettings, widgetText);
+    } = makeBasicTextWidget(editBox, userSettings);
 
     const lineElements = qlEditor.children;
     function numberLines() {
@@ -179,8 +196,8 @@ function makeTextWidget(container, userSettings, widgetText) {
     setParaSpacing(lineHeight);
 
     const fontFaceSelector = document.createElement("select");
-    for (const fontId of Object.keys(widgetText.fonts)) {
-        fontFaceSelector.add(new Option(widgetText.fonts[fontId].name, fontId));
+    for (const fontId of Object.keys(fonts)) {
+        fontFaceSelector.add(new Option(fonts[fontId].name, fontId));
     }
 
     fontFaceSelector.addEventListener("change", function () {
@@ -189,7 +206,7 @@ function makeTextWidget(container, userSettings, widgetText) {
         numberLines();
     });
 
-    const fontControl = makeLabel([widgetText.font + ": ", fontFaceSelector]);
+    const fontControl = makeLabel([translate.gettext("Font") + ": ", fontFaceSelector]);
 
     const fontSizeSelector = document.createElement("select");
     const fontSizes = [10, 12, 14, 17, 20, 24, 30, 36, 44];
@@ -208,7 +225,7 @@ function makeTextWidget(container, userSettings, widgetText) {
         setFontSize();
     });
 
-    const fontSizeControl = makeLabel([widgetText.size + ": ", fontSizeSelector]);
+    const fontSizeControl = makeLabel([translate.gettext("Size") + ": ", fontSizeSelector]);
 
     function setWrap() {
         basicSetWrap();
@@ -220,7 +237,7 @@ function makeTextWidget(container, userSettings, widgetText) {
         userSettings.textWrap = this.checked;
         setWrap();
     });
-    const wrapControl = makeLabel([wrapCheck, widgetText.wrap]);
+    const wrapControl = makeLabel([wrapCheck, translate.gettext("Wrap")]);
 
     controlRow.append(fontControl, fontSizeControl, wrapControl);
 
@@ -239,7 +256,7 @@ function makeTextWidget(container, userSettings, widgetText) {
     setWrap();
 
     const onSettings = new Set();
-    const settingsButton = actionButton(widgetText.settings);
+    const settingsButton = actionButton(translate.gettext("Settings"));
     settingsButton.addEventListener("click", function () {
         for (const func of onSettings) {
             func();
@@ -282,7 +299,7 @@ function makeTextWidget(container, userSettings, widgetText) {
     };
 }
 
-function makeProofTextWidget(container, projectId, userSettings, languagesWithDictionaries, projectLanguages, proofText, widgetText) {
+export function makeProofTextWidget(container, projectId, userSettings, languagesWithDictionaries, projectLanguages) {
     const Parchment = Quill.import("parchment");
     const config = { scope: Parchment.Scope.INLINE };
 
@@ -355,7 +372,6 @@ function makeProofTextWidget(container, projectId, userSettings, languagesWithDi
     const { setup, reLayout, setText, quill, editBox, controlBar, setParaSpacing, qlEditor, extraSettings, onDoneSettings } = makeTextWidget(
         container,
         userSettings,
-        widgetText,
     );
 
     const lineSpacer = document.createElement("input");
@@ -364,7 +380,7 @@ function makeProofTextWidget(container, projectId, userSettings, languagesWithDi
     lineSpacer.min = "1.5";
     lineSpacer.max = "3";
     lineSpacer.step = "0.01";
-    lineSpacer.title = proofText.adjustLineSpace;
+    lineSpacer.title = translate.gettext("Adjust the line spacing");
     lineSpacer.addEventListener("input", (event) => {
         const lineHeight = event.target.value;
         setParaSpacing(lineHeight);
@@ -396,7 +412,6 @@ function makeProofTextWidget(container, projectId, userSettings, languagesWithDi
         languagesWithDictionaries,
         projectLanguages,
         editBox,
-        proofText,
         extraSettings,
         onDoneSettings,
         scrollListeners,
@@ -406,7 +421,7 @@ function makeProofTextWidget(container, projectId, userSettings, languagesWithDi
 
     // userSettings.formatting ??= {}; // needs chrome 85, FF 79, Safari 14
     userSettings.formatting ?? (userSettings.formatting = {});
-    const formatter = makePreview(userSettings.formatting, proofText, quill, extraSettings, statSpan);
+    const formatter = makePreview(userSettings.formatting, quill, extraSettings, statSpan);
 
     const textOnlyRadio = makeRadio("viewMode");
     textOnlyRadio.checked = true;
@@ -414,7 +429,7 @@ function makeProofTextWidget(container, projectId, userSettings, languagesWithDi
         leave();
         leave = leaveText;
     });
-    const textOnlyControl = makeLabel([textOnlyRadio, proofText.textOnly]);
+    const textOnlyControl = makeLabel([textOnlyRadio, translate.gettext("Text Only")]);
 
     const wordCheckRadio = makeRadio("viewMode");
     wordCheckRadio.addEventListener("click", function () {
@@ -422,7 +437,7 @@ function makeProofTextWidget(container, projectId, userSettings, languagesWithDi
         wordChecker.enter();
         leave = wordChecker.leave;
     });
-    const wordCheckControl = makeLabel([wordCheckRadio, proofText.wordCheck]);
+    const wordCheckControl = makeLabel([wordCheckRadio, translate.gettext("Word Check")]);
 
     const formatPreviewRadio = makeRadio("viewMode");
     formatPreviewRadio.addEventListener("click", function () {
@@ -430,7 +445,7 @@ function makeProofTextWidget(container, projectId, userSettings, languagesWithDi
         formatter.enter();
         leave = formatter.leave;
     });
-    const formatPreviewControl = makeLabel([formatPreviewRadio, proofText.formatPreview]);
+    const formatPreviewControl = makeLabel([formatPreviewRadio, translate.gettext("Format Preview")]);
 
     controlBar.prepend(textOnlyControl, wordCheckControl, formatPreviewControl);
     controlBar.append(lineSpacer, statSpan);

@@ -1,7 +1,6 @@
-/* exported constructToolBox */
 /* eslint no-use-before-define: "off" */
 
-function constructToolBox(textWidget, pickerSets, roundType, proofSettings, projectId) {
+export function constructToolBox(textWidget, pickerSets, roundType, proofSettings, projectId) {
     const midPickerBox = document.getElementById("mid_picker_box");
     const showPickerButton = document.getElementById("show_picker_button");
     const pickerDiv = document.getElementById("picker_box");

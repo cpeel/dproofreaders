@@ -1,8 +1,9 @@
-/*global splitControl pageBrowse showWordContext */
+/*global splitControl showWordContext */
+import { pageBrowse } from "../../scripts/page_browse.js";
+import translate from "../../scripts/gettext.js";
 
 window.addEventListener("DOMContentLoaded", function () {
     const container = document.getElementById("page-browser");
-    const widgetText = JSON.parse(container.dataset.widget_text);
 
     let storageKeyLayout = showWordContext.storageKey + "-layout";
     let layout;
@@ -30,7 +31,7 @@ window.addEventListener("DOMContentLoaded", function () {
     mainSplit.reLayout();
 
     function setSplitLink() {
-        switchLink.textContent = splitVertical ? widgetText.splitHorizontal : widgetText.splitVertical;
+        switchLink.textContent = splitVertical ? translate.gettext("Change to horizontal layout") : translate.gettext("Change to vertical layout");
     }
 
     setSplitLink();

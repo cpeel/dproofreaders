@@ -1,8 +1,8 @@
 /* global makeLabel makeCheckBox */
-/* exported makeImageWidget */
-/* exported makeProofImageWidget*/
 
-function makeImageWidget(container, userSettings, widgetText) {
+import translate from "./gettext.js";
+
+export function makeImageWidget(container, userSettings) {
     const content = document.createElement("div");
     content.id = "image_content";
     const grabCursor = "grab";
@@ -114,7 +114,7 @@ function makeImageWidget(container, userSettings, widgetText) {
     percentInput.type = "number";
     percentInput.classList.add("text_number");
     percentInput.value = percent;
-    percentInput.title = widgetText.zoomPercent;
+    percentInput.title = translate.gettext("Zoom to percentage of 1000 pixels wide");
 
     function setZoom() {
         if (percent < minPercent) {
@@ -164,7 +164,7 @@ function makeImageWidget(container, userSettings, widgetText) {
         return button;
     }
 
-    const fitHeightButton = makeImageButtton(widgetText.fitHeight, "fas fa-arrows-alt-v");
+    const fitHeightButton = makeImageButtton(translate.gettext("Fit image to height of window"), "fas fa-arrows-alt-v");
     fitHeightButton.addEventListener("click", function () {
         const contentHeight = getComputedStyle(content).height;
         if (sine == 0) {
@@ -178,7 +178,7 @@ function makeImageWidget(container, userSettings, widgetText) {
         initScroll();
     });
 
-    const fitWidthButton = makeImageButtton(widgetText.fitWidth, "fas fa-arrows-alt-h");
+    const fitWidthButton = makeImageButtton(translate.gettext("Fit image to width of window"), "fas fa-arrows-alt-h");
     fitWidthButton.addEventListener("click", function () {
         const contentWidth = getComputedStyle(content).width;
         if (sine == 0) {
@@ -192,26 +192,26 @@ function makeImageWidget(container, userSettings, widgetText) {
         initScroll();
     });
 
-    const zoomInButton = makeImageButtton(widgetText.zoomIn, "fas fa-search-plus");
+    const zoomInButton = makeImageButtton(translate.gettext("Zoom in 10%"), "fas fa-search-plus");
     zoomInButton.addEventListener("click", function () {
         percent *= 1.1;
         setDrawSave();
     });
 
-    const zoomOutButton = makeImageButtton(widgetText.zoomOut, "fas fa-search-minus");
+    const zoomOutButton = makeImageButtton(translate.gettext("Zoom out 10%"), "fas fa-search-minus");
     zoomOutButton.addEventListener("click", function () {
         percent /= 1.1;
         setDrawSave();
     });
 
-    const clockRotateButton = makeImageButtton(widgetText.clockRotate, "fas fa-redo-alt");
+    const clockRotateButton = makeImageButtton(translate.gettext("Rotate image clockwise 90°"), "fas fa-redo-alt");
     clockRotateButton.addEventListener("click", function () {
         [sine, cosine] = [-cosine, sine];
         setImageStyle();
         initScroll();
     });
 
-    const counterClockRotateButton = makeImageButtton(widgetText.counterclockRotate, "fas fa-undo-alt");
+    const counterClockRotateButton = makeImageButtton(translate.gettext("Rotate image counterclockwise 90°"), "fas fa-undo-alt");
     counterClockRotateButton.addEventListener("click", function () {
         [sine, cosine] = [cosine, -sine];
         setImageStyle();
@@ -382,11 +382,11 @@ function makeImageWidget(container, userSettings, widgetText) {
     };
 }
 
-function makeProofImageWidget(container, userSettings, widgetText, proofText) {
-    const { setImage, content, controlBar, reSize, reset } = makeImageWidget(container, userSettings, widgetText);
+export function makeProofImageWidget(container, userSettings) {
+    const { setImage, content, controlBar, reSize, reset } = makeImageWidget(container, userSettings);
 
     const scrollWithTextBox = makeCheckBox();
-    const scrollControl = makeLabel([scrollWithTextBox, proofText.scrollWithText]);
+    const scrollControl = makeLabel([scrollWithTextBox, translate.gettext("Scroll with Text")]);
     controlBar.append(scrollControl);
 
     userSettings.scrollWithText ?? (userSettings.scrollWithText = false);

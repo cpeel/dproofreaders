@@ -1,7 +1,6 @@
 /*global $ proofIntData splitControl makeControlDiv */
-/* exported makeTextWidget */
 
-function makeTextWidget(container, splitter = false) {
+export function makeTextWidget(container, splitter = false) {
     const textArea = document.createElement("textarea");
     textArea.classList.add("text-pane");
     textArea.readOnly = !splitter;

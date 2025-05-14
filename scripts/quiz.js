@@ -1,13 +1,13 @@
-/* global makeQuizTextWidget constructToolBox */
+import { makeQuizTextWidget } from "./text_widget.js";
+import { constructToolBox } from "./toolbox.js";
 
 window.addEventListener("DOMContentLoaded", () => {
     const textDiv = document.getElementById("quiz_text");
     const initialText = textDiv.dataset.initial_text;
     const pickerData = JSON.parse(textDiv.dataset.pickersets);
-    const widgetText = JSON.parse(textDiv.dataset.widget_text);
     const roundType = textDiv.dataset.round_type;
 
-    const quizTextWidget = makeQuizTextWidget(textDiv, {}, widgetText);
+    const quizTextWidget = makeQuizTextWidget(textDiv, {});
     constructToolBox(quizTextWidget, pickerData, roundType, {}, "quiz");
     function initialiseText() {
         quizTextWidget.setText(initialText);

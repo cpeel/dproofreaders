@@ -1,19 +1,21 @@
-/*global analyse makeCheckBox makeLabel getILTags */
-/* exported makePreview */
+/*global makeCheckBox makeLabel */
 /* eslint no-unused-vars: "warn" */
 
-function makePreview(formatting, proofText, quill, extraSettings, statSpan) {
+import { analyse, getILTags } from "./analyse_format.js";
+import translate from "./gettext.js";
+
+export function makePreview(formatting, quill, extraSettings, statSpan) {
     const colorMarkupCheck = makeCheckBox();
-    const colorMarkupControl = makeLabel([colorMarkupCheck, proofText.colorMarkup]);
+    const colorMarkupControl = makeLabel([colorMarkupCheck, translate.gettext("Color markup")]);
 
     const hideTagsCheck = makeCheckBox();
-    const hideTagsControl = makeLabel([hideTagsCheck, proofText.hideTags]);
+    const hideTagsControl = makeLabel([hideTagsCheck, translate.gettext("Hide tags")]);
 
     const allowUnderlineCheck = makeCheckBox();
-    const allowUnderlineControl = makeLabel([allowUnderlineCheck, proofText.allowUnderline]);
+    const allowUnderlineControl = makeLabel([allowUnderlineCheck, translate.gettext("Allow <u> for underline")]);
 
     const allowMathCheck = makeCheckBox();
-    const allowMathControl = makeLabel([allowMathCheck, proofText.previewMath]);
+    const allowMathControl = makeLabel([allowMathCheck, translate.gettext("Preview Math")]);
 
     const optGrid = document.createElement("div");
     optGrid.classList.add("grid2col");
@@ -262,7 +264,7 @@ function makePreview(formatting, proofText, quill, extraSettings, statSpan) {
         // mark issues after style so don't get hidden
         for (const issue of analysis.issues) {
             const attributes = {};
-            attributes.title = proofText[issue.code];
+            attributes.title = issue.text;
             Object.assign(attributes, issue.type === 0 ? colors.hlt : colors.err);
             quill.formatText(issue.start, issue.len, attributes, "silent");
         }

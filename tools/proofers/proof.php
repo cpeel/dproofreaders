@@ -3,7 +3,6 @@ $relPath = "./../../pinc/";
 include_once($relPath.'base.inc');
 include_once($relPath.'Project.inc');
 include_once($relPath.'slim_header.inc');
-include_once($relPath.'widget_text.inc'); // $widget_text
 include_once($relPath.'bad_page_instructions.inc');
 include_once($relPath.'draw_toolbox.inc');
 
@@ -15,18 +14,10 @@ require_login();
 $title = _("Proof test");
 
 $js_files = [
-    "$code_url/pinc/3rdparty/xregexp/xregexp-all.js",
+    "$code_url/node_modules/xregexp/xregexp-all.js",
     "$code_url/scripts/splitControl.js",
-    "$code_url/scripts/image_widget.js",
-    "$code_url/scripts/view_splitter_2b.js",
     "$code_url/scripts/misc.js",
-    "$code_url/scripts/validator.js",
-    "$code_url/scripts/analyse_format.js",
-    "$code_url/scripts/show_format.js",
-    "$code_url/scripts/word_check.js",
-    "$code_url/scripts/text_widget.js",
-    "$code_url/scripts/toolbox.js",
-    "$code_url/tools/proofers/proof.js",
+    "$code_url/tools/proofers/proof.js|module",
     "$code_url/pinc/3rdparty/quill/quill.js",
     "$code_url/pinc/3rdparty/katex/katex.min.js",
     // "https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js",
@@ -48,73 +39,6 @@ $header_args = [
 
 slim_header($title, $header_args);
 
-$proof_text =
-[
-    "adjustLineSpace" => _("Adjust the line spacing"),
-    "noStartTag" => _("No start tag for this end tag"),
-    "noEndTag" => _("No end tag for this start tag"),
-    "noEndTagInPara" => _("No corresponding end tag in paragraph"),
-    "misMatchTag" => _("End tag does not match start tag"),
-    "nestedTag" => _("Tag nested within same tag"),
-    "unRecTag" => _("Unrecognized tag"),
-    "charBefore" => _("No characters should precede this"),
-    "blankBefore" => _("A blank line should precede this"),
-    "blankAfter" => _("A blank line should follow %s"),
-    "NWinNW" => _("No-wrap inside no-wrap"),
-    "BQinNW" => _("Block quote inside no-wrap"),
-    "charAfter" => _("No characters should follow %s"),
-    "OolPrev" => _("Out-of-line start tag should not be preceded by normal text"),
-    "OolNext" => _("Out-of-line end tag should not be followed by normal text"),
-    "blankLines124" => _("Only 1, 2 or 4 blank lines should be used"),
-    "puncAfterStart" => _("Punctuation after start tag"),
-    "spaceAfterStart" => _("Space after start tag"),
-    "nlAfterStart" => _("Newline after start tag"),
-    "nlBeforeEnd" => _("Newline before end tag"),
-    "spaceBeforeEnd" => _("Space before end tag"),
-    "noBold" => _("Heading should not be entirely bold"),
-    "scNoCap" => _("Small caps must contain at least one upper case character"),
-    "charBeforeStart" => _("Character or punctuation before inline start tag"),
-    "charAfterEnd" => _("Character after inline end tag"),
-    "puncBEnd" => _(", ; or : before end tag"),
-    "noCloseBrack" => _("No matching closing bracket"),
-    "footnoteId" => _("Footnote identifier should be a letter or number"),
-    "starAnchor" => _("Footnote anchor should be an upper-case letter"),
-    "noFootnote" => _("No corresponding footnote on this page"),
-    "noAnchor" => _("No anchor for this footnote"),
-    "noColon" => _("Footnote must have a colon"),
-    "colonNext" => _("The colon should immediately follow *[Footnote"),
-    "spaceNext" => _("Footnote should be followed by one space and identifier"),
-    "dupNote" => _("Duplicate footnote identifier"),
-    "continueFirst" => _("Continuation footnote should precede others"),
-    "sideNoteBlank" => _("A blank line should precede and follow Sidenote"),
-    "emptyTag" => _("Empty tag"),
-    "multipleAnchors" => _("Multiple anchors for same footnote"),
-    "boldPara" => _("Entirely bold paragraph or section heading"),
-    "validate" => _("Validate"),
-    "colorMarkup" => _("Color markup"),
-    "hideTags" => _("Hide tags"),
-    "quitFP" => _("Quit Format Preview"),
-    "quitWC" => _("Quit Word Check"),
-    "languages" => _("Languages"),
-    "ok" => _("OK"),
-    "textOnly" => _("Text Only"),
-    "formatPreview" => _("Format Preview"),
-    "wordCheck" => _("Word Check"),
-    "scrollWithText" => _("Scroll with Text"),
-    "selectAReason" => _("Please select a reason"),
-    "noUser" => pgettext("no user", "none"),
-    "forumURL" => get_url_for_forum(),
-    "options" => _("Options"),
-    "previewMath" => _("Preview Math"),
-    "allowUnderline" => _("Allow <u> for underline"),
-    "qStopProof" => _("Are you sure you want to stop proofreading?"),
-    "qRevert" => _("Are you sure you want to revert to your last save?"),
-    "qReturn" => _("This will discard all changes you have made on this page. Are you sure you want to return this page to the current round?"),
-    "accept" => _("Accept"),
-];
-
-$proof_text = json_encode($proof_text);
-
 function echo_bad_page_report()
 {
     global $PAGE_BADNESS_REASONS;
@@ -133,8 +57,10 @@ function echo_bad_page_report()
     "</div>";
 }
 
+$forum_url_encoded = json_encode(get_url_for_forum());
+
 echo "
-<div id='proofreading_interface' data-proof_text='$proof_text' data-widget_text ='$widget_text' class='column-flex'>
+<div id='proofreading_interface' data-forum_url='$forum_url_encoded' class='column-flex'>
     <div class='fixed-box border_1' id='page_control'>
         <div class='row_flex'>
             <span class='stretch-box margin_a' id='project_title'>

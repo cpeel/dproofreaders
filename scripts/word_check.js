@@ -1,9 +1,10 @@
 /* global ajax hide */
-/* exported makeWordchecker */
 /* eslint no-use-before-define: "off" */
 /* eslint camelcase: "off" */
 
-function makeWordchecker(projectId, quill, languagesWithDictionaries, projectLanguages, editBox, proofText, extraSettings, onDoneSettings, scrollListeners) {
+import translate from "./gettext.js";
+
+export function makeWordchecker(projectId, quill, languagesWithDictionaries, projectLanguages, editBox, extraSettings, onDoneSettings, scrollListeners) {
     const langGrid = document.createElement("div");
     langGrid.classList.add("langcol");
 
@@ -12,7 +13,7 @@ function makeWordchecker(projectId, quill, languagesWithDictionaries, projectLan
     const acceptButton = document.createElement("button");
     acceptButton.type = "button";
     acceptButton.classList.add("accept_button");
-    acceptButton.innerText = proofText.accept;
+    acceptButton.innerText = translate.gettext("Accept");
 
     const languages = [projectLanguages[0]];
 

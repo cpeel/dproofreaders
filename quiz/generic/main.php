@@ -3,7 +3,6 @@ $relPath = '../../pinc/';
 include_once($relPath.'base.inc');
 include_once($relPath.'slim_header.inc');
 include_once($relPath.'draw_toolbox.inc');
-include_once($relPath.'widget_text.inc'); // $widget_text
 
 require_login();
 
@@ -18,9 +17,7 @@ $header_args = [
     ],
     'js_files' => [
         "https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js",
-        "$code_url/scripts/text_widget.js",
-        "$code_url/scripts/quiz.js",
-        "$code_url/scripts/toolbox.js",
+        "$code_url/scripts/quiz.js|module",
     ],
     "body_attributes" => 'class="no-margin overflow-hidden fix-full"',
 ];
@@ -42,7 +39,7 @@ echo "
                 </div>
             </div>
             <div class='column-flex' id='quiz_text_outer'>
-                <div id='quiz_text' class='stretch-box' data-initial_text='$text' data-pickersets='$quiz_pickersets' data-widget_text='$widget_text' data-round_type='$round_type'></div>
+                <div id='quiz_text' class='stretch-box' data-initial_text='$text' data-pickersets='$quiz_pickersets' data-round_type='$round_type'></div>
                 <div id='quiz_controls' class='fixed_box'>
 
 <form action='./returnfeed.php?quiz_page_id=$quiz_page_id' target='right' method='post' name='editform' id='editform'>

@@ -21,7 +21,7 @@ $mru_abbreviation = javascript_safe(_("MRU"));
 $header_args = [
     "js_files" => [
         "$code_url/tools/proofers/character_selector.js",
-        "$code_url/tools/proofers/toolbox.js",
+        "$code_url/tools/proofers/toolbox.js|module",
     ],
     "js_data" => "
         var projectID = '$projectid';

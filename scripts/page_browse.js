@@ -1,14 +1,18 @@
-/*global ajax makeImageWidget makeTextWidget viewSplitter makeUrl codeUrl actionButton makeLabel hide show */
-/* exported pageBrowse */
+/*global ajax makeUrl codeUrl actionButton makeLabel hide show */
 
-function makePageControl(pages, selectedImageFileName, widgetText, changePage) {
+import { makeTextWidget } from "./text_widget.js";
+import { makeImageWidget } from "./image_widget.js";
+import { viewSplitter } from "./view_splitter_2b.js";
+import translate from "./gettext.js";
+
+function makePageControl(pages, selectedImageFileName, changePage) {
     // changePage is a callback to act when page changes
 
     const pageSelector = document.createElement("select");
-    const pageSelectorLabel = makeLabel([widgetText.page + ": ", pageSelector]);
+    const pageSelectorLabel = makeLabel([translate.gettext("Page") + ": ", pageSelector]);
 
-    const prevButton = actionButton(widgetText.previous);
-    const nextButton = actionButton(widgetText.next);
+    const prevButton = actionButton(translate.gettext("Previous"));
+    const nextButton = actionButton(translate.gettext("Next"));
 
     pages.forEach(function (page, index) {
         const imageFilename = page.image;
@@ -71,8 +75,7 @@ function makePageControl(pages, selectedImageFileName, widgetText, changePage) {
     return [pageSelectorLabel, prevButton, nextButton];
 }
 
-async function pageBrowse(container, params, replaceUrl, setShowFile = function () {}) {
-    const widgetText = JSON.parse(container.dataset.widget_text);
+export async function pageBrowse(container, params, replaceUrl, setShowFile = function () {}) {
     // clear anything in the container
     container.innerHTML = "";
 
@@ -91,7 +94,7 @@ async function pageBrowse(container, params, replaceUrl, setShowFile = function 
     const titlePara = document.createElement("p");
     const projectTitleSpan = document.createElement("span");
     const projectLink = document.createElement("a");
-    projectLink.textContent = widgetText.projectPage;
+    projectLink.textContent = translate.gettext("Project Page");
     titlePara.append(projectTitleSpan, " ", projectLink);
 
     const pageControlDiv = document.createElement("div");
@@ -105,10 +108,10 @@ async function pageBrowse(container, params, replaceUrl, setShowFile = function 
     }
     container.append(pageControlDiv, imageTextDiv);
 
-    const textButton = actionButton(widgetText.showTextOnly);
-    const imageButton = actionButton(widgetText.showImageOnly);
-    const imageTextButton = actionButton(widgetText.showImageText);
-    const resetButton = actionButton(widgetText.selectAProject);
+    const textButton = actionButton(translate.gettext("Show Text only"));
+    const imageButton = actionButton(translate.gettext("Show Image only"));
+    const imageTextButton = actionButton(translate.gettext("Show Image & Text"));
+    const resetButton = actionButton(translate.gettext("Select a different project"));
 
     let imageWidget = null;
     let textWidget = null;
@@ -121,7 +124,7 @@ async function pageBrowse(container, params, replaceUrl, setShowFile = function 
         const imageFileName = page.image;
         params.set("imagefile", imageFileName);
         replaceUrl();
-        document.title = widgetText.displayPageX.replace("%s", imageFileName);
+        document.title = translate.gettext("Display Page: %s").replace("%s", imageFileName);
 
         if (displayMode !== "text") {
             imageWidget.setImage(page.image_url);
@@ -165,7 +168,7 @@ async function pageBrowse(container, params, replaceUrl, setShowFile = function 
         try {
             const rounds = await ajax("GET", "v1/projects/pagerounds");
             roundSelector = document.createElement("select");
-            roundControl = makeLabel([widgetText.round + ": ", roundSelector]);
+            roundControl = makeLabel([translate.gettext("Round") + ": ", roundSelector]);
 
             rounds.forEach(function (round) {
                 let selected = currentRound === round;
@@ -191,12 +194,12 @@ async function pageBrowse(container, params, replaceUrl, setShowFile = function 
             await populateRoundSelector();
             textDiv = document.createElement("div");
             textDiv.classList.add("column-flex");
-            textWidget = makeTextWidget(textDiv, userSettings, widgetText);
+            textWidget = makeTextWidget(textDiv, userSettings);
         }
         if (displayMode !== "text") {
             imageDiv = document.createElement("div");
             imageDiv.classList.add("column-flex");
-            imageWidget = makeImageWidget(imageDiv, userSettings, widgetText);
+            imageWidget = makeImageWidget(imageDiv, userSettings);
         }
         pageControlDiv.innerHTML = "";
         switch (displayMode) {
@@ -214,7 +217,7 @@ async function pageBrowse(container, params, replaceUrl, setShowFile = function 
                 break;
             case "imageText": {
                 imageTextDiv.append(imageDiv, textDiv);
-                const theSplitter = viewSplitter(imageTextDiv, userSettings, widgetText);
+                const theSplitter = viewSplitter(imageTextDiv, userSettings);
                 theSplitter.mainSplit.onResize.add(textWidget.reLayout);
                 theSplitter.mainSplit.onResize.add(imageWidget.reSize);
                 theSplitter.setSplitDirCallback.push(textWidget.setup, imageWidget.reset);
@@ -250,11 +253,11 @@ async function pageBrowse(container, params, replaceUrl, setShowFile = function 
         } else {
             page = findPage(imageFile);
             if (!page) {
-                alert(widgetText.noPageX.replace("%s", imageFile));
+                alert(translate.gettext("There is no page %s in this project").replace("%s", imageFile));
                 page = pages[0];
             }
         }
-        pageControls = makePageControl(pages, imageFile, widgetText, function (newPage) {
+        pageControls = makePageControl(pages, imageFile, function (newPage) {
             page = newPage;
             showCurrentPage();
         });
@@ -267,23 +270,23 @@ async function pageBrowse(container, params, replaceUrl, setShowFile = function 
         params.delete("imagefile");
         // keep mode and round
         replaceUrl();
-        document.title = widgetText.browsePages;
+        document.title = translate.gettext("Browse pages");
         // just show the project input
-        projectTitleSpan.textContent = widgetText.browsePages;
+        projectTitleSpan.textContent = translate.gettext("Browse pages");
         hide(projectLink);
         pageControlDiv.innerHTML = "";
         imageTextDiv.innerHTML = "";
 
         const projectInput = document.createElement("input");
         projectInput.type = "text";
-        const projectSelectButton = actionButton(widgetText.selectProject);
-        const projectInputLabel = makeLabel([widgetText.projectid + ": ", projectInput]);
+        const projectSelectButton = actionButton(translate.gettext("Select Project"));
+        const projectInputLabel = makeLabel([translate.gettext("Project ID") + ": ", projectInput]);
         pageControlDiv.append(projectInputLabel, projectSelectButton);
 
         projectSelectButton.addEventListener("click", function () {
             projectId = projectInput.value;
             if ("" === projectId) {
-                alert(widgetText.enterID);
+                alert(translate.gettext("Please enter a project ID"));
                 return;
             }
             params.set("project", projectId);

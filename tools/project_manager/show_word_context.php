@@ -8,7 +8,6 @@ include_once($relPath.'slim_header.inc');
 include_once($relPath.'page_controls.inc'); // get_proofreading_interface_data_js()
 include_once($relPath.'control_bar.inc'); // get_control_bar_texts()
 include_once($relPath.'post_files.inc'); // page_info_query()
-include_once($relPath.'widget_text.inc');
 include_once("./word_freq_table.inc"); // enforce_edit_authorization(), decode_word()
 
 require_login();
@@ -36,10 +35,8 @@ $header_args = [
     ],
     "js_files" => [
         "$code_url/scripts/splitControl.js",
-        "$code_url/scripts/image_widget.js",
         "$code_url/scripts/misc.js",
-        "$code_url/scripts/page_browse.js",
-        "$code_url/tools/project_manager/show_word_context.js",
+        "$code_url/tools/project_manager/show_word_context.js|module",
     ],
     "js_data" => "var showWordContext = $details;",
 
@@ -114,7 +111,7 @@ if ($foundInstances >= $wordInstances) {
 }
 echo "</div></div>";
 
-echo "<div id='page-browser' class='overflow-hidden' data-widget_text ='$widget_text'>";
+echo "<div id='page-browser' class='overflow-hidden'>";
 echo "<p style='margin: 0.5em;'>" . _("Select one of the page links to view the page image (scan).") . "</p>";
 echo "</div>";
 echo "</div>";
