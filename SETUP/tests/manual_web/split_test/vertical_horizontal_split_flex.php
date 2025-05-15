@@ -9,8 +9,7 @@ $title = _('Vertical and Horizontal Split with Flex Layout');
 
 $header_args = [
     "js_files" => [
-        "$code_url/scripts/splitControl.js",
-        "vertical_horizontal_split.js",
+        "vertical_horizontal_split.js|module",
     ],
     "css_files" => ["split_test.css"],
     "body_attributes" => "style='margin: 0; overflow: hidden'",

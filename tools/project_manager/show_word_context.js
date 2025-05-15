@@ -1,4 +1,5 @@
-/*global splitControl showWordContext */
+/*global showWordContext */
+import { splitControl } from "../../scripts/splitControl.js";
 import { pageBrowse } from "../../scripts/page_browse.js";
 import translate from "../../scripts/gettext.js";
 

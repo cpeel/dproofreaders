@@ -8,7 +8,6 @@ require_login();
 $title = _("Browse pages");
 
 $js_files = [
-    "$code_url/scripts/splitControl.js",
     "$code_url/scripts/misc.js",
     "$code_url/tools/page_browser.js|module",
     "https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js",

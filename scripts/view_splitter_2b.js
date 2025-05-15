@@ -1,5 +1,6 @@
-/* global splitControl codeUrl */
+/* global codeUrl */
 
+import { splitControl } from "./splitControl.js";
 import translate from "./gettext.js";
 
 export var viewSplitter = function (container, userSettings) {

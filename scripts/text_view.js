@@ -1,4 +1,6 @@
-/*global $ proofIntData splitControl makeControlDiv */
+/*global $ proofIntData makeControlDiv */
+
+import { splitControl } from "./splitControl.js";
 
 export function makeTextWidget(container, splitter = false) {
     const textArea = document.createElement("textarea");

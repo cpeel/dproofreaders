@@ -35,7 +35,6 @@ $header_args = [
         "$code_url/styles/struct.css",
     ],
     "js_files" => [
-        "$code_url/scripts/splitControl.js",
         "$code_url/scripts/misc.js",
         "$code_url/tools/project_manager/show_word_context.js|module",
     ],

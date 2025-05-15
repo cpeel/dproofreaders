@@ -15,7 +15,6 @@ $title = _("Proof test");
 
 $js_files = [
     "$code_url/node_modules/xregexp/xregexp-all.js",
-    "$code_url/scripts/splitControl.js",
     "$code_url/scripts/misc.js",
     "$code_url/tools/proofers/proof.js|module",
     "$code_url/pinc/3rdparty/quill/quill.js",
