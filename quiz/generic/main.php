@@ -13,10 +13,10 @@ include "./quiz_page.inc"; // qp_round_id_for_pi_toolbox
 $header_args = [
     "css_files" => [
         "$code_url/styles/struct.css",
-        "https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.core.css",
+        "$code_url/node_modules/quill/dist/quill.core.css",
     ],
     'js_files' => [
-        "https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js",
+        "$code_url/node_modules/quill/dist/quill.js",
         "$code_url/scripts/quiz.js|module",
     ],
     "body_attributes" => 'class="no-margin overflow-hidden fix-full"',
