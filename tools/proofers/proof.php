@@ -1,7 +1,6 @@
 <?php
 $relPath = "./../../pinc/";
 include_once($relPath.'base.inc');
-include_once($relPath.'Project.inc');
 include_once($relPath.'slim_header.inc');
 include_once($relPath.'bad_page_instructions.inc');
 include_once($relPath.'draw_toolbox.inc');
@@ -28,7 +27,6 @@ $header_args = [
         "$code_url/node_modules/katex/dist/katex.min.css",
     ],
     "js_files" => $js_files,
-    "js_data" => "var langCode = '" . substr(get_desired_language(), 0, 2) . "';",
     "body_attributes" => 'class="no-margin overflow-hidden fix-full"',
 ];
 
@@ -71,7 +69,7 @@ echo "
             </span>
             <span class='fixed-box'>
                 <a id=editing_guidelines target='roundDoc'>", _('Guidelines'), "</a>
-                <a target='viewcomments' href = '$code_url/faq/prooffacehelp.php'>" . _('Interface Help') . "</a>
+                <a target='viewcomments' href = '../../faq/prooffacehelp.php'>" . _('Interface Help') . "</a>
             </span>
         </div>
         <div id='action_buttons'>",
