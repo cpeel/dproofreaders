@@ -2,20 +2,13 @@
 
 function draw_toolbox()
 {
-    $toolbox_text = json_encode(
-        [
-            "mruAbbrev" => _("MRU"),
-            "mruTitle" => _("Most recently used"),
-        ]
-    );
-
     echo "
 <div class='fixed-box tool_box row_flex' id='toolbox'>
     <div id='outer_picker_box' class='fixed-box'>
         <div id='mid_picker_box' class='row_flex'>
             <button type='button' id='hide_picker_button' class='show_hide_picker_button' title='", attr_safe(_("Hide the character picker")), "'>&lang;</button>
             <div class='char_box'><input type='text' readonly class='big_text' id='large_char'></div>
-            <div id='picker_box' data-toolbox_text='$toolbox_text'>
+            <div id='picker_box'>
             </div>
         </div>
         <button type='button' id='show_picker_button' class='show_hide_picker_button' style='display:none;' title='", attr_safe(_("Show the character picker")), "'>&rang;</button>

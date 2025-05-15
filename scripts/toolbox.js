@@ -1,11 +1,11 @@
 /* eslint no-use-before-define: "off" */
+import translate from "./gettext.js";
 
 export function constructToolBox(textWidget, pickerSets, roundType, proofSettings, projectId) {
     const midPickerBox = document.getElementById("mid_picker_box");
     const showPickerButton = document.getElementById("show_picker_button");
     const pickerDiv = document.getElementById("picker_box");
     const largeChar = document.getElementById("large_char");
-    const toolboxText = JSON.parse(pickerDiv.dataset.toolbox_text);
 
     function hidePicker() {
         midPickerBox.style.display = "none";
@@ -157,7 +157,7 @@ export function constructToolBox(textWidget, pickerSets, roundType, proofSetting
         }
     }
 
-    let mruSubset = { name: toolboxText.mruAbbrev, title: toolboxText.mruTitle, rows: makeMruCodepoints() };
+    let mruSubset = { name: translate.gettext("MRU"), title: translate.gettext("Most recently used"), rows: makeMruCodepoints() };
     const mruKeyBlock = drawSubset("", mruSubset);
 
     for (const pickerSet of pickerSets) {
