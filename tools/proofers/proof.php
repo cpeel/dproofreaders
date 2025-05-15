@@ -18,16 +18,14 @@ $js_files = [
     "$code_url/scripts/misc.js",
     "$code_url/tools/proofers/proof.js|module",
     "$code_url/node_modules/quill/dist/quill.js",
-    "$code_url/pinc/3rdparty/katex/katex.min.js",
-    // "https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.js",
+    "$code_url/node_modules/katex/dist/katex.min.js",
 ];
 
 $header_args = [
     "css_files" => [
         "$code_url/styles/struct.css",
         "$code_url/node_modules/quill/dist/quill.core.css",
-        "$code_url/pinc/3rdparty/katex/katex.min.css",
-        // "https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css",
+        "$code_url/node_modules/katex/dist/katex.min.css",
     ],
     "js_files" => $js_files,
     "js_data" => "var langCode = '" . substr(get_desired_language(), 0, 2) . "';",
