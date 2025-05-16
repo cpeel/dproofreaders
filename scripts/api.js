@@ -1,4 +1,4 @@
-/*global codeUrl */
+/*global codeUrl userApiKey */
 /* exported ajax */
 /* exported AJAX_ERROR_CODES */
 
@@ -31,10 +31,15 @@ async function ajax(method, apiUrl, queryParams = {}, data = {}, fetchPromise = 
             searchParams.append(key, value);
         }
     }
+    let apiKey = "SESSION";
+    if (typeof userApiKey !== "undefined") {
+        apiKey = userApiKey;
+    }
+
     url.search = searchParams;
     let upperCaseMethod = method.toUpperCase();
     let options = {
-        headers: { "X-API-KEY": "SESSION", Accept: "application/json" },
+        headers: { "X-API-KEY": apiKey, Accept: "application/json" },
         credentials: "same-origin",
         method: upperCaseMethod,
     };

@@ -16,4 +16,6 @@ vendor
 .php-cs-fixer.cache
 .phpdoc
 .phpstan.cache
-
+# parcel stuff
+.parcel-cache
+dist/
