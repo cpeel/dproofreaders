@@ -3,7 +3,6 @@ $relPath = "./../../pinc/";
 include_once($relPath.'base.inc');
 include_once($relPath.'http_headers.inc');
 include_once($relPath.'slim_header.inc');
-include_once($relPath.'control_bar.inc'); // get_control_bar_texts()
 include_once($relPath.'abort.inc');
 include_once('PPage.inc');
 
@@ -17,8 +16,7 @@ try {
 $user = User::load_current();
 
 $js_files = [
-    "$code_url/scripts/control_bar.js",
-    "$code_url/tools/proofers/proof_image.js",
+    "$code_url/tools/proofers/proof_image.js|module",
 ];
 
 $storage_key = "proof-std" . (($user->profile->i_layout == 1) ? "-v" : "-h");
@@ -31,7 +29,7 @@ $image_data = json_encode([
 
 $header_args = [
     "js_files" => $js_files,
-    "js_data" => get_control_bar_texts() . "
+    "js_data" => "
             var imageData = $image_data;
         ",
     "body_attributes" => 'id="standard_interface_image"',
