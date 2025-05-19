@@ -15,6 +15,7 @@ define('SHOW_STATSBAR', true);
 function output_html_header($nameofpage, $extra_args = [], $show_statsbar = true)
 {
     global $code_url, $code_dir, $dyn_url, $dyn_dir, $site_abbreviation;
+    global $development;
 
     static $was_output = false;
     if ($was_output) {
@@ -127,6 +128,8 @@ function output_html_header($nameofpage, $extra_args = [], $show_statsbar = true
     if ($include_runtime) {
         $runtime_bundle = str_replace("auto", "dist", $manifest["runtime.js"]);
         echo "<script src='$code_url/$runtime_bundle' type='module'></script>\n";
+        $vendor_bundle = str_replace("auto", "dist", $manifest["vendors.js"]);
+        echo "<script src='$code_url/$vendor_bundle' type='module'></script>\n";
     }
 
     // Per-page Javascript
