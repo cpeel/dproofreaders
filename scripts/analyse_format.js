@@ -779,74 +779,41 @@ function analyse(txt, config) {
     }
 
     // check that math delimiters \[ \], \( \) are matched
-    // allow inline math inside display math (in text{})
     function checkMath() {
-        var tagStack = []; // holds start tag [ or (
-        var stackTop;
         const mathRe = /\\\[|\\\]|\\\(|\\\)/g;
+        let openTag = null;
         let result;
         let tag;
-        let start;
+        let startIndex;
+        let tagIndex;
         while ((result = mathRe.exec(txt)) !== null) {
-            start = result.index;
+            tagIndex = result.index;
             tag = result[0].charAt(1);
-            if (tagStack.length === 0) {
-                // no tags on stack
+            if (!openTag) {
                 if (tag === "(" || tag === "[") {
-                    tagStack.push({ tag: tag, start: start });
+                    openTag = tag;
+                    startIndex = tagIndex;
                 } else {
-                    reportIssue(start, 2, "noStartTag");
+                    // found an end tag
+                    reportIssue(tagIndex, 2, "noStartTag");
                 }
             } else {
-                // there are tags in the stack
-                stackTop = tagStack[tagStack.length - 1];
-                if (stackTop.tag === "[") {
-                    // ] or ( ok, [ or ) error
-                    switch (tag) {
-                        case "]":
-                            tagStack.pop();
-                            break;
-                        case "(":
-                            tagStack.push({ tag: tag, start: start });
-                            break;
-                        case "[":
-                            // report error for stack tag push the new one
-                            tagStack.pop();
-                            tagStack.push({ tag: tag, start: start });
-                            reportIssue(stackTop.start, 2, "noEndTag");
-                            break;
-                        case ")":
-                            tagStack.pop();
-                            reportIssue(stackTop.start, 2, "misMatchTag");
-                            reportIssue(start, 2, "misMatchTag");
-                            break;
-                    }
+                // there is an open tag
+                if (tag === "(" || tag === "[") {
+                    reportIssue(startIndex, 2, "noEndTag");
+                    openTag = tag;
+                    startIndex = tagIndex;
+                } else if ((openTag === "(" && tag === "]") || (openTag === "[" && tag === ")")) {
+                    reportIssue(tagIndex, 2, "misMatchTag");
+                    reportIssue(startIndex, 2, "misMatchTag");
                 } else {
-                    // stacktop is (, ) ok else error
-                    switch (tag) {
-                        case ")":
-                            tagStack.pop();
-                            break;
-                        case "(":
-                        case "[":
-                            // report error for stack tag push the new one
-                            tagStack.pop();
-                            tagStack.push({ tag: tag, start: start });
-                            reportIssue(stackTop.start, 2, "noEndTag");
-                            break;
-                        case "]":
-                            tagStack.pop();
-                            reportIssue(stackTop.start, 2, "misMatchTag");
-                            reportIssue(start, 2, "misMatchTag");
-                            break;
-                    }
+                    // ok
+                    openTag = null;
                 }
             }
         }
-        // if there are any tags on the stack mark them as errors
-        while (tagStack.length !== 0) {
-            stackTop = tagStack.pop();
-            reportIssue(stackTop.start, 2, "noEndTag");
+        if (openTag) {
+            reportIssue(startIndex, 2, "noEndTag");
         }
     }
 
