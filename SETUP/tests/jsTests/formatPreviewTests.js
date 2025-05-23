@@ -1,4 +1,6 @@
-/* global QUnit analyse processExMath findClose makePreview defaultStyles */
+/* global QUnit */
+
+import { analyse, findClose, processExMath, makePreview, defaultStyles } from "../../../scripts/analyse_format.js";
 
 QUnit.module("Format preview test", function () {
     let configuration = {
@@ -29,8 +31,8 @@ QUnit.module("Format preview test", function () {
     let text;
     let issArray;
 
-    // assert issue exists and start, length, type, code and subText correct
-    function issueTest(assert, index, start, length, code, type, subText = "") {
+    // assert issue exists and start, length, type, and code correct
+    function issueTest(assert, index, start, length, code, type) {
         // put code as message in first one
         let issueExists = issArray.length > index;
         assert.ok(issueExists, code);
@@ -40,7 +42,6 @@ QUnit.module("Format preview test", function () {
             assert.strictEqual(issue.start, start);
             assert.strictEqual(issue.len, length);
             assert.strictEqual(issue.type, type);
-            assert.strictEqual(issue.subText, subText);
         }
     }
 
@@ -504,22 +505,18 @@ QUnit.module("Format preview test", function () {
         assert.strictEqual(procText, "xy]zaef");
     });
 
-    function getMessage(messageCode) {
-        return messageCode;
-    }
-
     QUnit.test("Check bad tag is converted to valid html", function (assert) {
         let text = "<i&>";
-        let preview = makePreview(text, false, false, defaultStyles, getMessage);
+        let preview = makePreview(text, false, false, defaultStyles);
         assert.strictEqual(preview.ok, true);
         assert.strictEqual(preview.issues, 0);
         assert.strictEqual(preview.possIss, 1);
-        assert.strictEqual(preview.txtout, "<span class='hlt_color' title='unRecTag'>&lt;</span>i&amp;&gt;");
+        assert.strictEqual(preview.txtout, "<span class='hlt_color' title='Unrecognized tag'>&lt;</span>i&amp;&gt;");
     });
 
     QUnit.test("Check html entity is encoded", function (assert) {
         let text = "&copy;";
-        let preview = makePreview(text, false, false, defaultStyles, getMessage);
+        let preview = makePreview(text, false, false, defaultStyles);
         assert.strictEqual(preview.ok, true);
         assert.strictEqual(preview.issues, 0);
         assert.strictEqual(preview.possIss, 0);
@@ -528,7 +525,7 @@ QUnit.module("Format preview test", function () {
 
     QUnit.test("Small cap markup with mixed case", function (assert) {
         let text = "<sc>Ab</sc>";
-        let preview = makePreview(text, false, false, defaultStyles, getMessage);
+        let preview = makePreview(text, false, false, defaultStyles);
         assert.strictEqual(preview.ok, true);
         assert.strictEqual(preview.issues, 0);
         assert.strictEqual(preview.possIss, 0);
@@ -537,7 +534,7 @@ QUnit.module("Format preview test", function () {
 
     QUnit.test("Small cap markup with all upper case", function (assert) {
         let text = "<sc>AB</sc>";
-        let preview = makePreview(text, false, false, defaultStyles, getMessage);
+        let preview = makePreview(text, false, false, defaultStyles);
         assert.strictEqual(preview.ok, true);
         assert.strictEqual(preview.issues, 0);
         assert.strictEqual(preview.possIss, 0);
@@ -546,7 +543,7 @@ QUnit.module("Format preview test", function () {
 
     QUnit.test("Small cap markup with all upper case with &", function (assert) {
         let text = "<sc>A&B</sc>";
-        let preview = makePreview(text, false, false, defaultStyles, getMessage);
+        let preview = makePreview(text, false, false, defaultStyles);
         assert.strictEqual(preview.ok, true);
         assert.strictEqual(preview.issues, 0);
         assert.strictEqual(preview.possIss, 0);
@@ -555,7 +552,7 @@ QUnit.module("Format preview test", function () {
 
     QUnit.test("Rewrap continuation paragraph", function (assert) {
         let text = `abcd`;
-        let preview = makePreview(text, false, true, defaultStyles, getMessage);
+        let preview = makePreview(text, false, true, defaultStyles);
         assert.strictEqual(preview.ok, true);
         assert.strictEqual(preview.issues, 0);
         assert.strictEqual(preview.possIss, 0);
@@ -565,7 +562,7 @@ QUnit.module("Format preview test", function () {
     QUnit.test("Rewrap new paragraph", function (assert) {
         let text = `
 abcd`;
-        let preview = makePreview(text, false, true, defaultStyles, getMessage);
+        let preview = makePreview(text, false, true, defaultStyles);
         assert.strictEqual(preview.ok, true);
         assert.strictEqual(preview.issues, 0);
         assert.strictEqual(preview.possIss, 0);
@@ -580,7 +577,7 @@ abcd`;
 
 EDIBLE FIGS
 */`;
-        let preview = makePreview(text, false, true, defaultStyles, getMessage);
+        let preview = makePreview(text, false, true, defaultStyles);
         assert.strictEqual(preview.ok, true);
         assert.strictEqual(preview.issues, 0);
         assert.strictEqual(preview.possIss, 0);
@@ -597,7 +594,7 @@ FIG CULTURE.
 
 abc
 */`;
-        let preview = makePreview(text, false, true, defaultStyles, getMessage);
+        let preview = makePreview(text, false, true, defaultStyles);
         assert.strictEqual(preview.ok, true);
         assert.strictEqual(preview.issues, 0);
         assert.strictEqual(preview.possIss, 0);
@@ -608,7 +605,7 @@ abc
         let text = `/#
 abc
 #/`;
-        let preview = makePreview(text, false, true, defaultStyles, getMessage);
+        let preview = makePreview(text, false, true, defaultStyles);
         assert.strictEqual(preview.ok, true);
         assert.strictEqual(preview.issues, 0);
         assert.strictEqual(preview.possIss, 0);
@@ -620,7 +617,7 @@ abc
 
 abc
 #/`;
-        let preview = makePreview(text, false, true, defaultStyles, getMessage);
+        let preview = makePreview(text, false, true, defaultStyles);
         assert.strictEqual(preview.ok, true);
         assert.strictEqual(preview.issues, 0);
         assert.strictEqual(preview.possIss, 0);
@@ -632,7 +629,7 @@ abc
 /#
 abc
 #/`;
-        let preview = makePreview(text, false, true, defaultStyles, getMessage);
+        let preview = makePreview(text, false, true, defaultStyles);
         assert.strictEqual(preview.ok, true);
         assert.strictEqual(preview.issues, 0);
         assert.strictEqual(preview.possIss, 0);
@@ -648,7 +645,7 @@ bqnw
 
 bq
 #/`;
-        let preview = makePreview(text, false, true, defaultStyles, getMessage);
+        let preview = makePreview(text, false, true, defaultStyles);
         assert.strictEqual(preview.ok, true);
         assert.strictEqual(preview.issues, 0);
         assert.strictEqual(preview.possIss, 0);
@@ -670,7 +667,7 @@ bqnw
 
 bq
 #/`;
-        let preview = makePreview(text, false, true, defaultStyles, getMessage);
+        let preview = makePreview(text, false, true, defaultStyles);
         assert.strictEqual(preview.ok, true);
         assert.strictEqual(preview.issues, 0);
         assert.strictEqual(preview.possIss, 0);
@@ -693,7 +690,7 @@ bqbq
 
 bq
 #/`;
-        let preview = makePreview(text, false, true, defaultStyles, getMessage);
+        let preview = makePreview(text, false, true, defaultStyles);
         assert.strictEqual(preview.ok, true);
         assert.strictEqual(preview.issues, 0);
         assert.strictEqual(preview.possIss, 0);
