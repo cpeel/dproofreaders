@@ -7,7 +7,8 @@
     "lint-fix": "eslint --fix",
     "format-check": "prettier '**/*.js' --check",
     "format": "prettier '**/*.js' --write",
-    "test": "node ./SETUP/tests/jsTests/jsUnit.js"
+    "test": "node ./SETUP/tests/jsTests/jsUnit.js",
+    "build": "node build.js"
   },
   "repository": {
     "type": "git",
@@ -26,9 +27,12 @@
   "homepage": "https://github.com/DistributedProofreaders/dproofreaders",
   "devDependencies": {
     "@eslint/js": "^9.9.0",
+    "esbuild": "^0.25.4",
+    "esbuild-plugin-manifest": "^1.0.5",
     "eslint": "^9.9.0",
     "eslint-config-prettier": "^9.1.0",
     "geckodriver": "^4.4.3",
+    "gettext.js": "^2.0.3",
     "globals": "^15.9.0",
     "less": "^4.2.0",
     "prettier": "^3.3.3",
@@ -42,7 +46,6 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.4",
     "d3": "^6.6.2",
-    "gettext.js": "^2.0.3",
     "jquery": "^3.5.1",
     "resumablejs": "^1.1.0"
   }

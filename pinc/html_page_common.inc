@@ -107,7 +107,7 @@ function output_html_header($nameofpage, $extra_args = [], $show_statsbar = true
 
     $include_runtime = false;
     foreach ($js_files as $js_file) {
-        $bundle_filename = str_replace("auto", "dist", $manifest[basename($js_file)] ?? "");
+        $bundle_filename = $manifest[str_replace($code_url, "dist", $js_file)] ?? "";
         if (! $development and $bundle_filename) {
             $include_runtime = true;
             if (in_array($js_file, $extra_args['js_modules'] ?? [])) {
@@ -125,8 +125,11 @@ function output_html_header($nameofpage, $extra_args = [], $show_statsbar = true
         }
     }
     if ($include_runtime) {
-        $runtime_bundle = str_replace("auto", "dist", $manifest["runtime.js"]);
-        echo "<script src='$code_url/$runtime_bundle' type='module'></script>\n";
+        foreach (array_values($manifest) as $js_file) {
+            if (stripos($js_file, "/chunk-") !== false) {
+                echo "<script src='$code_url/$js_file' type='module'></script>\n";
+            }
+        }
     }
 
     // Per-page Javascript
