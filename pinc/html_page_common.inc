@@ -14,7 +14,7 @@ define('SHOW_STATSBAR', true);
  */
 function output_html_header($nameofpage, $extra_args = [], $show_statsbar = true)
 {
-    global $code_url, $dyn_url, $dyn_dir, $site_abbreviation;
+    global $code_url, $code_dir, $dyn_url, $dyn_dir, $site_abbreviation;
 
     static $was_output = false;
     if ($was_output) {
@@ -97,13 +97,36 @@ function output_html_header($nameofpage, $extra_args = [], $show_statsbar = true
         $extra_args['js_modules'] ?? []
     );
 
+    $development = false;
+    if (! $development && is_file("$code_dir/dist/manifest.json")) {
+        # TODO: optimize loading of this JSON as a PHP script
+        $manifest = json_decode(file_get_contents("$code_dir/dist/manifest.json"), true);
+    } else {
+        $manifest = [];
+    }
+
+    $include_runtime = false;
     foreach ($js_files as $js_file) {
-        if (in_array($js_file, $extra_args['js_modules'] ?? [])) {
-            echo "<script src='$js_file' type='module'></script>\n";
+        $bundle_filename = str_replace("auto", "dist", $manifest[basename($js_file)] ?? "");
+        if (! $development and $bundle_filename) {
+            $include_runtime = true;
+            if (in_array($js_file, $extra_args['js_modules'] ?? [])) {
+                echo "<script src='$code_url/$bundle_filename' type='module'></script>\n";
+            } else {
+                echo "<script src='$code_url/$bundle_filename'></script>\n";
+            }
         } else {
-            $cache_fixer = get_local_file_browser_cache_key($js_file);
-            echo "<script src='$js_file$cache_fixer'></script>\n";
+            if (in_array($js_file, $extra_args['js_modules'] ?? [])) {
+                echo "<script src='$js_file' type='module'></script>\n";
+            } else {
+                $cache_fixer = get_local_file_browser_cache_key($js_file);
+                echo "<script src='$js_file$cache_fixer'></script>\n";
+            }
         }
+    }
+    if ($include_runtime) {
+        $runtime_bundle = str_replace("auto", "dist", $manifest["runtime.js"]);
+        echo "<script src='$code_url/$runtime_bundle' type='module'></script>\n";
     }
 
     // Per-page Javascript

@@ -65,6 +65,13 @@ if [ ! -f "package-lock.json" ]; then
 fi
 
 if [ $PROD -eq 1 ]; then
+    # first install the dev dependencies for building
+    npm ci
+
+    # now run the build to generate the dist/ artifacts
+    npm run build
+
+    # now install only the production dependencies
     npm ci --omit dev --omit optional
 
     # We only want node_modules to be pulling in JS and CSS assets, but
