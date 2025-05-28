@@ -622,13 +622,9 @@ function get_wordcheck_page_header_args(User $user, PPage $ppage): array
     ]);
 
     $header_args = [
-        "js_files" => [
-            "$code_url/node_modules/xregexp/xregexp-all.js",
-            "$code_url/tools/proofers/wordcheck.js",
-            "$code_url/scripts/character_test.js",
-        ],
         "js_modules" => [
             "$code_url/tools/proofers/proof_image.js",
+            "$code_url/tools/proofers/wordcheck.js",
         ],
         "js_data" => get_page_js($user->profile->i_type == 1 ? 2 : 3) . "
             var imageData = $image_data;
