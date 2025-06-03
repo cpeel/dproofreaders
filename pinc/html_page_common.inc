@@ -212,7 +212,7 @@ function get_js_manifest(): array
     // load it and get the opcache-cached version without hitting the disk
     if (is_file("$code_dir/dist/manifest.php")) {
         require_once("$code_dir/dist/manifest.php");
-        return get_cached_js_manifest();
+        return get_cached_js_manifest(); // @phpstan-ignore function.notFound
     }
 
     // if it doesn't exist, see if the JSON version exists and if so load
@@ -243,12 +243,12 @@ function generate_cached_js_manifest(array $manifest): void
 
     $serialized_manifest = serialize($manifest);
     $cached_php_file = <<<EOF
-    <?php
-    function get_cached_js_manifest(): array
-    {
-        return unserialize('$serialized_manifest');
-    }
-    EOF;
+        <?php
+        function get_cached_js_manifest(): array
+        {
+            return unserialize('$serialized_manifest');
+        }
+        EOF;
 
     file_put_contents("$code_dir/dist/manifest.php", $cached_php_file);
 }
