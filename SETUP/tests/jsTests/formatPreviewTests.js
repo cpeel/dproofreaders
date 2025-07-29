@@ -1,6 +1,7 @@
-/* global QUnit */
+/* global QUnit defaultStyles */
 
-import { analyse, findClose, processExMath, makePreview, defaultStyles } from "../../../scripts/analyse_format.js";
+import { analyse, findClose, processExMath } from "../../../scripts/analyse_format.js";
+import { makePreview } from "../../../scripts/show_format.js";
 
 QUnit.module("Format preview test", function () {
     let configuration = {

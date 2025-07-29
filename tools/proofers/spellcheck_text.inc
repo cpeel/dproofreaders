@@ -408,7 +408,7 @@ function output_wordcheck_interface(User $user, PPage $ppage, string $text_data,
     } else {
         echo '<div>';
     }
-    echo '<form name="spcorrects" action="processtext.php" method="POST" onsubmit="return top.submitForm(this)">';
+    echo '<form name="spcorrects" action="processtext.php" method="POST">';
 
     // change all EOL characters to [lf]
     $revert_text = str_replace(["\r", "\n\n", "\n"], ["\n", "[lf]", "[lf]"], $revert_text);
@@ -605,7 +605,7 @@ function get_page_js(int $interface_type_init_value): string
         PAGE_JS;
 }
 
-/** @return array{"js_modules": string[], "js_data": string, "body_attributes": string, "css_data"?: string} */
+/** @return array{"js_files": string[], "js_data": string, "body_attributes": string, "css_data"?: string} */
 function get_wordcheck_page_header_args(User $user, PPage $ppage): array
 {
     global $code_url, $word_check_messages;
