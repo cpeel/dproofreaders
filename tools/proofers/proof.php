@@ -37,23 +37,17 @@ echo "
 <div id='proofreading_interface' data-forum_url='$forum_url_encoded' class='column-flex'>
     <div class='fixed-box default-border' id='page_control'>
         <div class='row_flex'>
-            <span class='stretch-box margin_a' id='project_title'>
+            <span class='stretch-box margin_a'>
+                <b><a id='project_title' target='project-comments' title='", _("View Project Comments in New Window"), "'></a></b>
             </span>
             <span class='fixed-box'>
-                <span id='page_number'></span>
+                <span id='page_number'></span> &middot;
                 <a id=view_other_pages target='lg_image'>", _("View other pages"), "</a>
             </span>
         </div>
         <div class='row_flex'>
-            <span class='stretch-box margin_a'>
-                <a id='project_page' target='project-comments' title='", _("View Project Comments in New Window"), "'>" . _("Project Page") . "</a>
-            </span>
-            <span class='fixed-box'>
-                <a id=editing_guidelines target='roundDoc'>", _('Guidelines'), "</a>
-                <a target='viewcomments' href = '../../faq/prooffacehelp.php'>" . _('Interface Help') . "</a>
-            </span>
-        </div>
-        <div id='action_buttons'>",
+            <span class='stretch-box'>
+                <div id='action_buttons'>",
 action_button('save_button', _("Save")),
 action_button('exit_button', _("Exit")),
 action_button('done_and_exit_button', _("Done & Exit")),
@@ -62,7 +56,15 @@ action_button('revert_to_original_button', _("Revert to Original")),
 action_button('revert_to_saved_button', _("Revert to Saved")),
 action_button('abandon_button', _("Abandon")),
 action_button('report_bad_button', _("Report Bad Page")),
-"</div>";
+        "
+                </div>
+            </span>
+            <span class='fixed-box'>
+                <a id=editing_guidelines target='roundDoc'>", _('Guidelines'), "</a> &middot;
+                <a target='viewcomments' href = '../../faq/prooffacehelp.php'>" . _('Interface Help') . "</a>
+            </span>
+        </div>
+";
 
 // report bad page -- begin
 echo "<div id='bad_page_report' style='display:none;'>";

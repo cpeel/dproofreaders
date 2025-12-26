@@ -178,7 +178,7 @@ window.addEventListener("DOMContentLoaded", async () => {
             nextPage();
         }
 
-        document.getElementById("project_page").href = makeUrl(`${codeUrl}/project.php`, { id: projectId, expected_state: projectState }, "project-comments");
+        document.getElementById("project_title").href = makeUrl(`${codeUrl}/project.php`, { id: projectId, expected_state: projectState }, "project-comments");
 
         function checkValidateText(error) {
             alert(error.message);
