@@ -492,6 +492,24 @@
   display: block;
 }
 /* ------------------------------------------------------------------------ */
+/* Quizzes */
+#quiz_left {
+  flex: 0 0 60%;
+}
+#quiz_image {
+  height: 50%;
+  overflow: scroll;
+}
+#quiz_text_outer {
+  height: 50%;
+}
+#quiz_text {
+  border: 1px solid black;
+}
+#quiz_right {
+  flex: 0 0 40%;
+}
+/* ------------------------------------------------------------------------ */
 /* Common color definitions
  * Where a particular color family has multiple shades available, a
  * suffix indicates relative contrast as compared with the default
