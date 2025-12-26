@@ -4,11 +4,6 @@
     flex-direction: column;
 }
 
-#quiz_left {
-    flex: 0 0 60%;
-    overflow: hidden;
-}
-
 #image_content::-webkit-scrollbar {
     display: none;  /* Safari and Chrome */
 }
@@ -17,24 +12,6 @@
     overflow: auto;
     flex: auto;
     scrollbar-width: none;
-}
-
-#quiz_right {
-    flex: 0 0 40%;
-}
-
-#quiz_image {
-    flex: 0 0 40%;
-    overflow: auto;
-}
-
-#quiz_text_outer {
-    flex: 0 0 60%;
-    overflow: hidden;
-}
-
-#quiz_text {
-    border: 1px solid black;
 }
 
 .langcol {
@@ -49,7 +26,7 @@
 }
 
 .fixed-box {
-    flex:0 0 auto;
+    flex: 0 0 auto;
 }
 
 .stretch-box {
