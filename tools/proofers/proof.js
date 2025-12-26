@@ -26,28 +26,26 @@ window.addEventListener("DOMContentLoaded", async () => {
 
     const imageTextDiv = document.getElementById("image_text");
     const imageContainer = document.getElementById("image_container");
+    const container = document.getElementById("text_div");
+
+    const docMap = {
+        proofreading: "proofreading_guidelines.php",
+        formatting: "formatting_guidelines.php",
+    };
 
     try {
-        const proofSettings = await ajax("GET", `v1/storage/newpi`);
-
+        // Load the project title and URL immediately
         const projectInfo = await ajax("GET", `v1/projects/${projectId}`, { field: ["title", "languages", "round_type"] });
         const roundType = projectInfo.round_type;
+        document.getElementById("project_title").href = makeUrl(`${codeUrl}/project.php`, { id: projectId, expected_state: projectState }, "project-comments");
         document.getElementById("project_title").textContent = projectInfo.title;
 
-        const pickerData = await ajax("GET", `v1/projects/${projectId}/pickersets`);
-
-        const docMap = {
-            proofreading: "proofreading_guidelines.php",
-            formatting: "formatting_guidelines.php",
-        };
-
-        const docURL = await ajax("GET", `v1/documents/${docMap[roundType]}`);
-        document.getElementById("editing_guidelines").href = docURL;
-
-        const dictionaries = await ajax("GET", "v1/dictionaries");
-
-        const container = document.getElementById("text_div");
+        // Load user's prefs to build out the image widget
+        const proofSettings = await ajax("GET", `v1/storage/newpi`);
         const imageWidget = makeProofImageWidget(imageContainer, proofSettings);
+
+        // Now site dictionaries to construct the text pane and build the page
+        const dictionaries = await ajax("GET", "v1/dictionaries");
 
         function syncScroll(s) {
             imageWidget.setScroll(s);
@@ -60,8 +58,15 @@ window.addEventListener("DOMContentLoaded", async () => {
         theSplitter.setSplitDirCallback.push(textWidget.setup, imageWidget.reset);
         textWidget.scrollListeners.add(syncScroll);
         theSplitter.fireSetSplitDir();
-        constructToolBox(textWidget, pickerData, roundType, proofSettings, projectId);
         document.getElementById("action_buttons").append(...theSplitter.buttons);
+
+        // Finally the pickersets to build the toolbox
+        const pickerData = await ajax("GET", `v1/projects/${projectId}/pickersets`);
+        constructToolBox(textWidget, pickerData, roundType, proofSettings, projectId);
+
+        // Update the guidelines link
+        const docURL = await ajax("GET", `v1/documents/${docMap[roundType]}`);
+        document.getElementById("editing_guidelines").href = docURL;
 
         let dataSaved = false;
         function setPageState(data) {
@@ -177,8 +182,6 @@ window.addEventListener("DOMContentLoaded", async () => {
             // get next page
             nextPage();
         }
-
-        document.getElementById("project_title").href = makeUrl(`${codeUrl}/project.php`, { id: projectId, expected_state: projectState }, "project-comments");
 
         function checkValidateText(error) {
             alert(error.message);
