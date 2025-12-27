@@ -95,7 +95,7 @@ window.addEventListener("DOMContentLoaded", async () => {
                         userString = user == "" ? translate.pgettext("no user", "none") : user;
                     } else {
                         const link = makeUrl(`${forumURL}/ucp.php`, { i: "pm", mode: "compose", u: roundInfo.forum_user_id }, "comments");
-                        userString = `<a href='${link}'>${user}</a>`;
+                        userString = `<a href='${link}' target='_blank'>${user}</a>`;
                     }
                     return `${roundInfo.round_id}: ${userString}`;
                 });
