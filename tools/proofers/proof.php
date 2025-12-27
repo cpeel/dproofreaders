@@ -38,11 +38,11 @@ echo "
     <div class='fixed-box default-border' id='page_control'>
         <div class='row_flex'>
             <span class='stretch-box margin_a'>
-                <b><a id='project_title' target='project-comments' title='", _("View Project Comments in New Window"), "'></a></b>
+                <b><a id='project_title' target='_blank' title='", _("View Project Comments in New Window"), "'></a></b>
             </span>
             <span class='fixed-box'>
                 <span id='page_number'></span> &middot;
-                <a id=view_other_pages target='lg_image'>", _("View other pages"), "</a>
+                <a id='view_other_pages' target='_blank'>", _("View other pages"), "</a>
             </span>
         </div>
         <div class='row_flex'>
@@ -56,12 +56,12 @@ action_button('revert_to_original_button', _("Revert to Original")),
 action_button('revert_to_saved_button', _("Revert to Saved")),
 action_button('abandon_button', _("Abandon")),
 action_button('report_bad_button', _("Report Bad Page")),
-        "
+"
                 </div>
             </span>
             <span class='fixed-box'>
-                <a id=editing_guidelines target='roundDoc'>", _('Guidelines'), "</a> &middot;
-                <a target='viewcomments' href = '../../faq/prooffacehelp.php'>" . _('Interface Help') . "</a>
+                <a id='editing_guidelines' target='_blank'>", _('Guidelines'), "</a> &middot;
+                <a target='_blank' href='../../faq/prooffacehelp.php'>" . _('Interface Help') . "</a>
             </span>
         </div>
 ";
