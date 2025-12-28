@@ -1,6 +1,6 @@
 /*global makeCheckBox makeLabel */
-/* eslint no-unused-vars: "warn" */
 
+import { TextWidgetPlugin } from "./text_widget_plugin.js";
 import { analyse, getILTags } from "./analyse_format.js";
 import translate from "./gettext.js";
 
@@ -31,68 +31,114 @@ export const defaultStyles = {
     allowMathPreview: false,
 };
 
-export function makePreview(formatting, quill, extraSettings, statSpan) {
-    const colorMarkupCheck = makeCheckBox();
-    const colorMarkupControl = makeLabel([colorMarkupCheck, translate.gettext("Color markup")]);
+export class FormatPreviewPlugin extends TextWidgetPlugin {
+    anlaysis;
+    ok;
+    pageText = "";
 
-    const hideTagsCheck = makeCheckBox();
-    const hideTagsControl = makeLabel([hideTagsCheck, translate.gettext("Hide tags")]);
+    constructor(quill, extraSettings, formatting, statSpan) {
+        super(quill, extraSettings);
 
-    const allowUnderlineCheck = makeCheckBox();
-    const allowUnderlineControl = makeLabel([allowUnderlineCheck, translate.gettext("Allow <u> for underline")]);
+        this.formatting = formatting;
+        this.statSpan = statSpan;
 
-    const allowMathCheck = makeCheckBox();
-    const allowMathControl = makeLabel([allowMathCheck, translate.gettext("Preview Math")]);
+        this.formatting.colors ??
+            (this.formatting.colors = {
+                err: { background: "#ff0000", color: "" },
+                hlt: { background: "#ceff09", color: "" },
+                i: { background: "", color: "#0000ff" },
+                b: { background: "", color: "#c55a1b" },
+                g: { background: "", color: "#8a2be2" },
+                sc: { background: "", color: "#009700" },
+                f: { background: "", color: "#ff0000" },
+                "#": { background: "#fecafe", color: "" },
+                "*": { background: "#d1fcff", color: "" },
+                etc: { background: "#ffcaaf", color: "" },
+            });
 
-    const optGrid = document.createElement("div");
-    optGrid.classList.add("grid2col");
-    optGrid.append(colorMarkupControl, hideTagsControl, allowMathControl, allowUnderlineControl);
+        this.formatting.allowUnderline ?? (this.formatting.allowUnderline = false);
+        this.formatting.colorMarkup ?? (this.formatting.colorMarkup = true);
+        this.formatting.hideTags ?? (this.formatting.hideTags = true);
+        this.formatting.allowMathPreview ?? (this.formatting.allowMathPreview = false);
 
-    const possIssBox = document.createElement("input");
-    possIssBox.type = "text";
-    possIssBox.size = "1";
-    possIssBox.readOnly = true;
+        this.formatStyles = {
+            i: { fontStyle: "italic" },
+            b: { fontWeight: "bold" },
+            g: { letterSpacing: "0.25em", marginRight: "-0.25em" },
+            sc: { fontVariant: "small-caps" },
+            f: { fontStyle: "normal" },
+            u: { textDecoration: "underline" },
+        };
 
-    formatting.colors ??
-        (formatting.colors = {
-            err: { background: "#ff0000", color: "" },
-            hlt: { background: "#ceff09", color: "" },
-            i: { background: "", color: "#0000ff" },
-            b: { background: "", color: "#c55a1b" },
-            g: { background: "", color: "#8a2be2" },
-            sc: { background: "", color: "#009700" },
-            f: { background: "", color: "#ff0000" },
-            "#": { background: "#fecafe", color: "" },
-            "*": { background: "#d1fcff", color: "" },
-            etc: { background: "#ffcaaf", color: "" },
-        });
+        const colorMarkupCheck = makeCheckBox();
+        const colorMarkupControl = makeLabel([colorMarkupCheck, translate.gettext("Color markup")]);
 
-    formatting.allowUnderline ?? (formatting.allowUnderline = false);
-    formatting.colorMarkup ?? (formatting.colorMarkup = true);
-    formatting.hideTags ?? (formatting.hideTags = true);
-    formatting.allowMathPreview ?? (formatting.allowMathPreview = false);
-    const colors = formatting.colors;
+        const hideTagsCheck = makeCheckBox();
+        const hideTagsControl = makeLabel([hideTagsCheck, translate.gettext("Hide tags")]);
 
-    const formatStyles = {
-        i: { fontStyle: "italic" },
-        b: { fontWeight: "bold" },
-        g: { letterSpacing: "0.25em", marginRight: "-0.25em" },
-        sc: { fontVariant: "small-caps" },
-        f: { fontStyle: "normal" },
-        u: { textDecoration: "underline" },
-    };
+        const allowUnderlineCheck = makeCheckBox();
+        const allowUnderlineControl = makeLabel([allowUnderlineCheck, translate.gettext("Allow <u> for underline")]);
 
-    // the way html treats small cap text is different to the dp convention
-    // so if sc-marked text is all upper-case transform to lower
-    function checkAllCap(scString) {
-        // remove tags such as <i> within the string so that all
-        // uppercase string is correctly identified
-        scString = scString.replace(/<\/?.{1,2}>/g, "");
-        return scString === scString.toUpperCase();
+        const allowMathCheck = makeCheckBox();
+        const allowMathControl = makeLabel([allowMathCheck, translate.gettext("Preview Math")]);
+
+        this.optGrid = document.createElement("div");
+        this.optGrid.classList.add("grid2col");
+        this.optGrid.append(colorMarkupControl, hideTagsControl, allowMathControl, allowUnderlineControl);
+
+        this.possIssBox = document.createElement("input");
+        this.possIssBox.type = "text";
+        this.possIssBox.size = "1";
+        this.possIssBox.readOnly = true;
+
+        colorMarkupCheck.addEventListener(
+            "change",
+            function (colorMarkupCheck) {
+                this.formatting.colorMarkup = colorMarkupCheck.checked;
+                this.showStyle();
+            }.bind(this, colorMarkupCheck),
+        );
+        colorMarkupCheck.checked = this.formatting.colorMarkup;
+
+        hideTagsCheck.addEventListener(
+            "change",
+            function (hideTagsCheck) {
+                this.formatting.hideTags = hideTagsCheck.checked;
+                this.showStyle();
+            }.bind(this, hideTagsCheck),
+        );
+        hideTagsCheck.checked = this.formatting.hideTags;
+
+        allowMathCheck.addEventListener(
+            "change",
+            function (allowMathCheck) {
+                this.formatting.allowMathPreview = allowMathCheck.checked;
+                this.markFormat();
+            }.bind(this, allowMathCheck),
+        );
+        allowMathCheck.checked = this.formatting.allowMathPreview;
+
+        allowUnderlineCheck.addEventListener(
+            "change",
+            function (allowUnderlineCheck) {
+                this.formatting.allowUnderline = allowUnderlineCheck.checked;
+                this.markFormat();
+            }.bind(this, allowUnderlineCheck),
+        );
+        allowUnderlineCheck.checked = this.formatting.allowUnderline;
     }
 
-    function showInlineStyle(text) {
-        const ILTags = getILTags(formatting);
+    showInlineStyle(text) {
+        // the way html treats small cap text is different to the dp convention
+        // so if sc-marked text is all upper-case transform to lower
+        function checkAllCap(scString) {
+            // remove tags such as <i> within the string so that all
+            // uppercase string is correctly identified
+            scString = scString.replace(/<\/?.{1,2}>/g, "");
+            return scString === scString.toUpperCase();
+        }
+
+        const ILTags = getILTags(this.formatting);
         const reStartTag = new RegExp(`<(${ILTags})>`, "g");
         let result;
         while ((result = reStartTag.exec(text)) !== null) {
@@ -102,27 +148,27 @@ export function makePreview(formatting, quill, extraSettings, statSpan) {
             const closeTag = `</${tagStyle}>`;
             const end = text.indexOf(closeTag, start);
             const attributes = {};
-            Object.assign(attributes, formatStyles[tagStyle]);
+            Object.assign(attributes, this.formatStyles[tagStyle]);
             if ("sc" === tagStyle) {
                 if (checkAllCap(text.slice(start, end))) {
                     attributes.textTransform = "lowercase";
                 }
             }
-            if (formatting.colorMarkup) {
-                Object.assign(attributes, colors[tagStyle]);
+            if (this.formatting.colorMarkup) {
+                Object.assign(attributes, this.formatting.colors[tagStyle]);
             }
-            quill.formatText(start, end - start + closeTag.length, attributes, "silent");
+            this.quill.formatText(start, end - start + closeTag.length, attributes, "silent");
         }
-        if (formatting.hideTags) {
+        if (this.formatting.hideTags) {
             const reAnyTag = new RegExp(`</?(?:${ILTags})>`, "g");
             while ((result = reAnyTag.exec(text)) !== null) {
-                quill.formatText(result.index, result[0].length, "display", "none", "silent");
+                this.quill.formatText(result.index, result[0].length, "display", "none", "silent");
             }
         }
     }
 
-    function showOolStyle(text) {
-        if (!formatting.colorMarkup) {
+    showOolStyle(text) {
+        if (!this.formatting.colorMarkup) {
             return;
         }
         // out-of-line tags can be nested
@@ -144,7 +190,7 @@ export function makePreview(formatting, quill, extraSettings, statSpan) {
                     if (nestLevel === 0) {
                         // found the corresponding tag
                         // mark the range
-                        quill.formatText(blockStart, anyTagResult.index - blockStart + 2, colors[result[1]], "silent");
+                        this.quill.formatText(blockStart, anyTagResult.index - blockStart + 2, this.formatting.colors[result[1]], "silent");
                         break;
                     } else {
                         nestLevel -= 1;
@@ -154,52 +200,52 @@ export function makePreview(formatting, quill, extraSettings, statSpan) {
         }
     }
 
-    const reSubSuper = /(_|\^)\{.+?\}/g;
-    // ^. ideally not [^x] or [x^]
-    const reSingleSuper = /\^[^\]{]/g;
+    showSubSuper(startHere, text) {
+        const reSubSuper = /(_|\^)\{.+?\}/g;
+        // ^. ideally not [^x] or [x^]
+        const reSingleSuper = /\^[^\]{]/g;
 
-    function showEtc(text) {
+        let result;
+        const attributes = {};
+        if (this.formatting.colorMarkup) {
+            Object.assign(attributes, this.formatting.colors["etc"]);
+        }
+        reSubSuper.lastIndex = startHere;
+        while ((result = reSubSuper.exec(text)) !== null) {
+            attributes.script = result[1] === "_" ? "sub" : "super";
+            const start = result.index;
+            const length = result[0].length;
+            this.quill.formatText(start, length, attributes, "silent");
+            if (this.formatting.hideTags) {
+                this.quill.formatText(start, 2, "display", "none", "silent");
+                this.quill.formatText(start + length - 1, 1, "display", "none", "silent");
+            }
+        }
+        // single char superscript
+        attributes.script = "super";
+        reSingleSuper.lastIndex = startHere;
+        while ((result = reSingleSuper.exec(text)) !== null) {
+            const start = result.index;
+            this.quill.formatText(start, 2, attributes, "silent");
+            if (this.formatting.hideTags) {
+                this.quill.formatText(start, 1, "display", "none", "silent");
+            }
+        }
+    }
+
+    showEtc(text) {
         // thought break
-        if (formatting.colorMarkup) {
+        if (this.formatting.colorMarkup) {
             let index = 0;
             while ((index = text.indexOf("<tb>", index)) >= 0) {
-                quill.formatText(index, 4, colors["etc"], "silent");
+                this.quill.formatText(index, 4, this.formatting.colors["etc"], "silent");
                 index += 4;
             }
         }
 
-        function showSubSuper(startHere, text) {
-            let result;
-            const attributes = {};
-            if (formatting.colorMarkup) {
-                Object.assign(attributes, colors["etc"]);
-            }
-            reSubSuper.lastIndex = startHere;
-            while ((result = reSubSuper.exec(text)) !== null) {
-                attributes.script = result[1] === "_" ? "sub" : "super";
-                const start = result.index;
-                const length = result[0].length;
-                quill.formatText(start, length, attributes, "silent");
-                if (formatting.hideTags) {
-                    quill.formatText(start, 2, "display", "none", "silent");
-                    quill.formatText(start + length - 1, 1, "display", "none", "silent");
-                }
-            }
-            // single char superscript
-            attributes.script = "super";
-            reSingleSuper.lastIndex = startHere;
-            while ((result = reSingleSuper.exec(text)) !== null) {
-                const start = result.index;
-                quill.formatText(start, 2, attributes, "silent");
-                if (formatting.hideTags) {
-                    quill.formatText(start, 1, "display", "none", "silent");
-                }
-            }
-        }
-
         // processes the text by showSubSuper but in math mode only outside math markup
-        if (!formatting.allowMathPreview) {
-            showSubSuper(0, text);
+        if (!this.formatting.allowMathPreview) {
+            this.showSubSuper(0, text);
         } else {
             // find whole math strings \[ ... \] or \( ... \)
             let txtOut = "";
@@ -208,7 +254,7 @@ export function makePreview(formatting, quill, extraSettings, statSpan) {
             let startIndex = 0;
             while ((result = mathRegex.exec(text)) !== null) {
                 // process from beginning or end of previous math to start of math
-                showSubSuper(startIndex, text.slice(0, result.index));
+                this.showSubSuper(startIndex, text.slice(0, result.index));
                 startIndex = mathRegex.lastIndex;
                 let formula = result[0];
                 const index = result.index;
@@ -218,12 +264,12 @@ export function makePreview(formatting, quill, extraSettings, statSpan) {
                 formula = formula.slice(2, -2);
                 // replace first character and hide the rest
                 const hideLength = mathRegex.lastIndex - index - 1;
-                quill.deleteText(index, 1);
-                quill.insertEmbed(index, formulaStyle, formula);
-                quill.formatText(index + 1, hideLength, "display", "none", "silent");
+                this.quill.deleteText(index, 1);
+                this.quill.insertEmbed(index, formulaStyle, formula);
+                this.quill.formatText(index + 1, hideLength, "display", "none", "silent");
             }
             // no more found, process to end
-            showSubSuper(startIndex, text);
+            this.showSubSuper(startIndex, text);
             return txtOut;
         }
     }
@@ -244,7 +290,7 @@ export function makePreview(formatting, quill, extraSettings, statSpan) {
     // if this is implemented quill text will change so have to use a new
     // getText function to use if saving from here
 
-    function reWrap(txt) {
+    reWrap(txt) {
         let mode = "para";
         const ops = [];
         const lines = txt.split("\n");
@@ -268,32 +314,49 @@ export function makePreview(formatting, quill, extraSettings, statSpan) {
                     break;
             }
         }
-        quill.setContents({ ops: ops }, "silent");
+        this.quill.setContents({ ops: ops }, "silent");
     }
 
-    let analysis;
-    let ok;
+    markFormat() {
+        this.analysis = analyse(this.pageText, this.formatting);
+        // so insert notes from end
+        this.analysis.noteArray.reverse();
+        let issArray = this.analysis.issues;
+        let nIssues = 0;
+        let possIss = 0;
+        issArray.forEach(function (issue) {
+            if (issue.type === 1) {
+                nIssues += 1;
+            } else {
+                possIss += 1;
+            }
+        });
+        // ok true if no errors which would cause showstyle() or reWrap() to fail
+        this.ok = nIssues === 0;
+        this.possIssBox.value = possIss;
+        this.showStyle();
+    }
 
-    function showStyle() {
-        const noNoteText = analysis.text;
+    showStyle() {
+        const noNoteText = this.analysis.text;
         let reWrapMode = false;
-        if (ok && reWrapMode) {
-            reWrap(noNoteText);
+        if (this.ok && reWrapMode) {
+            this.reWrap(noNoteText);
             return;
         }
 
-        quill.setText(noNoteText, "silent");
-        if (ok) {
-            showOolStyle(noNoteText);
-            showInlineStyle(noNoteText);
-            showEtc(noNoteText);
+        this.quill.setText(noNoteText, "silent");
+        if (this.ok) {
+            this.showOolStyle(noNoteText);
+            this.showInlineStyle(noNoteText);
+            this.showEtc(noNoteText);
         }
         // mark issues after style so don't get hidden
-        for (const issue of analysis.issues) {
+        for (const issue of this.analysis.issues) {
             const attributes = {};
             attributes.title = issue.text;
-            Object.assign(attributes, issue.type === 0 ? colors.hlt : colors.err);
-            quill.formatText(issue.start, issue.len, attributes, "silent");
+            Object.assign(attributes, issue.type === 0 ? this.formatting.colors.hlt : this.formatting.colors.err);
+            this.quill.formatText(issue.start, issue.len, attributes, "silent");
         }
 
         // then insert notes from end
@@ -306,76 +369,28 @@ export function makePreview(formatting, quill, extraSettings, statSpan) {
             marginRight: 0,
             fontVariant: "normal",
         };
-        for (const note of analysis.noteArray) {
-            quill.insertText(note.start, note.text, noteFormat, "silent");
+        for (const note of this.analysis.noteArray) {
+            this.quill.insertText(note.start, note.text, noteFormat, "silent");
         }
     }
 
-    let pageText;
-    function markFormat() {
-        analysis = analyse(pageText, formatting);
-        // so insert notes from end
-        analysis.noteArray.reverse();
-        let issArray = analysis.issues;
-        let nIssues = 0;
-        let possIss = 0;
-        issArray.forEach(function (issue) {
-            if (issue.type === 1) {
-                nIssues += 1;
-            } else {
-                possIss += 1;
-            }
-        });
-        // ok true if no errors which would cause showstyle() or reWrap() to fail
-        ok = nIssues === 0;
-        possIssBox.value = possIss;
-        showStyle();
+    enter() {
+        this.quill.enable(false);
+        // save text so can restore when leave formatting mode
+        this.pageText = this.quill.getText();
+        this.extraSettings.append(this.optGrid);
+        this.statSpan.append("poss. iss: ", this.possIssBox);
+        this.markFormat();
     }
 
-    colorMarkupCheck.addEventListener("change", function () {
-        formatting.colorMarkup = this.checked;
-        showStyle();
-    });
-    colorMarkupCheck.checked = formatting.colorMarkup;
-
-    hideTagsCheck.addEventListener("change", function () {
-        formatting.hideTags = this.checked;
-        showStyle();
-    });
-    hideTagsCheck.checked = formatting.hideTags;
-
-    allowMathCheck.addEventListener("change", function () {
-        formatting.allowMathPreview = this.checked;
-        markFormat();
-    });
-    allowMathCheck.checked = formatting.allowMathPreview;
-
-    allowUnderlineCheck.addEventListener("change", function () {
-        formatting.allowUnderline = this.checked;
-        markFormat();
-    });
-    allowUnderlineCheck.checked = formatting.allowUnderline;
-
-    function leave() {
+    leave() {
         // restore text with no marking.
-        quill.setText(pageText, "silent");
+        this.quill.setText(this.pageText, "silent");
         // it should be possible to suspend history while in preview
         // since text is unchanged by using "silent" but doesn't work
-        quill.history.clear();
-        extraSettings.replaceChildren();
-        statSpan.replaceChildren();
-        quill.enable();
+        this.quill.history.clear();
+        this.extraSettings.replaceChildren();
+        this.statSpan.replaceChildren();
+        this.quill.enable();
     }
-
-    return {
-        enter: function () {
-            quill.enable(false);
-            // save text so can restore when leave formatting mode
-            pageText = quill.getText();
-            extraSettings.append(optGrid);
-            statSpan.append("poss. iss: ", possIssBox);
-            markFormat();
-        },
-        leave,
-    };
 }

@@ -2,7 +2,7 @@
 /* eslint no-use-before-define: "warn" */
 /* eslint camelcase: "off" */
 
-import { makePreview } from "./format_preview.js";
+import { FormatPreviewPlugin } from "./format_preview.js";
 import { makeWordchecker } from "./word_check.js";
 import { makeValidator } from "./validator.js";
 import translate from "./gettext.js";
@@ -510,11 +510,11 @@ export class ProofTextWidget extends TextWidget {
             this.scrollListeners,
         );
 
-        const statSpan = document.createElement("span");
+        this.statSpan = document.createElement("span");
 
         // userSettings.formatting ??= {}; // needs chrome 85, FF 79, Safari 14
         this.userSettings.formatting ?? (this.userSettings.formatting = {});
-        this.formatter = makePreview(this.userSettings.formatting, this.quill, this.extraSettings, statSpan);
+        this.formatter = new FormatPreviewPlugin(this.quill, this.extraSettings, this.userSettings.formatting, this.statSpan);
 
         this.textOnlyRadio = makeRadio("viewMode");
         this.textOnlyRadio.checked = true;
@@ -530,7 +530,7 @@ export class ProofTextWidget extends TextWidget {
         const formatPreviewControl = makeLabel([formatPreviewRadio, translate.gettext("Format Preview")]);
 
         this.controlBar.prepend(textOnlyControl, wordCheckControl, formatPreviewControl);
-        this.controlBar.append(lineSpacer, statSpan);
+        this.controlBar.append(lineSpacer, this.statSpan);
 
         this.validator = makeValidator(projectId, this.quill);
     }
@@ -548,8 +548,8 @@ export class ProofTextWidget extends TextWidget {
 
     enterFormatPreview() {
         this.leave();
-        this.formatter.enter();
-        this.leave = this.formatter.leave;
+        this.formatter.enter.bind(this.formatter)();
+        this.leave = this.formatter.leave.bind(this.formatter);
     }
 
     scroll() {
