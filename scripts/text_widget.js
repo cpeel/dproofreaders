@@ -245,8 +245,10 @@ class BasicTextWidget {
     transformSelection(func) {
         const { index, length } = this.quill.getSelection(true);
         const selectedText = this.quill.getText(index, length);
+        const transformedText = func(selectedText);
         this.quill.deleteText(index, length, "user");
-        this.quill.insertText(index, func(selectedText), "user");
+        this.quill.insertText(index, transformedText, "user");
+        this.quill.setSelection(index, transformedText.length, "user");
     }
 
     replaceSelection(text) {
