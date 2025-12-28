@@ -108,6 +108,25 @@ function convertDiacriticalMarkup(string) {
     }
 }
 
+function surroundSelection(quill, before, after, ignoreSpace = false) {
+    // in the following "user" disables when not enabled
+    let { index, length } = quill.getSelection(true);
+    if (ignoreSpace) {
+        // move end fwd if spaces at end
+        while (length > 0 && quill.getText(index + length - 1, 1) === " ") {
+            length -= 1;
+        }
+        if (length === 0) {
+            return;
+        }
+    }
+
+    // do in two parts so undo buffer does not need to hold so much
+    quill.insertText(index + length, after, "user");
+    quill.insertText(index, before, "user");
+    quill.setSelection(index, length + before.length + after.length, "user");
+}
+
 class BasicTextWidget {
     constructor(editBox, userSettings) {
         this.editBox = editBox;
@@ -122,7 +141,12 @@ class BasicTextWidget {
 
     buildQuill() {
         const quill = new Quill(this.editBox, {
-            modules: { toolbar: false },
+            modules: {
+                toolbar: false,
+                keyboard: {
+                    bindings: this.getKeyboardBindings(),
+                },
+            },
             history: {
                 delay: 0,
                 maxStack: 500,
@@ -173,6 +197,35 @@ class BasicTextWidget {
         return quill;
     }
 
+    getKeyboardBindings() {
+        return {
+            bold: {
+                key: "b",
+                shortKey: true,
+                // eslint-disable-next-line no-unused-vars
+                handler(range, context) {
+                    surroundSelection(this.quill, "<b>", "</b>");
+                },
+            },
+            italic: {
+                key: "i",
+                shortKey: true,
+                // eslint-disable-next-line no-unused-vars
+                handler(range, context) {
+                    surroundSelection(this.quill, "<i>", "</i>");
+                },
+            },
+            underline: {
+                key: "u",
+                shortKey: true,
+                // eslint-disable-next-line no-unused-vars
+                handler(range, context) {
+                    surroundSelection(this.quill, "<u>", "</u>");
+                },
+            },
+        };
+    }
+
     setFontSize(fontSize) {
         this.qlEditor.style.fontSize = fontSize ?? this.userSettings.fontSize;
     }
@@ -186,19 +239,7 @@ class BasicTextWidget {
     }
 
     surroundSelection(before, after) {
-        // in the following "user" disables when not enabled
-        let { index, length } = this.quill.getSelection(true);
-        // move end fwd if spaces at end
-        while (length > 0 && this.quill.getText(index + length - 1, 1) === " ") {
-            length -= 1;
-        }
-        if (length === 0) {
-            return;
-        }
-        // do in two parts so undo buffer does not need to hold so much
-        this.quill.insertText(index + length, after, "user");
-        this.quill.insertText(index, before, "user");
-        this.quill.setSelection(index, length + before.length + after.length, "user");
+        surroundSelection(this.quill, before, after, true);
     }
 
     transformSelection(func) {
