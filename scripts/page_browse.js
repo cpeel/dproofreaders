@@ -4,7 +4,7 @@ import translate from "./gettext.js";
 import { ajax } from "./api.js";
 import { viewSplitter } from "./view_splitter.js";
 import { makeImageWidget } from "./image_widget.js";
-import { makeTextWidget } from "./text_widget.js";
+import { TextWidget } from "./text_widget.js";
 
 function makePageControl(pages, selectedImageFileName, changePage) {
     // changePage is a callback to act when page changes
@@ -195,7 +195,7 @@ export async function pageBrowse(container, params, replaceUrl, setShowFile = fu
             await populateRoundSelector();
             textDiv = document.createElement("div");
             textDiv.classList.add("column-flex");
-            textWidget = makeTextWidget(textDiv, userSettings);
+            textWidget = new TextWidget(textDiv, userSettings);
         }
         if (displayMode !== "text") {
             imageDiv = document.createElement("div");
@@ -219,9 +219,9 @@ export async function pageBrowse(container, params, replaceUrl, setShowFile = fu
             case "imageText": {
                 imageTextDiv.append(imageDiv, textDiv);
                 const theSplitter = viewSplitter(imageTextDiv, userSettings);
-                theSplitter.mainSplit.onResize.add(textWidget.reLayout);
+                theSplitter.mainSplit.onResize.add(textWidget.reLayout.bind(textWidget));
                 theSplitter.mainSplit.onResize.add(imageWidget.reSize);
-                theSplitter.setSplitDirCallback.push(textWidget.setup, imageWidget.reset);
+                theSplitter.setSplitDirCallback.push(textWidget.setup.bind(textWidget), imageWidget.reset);
                 pageControlDiv.append(resetButton, imageButton, textButton, ...pageControls, roundControl, ...theSplitter.buttons);
                 theSplitter.fireSetSplitDir();
                 break;

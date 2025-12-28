@@ -1,4 +1,4 @@
-import { makeQuizTextWidget } from "./text_widget.js";
+import { QuizTextWidget } from "./text_widget.js";
 import { constructToolBox } from "./toolbox.js";
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -7,7 +7,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const pickerData = JSON.parse(textDiv.dataset.pickersets);
     const roundType = textDiv.dataset.round_type;
 
-    const quizTextWidget = makeQuizTextWidget(textDiv, {});
+    const quizTextWidget = new QuizTextWidget(textDiv, {});
     constructToolBox(quizTextWidget, pickerData, roundType, {}, "quiz");
     function initialiseText() {
         quizTextWidget.setText(initialText);

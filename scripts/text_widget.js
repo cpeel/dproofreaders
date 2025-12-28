@@ -22,45 +22,6 @@ const fonts = {
     },
 };
 
-function editOperations(quill) {
-    return {
-        // in the following "user" disables when not enabled
-        surroundSelection: function (before, after) {
-            let { index, length } = quill.getSelection(true);
-            // move end fwd if spaces at end
-            while (length > 0 && quill.getText(index + length - 1, 1) === " ") {
-                length -= 1;
-            }
-            if (length === 0) {
-                return;
-            }
-            // do in two parts so undo buffer does not need to hold so much
-            quill.insertText(index + length, after, "user");
-            quill.insertText(index, before, "user");
-            quill.setSelection(index, length + before.length + after.length, "user");
-        },
-        transformSelection: function (func) {
-            const { index, length } = quill.getSelection(true);
-            const selectedText = quill.getText(index, length);
-            quill.deleteText(index, length, "user");
-            quill.insertText(index, func(selectedText), "user");
-        },
-        replaceSelection: function (text) {
-            const { index, length } = quill.getSelection(true);
-            // HACK to make Quill undo work correctly do not delete zero length
-            // otherwise it combines inserts into one operation
-            if (0 !== length) {
-                quill.deleteText(index, length, "user");
-            }
-            quill.insertText(index, text, "user");
-            quill.setSelection(index + text.length, 0, "user");
-        },
-        getText: function () {
-            return quill.getText();
-        },
-    };
-}
-
 function convertPunctuation(string) {
     const conversionMap = {
         "‘": "'",
@@ -147,147 +108,273 @@ function convertDiacriticalMarkup(string) {
     }
 }
 
-function makeBasicTextWidget(editBox, userSettings) {
-    const quill = new Quill(editBox, {
-        modules: { toolbar: false },
-        history: {
-            delay: 0,
-            maxStack: 500,
-            userOnly: true,
-        },
-    });
+class BasicTextWidget {
+    constructor(editBox, userSettings) {
+        this.editBox = editBox;
+        this.quill = this.buildQuill(this.editBox);
+        this.qlEditor = this.editBox.firstChild;
 
-    quill.root.setAttribute("spellcheck", false);
+        this.userSettings = userSettings;
+        this.userSettings.fontSize ?? (this.userSettings.fontSize = "12pt");
+        this.userSettings.textWrap ?? (this.userSettings.textWrap = false);
+        this.userSettings.fontId ?? (this.userSettings.fontId = "dp_sans_mono");
+    }
 
-    quill.on("text-change", (delta, oldDelta, source) => {
-        if (source == "user") {
-            var retain = 0;
-            [...delta.ops].map((op) => {
-                if (Object.hasOwn(op, "retain")) {
-                    retain = op.retain;
-                } else if (Object.hasOwn(op, "insert")) {
-                    // check if we should attempt diacritical conversion, we only support
-                    // the user typing this in so the op.insert will always end with ]
-                    if ([...op.insert].reverse()[0] == "]") {
-                        // find the start and end of our markup, we can treat
-                        // this as basic ASCII since all of our diacritical
-                        // markup is basic ASCII
-                        var maybeMarkupStartIndex = Math.max(0, retain + [...op.insert].length - 4);
-                        var maybeMarkup = quill.getText(maybeMarkupStartIndex, 4);
-                        const converted = convertDiacriticalMarkup(maybeMarkup);
-                        if (maybeMarkup != converted) {
-                            quill.deleteText(maybeMarkupStartIndex, 4);
-                            quill.insertText(maybeMarkupStartIndex, converted);
-                            setTimeout(() => quill.setSelection(maybeMarkupStartIndex + [...converted].length, 0), 0);
+    buildQuill() {
+        const quill = new Quill(this.editBox, {
+            modules: { toolbar: false },
+            history: {
+                delay: 0,
+                maxStack: 500,
+                userOnly: true,
+            },
+        });
+
+        quill.root.setAttribute("spellcheck", false);
+
+        quill.on("text-change", (delta, oldDelta, source) => {
+            if (source == "user") {
+                var retain = 0;
+                [...delta.ops].map((op) => {
+                    if (Object.hasOwn(op, "retain")) {
+                        retain = op.retain;
+                    } else if (Object.hasOwn(op, "insert")) {
+                        // check if we should attempt diacritical conversion, we only support
+                        // the user typing this in so the op.insert will always end with ]
+                        if ([...op.insert].reverse()[0] == "]") {
+                            // find the start and end of our markup, we can treat
+                            // this as basic ASCII since all of our diacritical
+                            // markup is basic ASCII
+                            var maybeMarkupStartIndex = Math.max(0, retain + [...op.insert].length - 4);
+                            var maybeMarkup = quill.getText(maybeMarkupStartIndex, 4);
+                            const converted = convertDiacriticalMarkup(maybeMarkup);
+                            if (maybeMarkup != converted) {
+                                quill.deleteText(maybeMarkupStartIndex, 4);
+                                quill.insertText(maybeMarkupStartIndex, converted);
+                                setTimeout(() => quill.setSelection(maybeMarkupStartIndex + [...converted].length, 0), 0);
+                            }
                         }
-                    }
-                    // if not, see if we need to convert any punctuation
-                    else {
-                        const converted = convertPunctuation(op.insert);
-                        if (op.insert != converted) {
-                            quill.deleteText(retain, [...op.insert].length);
-                            quill.insertText(retain, converted);
-                            if ([...op.insert].length != [...converted].length) {
-                                setTimeout(() => quill.setSelection(retain + [...converted].length, 0), 0);
+                        // if not, see if we need to convert any punctuation
+                        else {
+                            const converted = convertPunctuation(op.insert);
+                            if (op.insert != converted) {
+                                quill.deleteText(retain, [...op.insert].length);
+                                quill.insertText(retain, converted);
+                                if ([...op.insert].length != [...converted].length) {
+                                    setTimeout(() => quill.setSelection(retain + [...converted].length, 0), 0);
+                                }
                             }
                         }
                     }
-                }
-            });
+                });
+            }
+        });
+
+        return quill;
+    }
+
+    setFontSize(fontSize) {
+        this.qlEditor.style.fontSize = fontSize ?? this.userSettings.fontSize;
+    }
+
+    setFontFace(fontId) {
+        this.qlEditor.style.fontFamily = fonts[fontId ?? this.userSettings.fontId].face;
+    }
+
+    setWrap(wrap) {
+        this.qlEditor.style.whiteSpace = (wrap ?? this.userSettings.textWrap) ? "pre-wrap" : "pre";
+    }
+
+    surroundSelection(before, after) {
+        // in the following "user" disables when not enabled
+        let { index, length } = this.quill.getSelection(true);
+        // move end fwd if spaces at end
+        while (length > 0 && this.quill.getText(index + length - 1, 1) === " ") {
+            length -= 1;
         }
-    });
-
-    const qlEditor = editBox.firstChild;
-
-    function setFontSize() {
-        qlEditor.style.fontSize = userSettings.fontSize;
+        if (length === 0) {
+            return;
+        }
+        // do in two parts so undo buffer does not need to hold so much
+        this.quill.insertText(index + length, after, "user");
+        this.quill.insertText(index, before, "user");
+        this.quill.setSelection(index, length + before.length + after.length, "user");
     }
 
-    userSettings.fontSize ?? (userSettings.fontSize = "12pt");
-
-    function setFontFace() {
-        qlEditor.style.fontFamily = fonts[userSettings.fontId].face;
+    transformSelection(func) {
+        const { index, length } = this.quill.getSelection(true);
+        const selectedText = this.quill.getText(index, length);
+        this.quill.deleteText(index, length, "user");
+        this.quill.insertText(index, func(selectedText), "user");
     }
 
-    userSettings.textWrap ?? (userSettings.textWrap = false);
-
-    function setWrap() {
-        qlEditor.style.whiteSpace = userSettings.textWrap ? "pre-wrap" : "pre";
+    replaceSelection(text) {
+        const { index, length } = this.quill.getSelection(true);
+        // HACK to make Quill undo work correctly do not delete zero length
+        // otherwise it combines inserts into one operation
+        if (0 !== length) {
+            this.quill.deleteText(index, length, "user");
+        }
+        this.quill.insertText(index, text, "user");
+        this.quill.setSelection(index + text.length, 0, "user");
     }
 
-    userSettings.fontId ?? (userSettings.fontId = "dp_sans_mono");
+    getText() {
+        return this.quill.getText();
+    }
 
-    return {
-        quill,
-        qlEditor,
-        setText: function (text) {
-            quill.setText(text);
-        },
-        setFontSize,
-        setFontFace,
-        setWrap,
-    };
+    setText(text) {
+        this.quill.setText(text);
+    }
 }
 
-export function makeQuizTextWidget(editBox, userSettings) {
-    const { quill, setText, setFontSize, setFontFace, setWrap } = makeBasicTextWidget(editBox, userSettings);
-    const { surroundSelection, transformSelection, replaceSelection, getText } = editOperations(quill);
+export class QuizTextWidget extends BasicTextWidget {
+    constructor(editBox, userSettings) {
+        super(editBox, userSettings);
 
-    setFontSize();
-    setFontFace();
-    setWrap();
-
-    return {
-        surroundSelection,
-        transformSelection,
-        replaceSelection,
-        setText,
-        getText,
-    };
+        this.setFontSize();
+        this.setFontFace();
+        this.setWrap();
+    }
 }
 
-export function makeTextWidget(container, userSettings) {
-    const controlBar = document.createElement("div");
-    controlBar.classList.add("simple_bar", "top_settings_box");
+export class TextWidget extends BasicTextWidget {
+    constructor(container, userSettings) {
+        const editBox = document.createElement("div");
+        editBox.classList.add("stretch-box", "overflow-hidden");
 
-    const settingsDlg = document.createElement("dialog");
-    container.append(settingsDlg);
+        super(editBox, userSettings);
 
-    const controlRow = document.createElement("p");
+        this.container = container;
 
-    const extraSettings = document.createElement("div");
+        this.controlBar = document.createElement("div");
+        this.controlBar.classList.add("simple_bar", "top_settings_box");
 
-    const doneButton = actionButton(translate.gettext("Done"));
+        this.viewSettingsDialog = document.createElement("dialog");
+        this.container.append(this.viewSettingsDialog);
 
-    const editBox = document.createElement("div");
-    editBox.classList.add("stretch-box", "overflow-hidden");
+        const controlRow = document.createElement("p");
 
-    const numberText = document.createElement("div");
-    numberText.classList.add("stretch-box", "row_flex");
+        // Set up settings dialog & controls
+        this.extraSettings = document.createElement("div");
 
-    const numberColumn = document.createElement("div");
-    numberColumn.classList.add("fixed-box");
-    numberColumn.id = "number_col";
+        this.onSettings = new Set();
+        const settingsButton = actionButton(translate.gettext("Settings"));
+        settingsButton.addEventListener("click", this.openSettingsDialog.bind(this));
 
-    numberText.append(numberColumn, editBox);
+        this.onDoneSettings = new Set();
+        const doneButton = actionButton(translate.gettext("Done"));
+        doneButton.addEventListener("click", this.closeSettingsDialog.bind(this));
 
-    const {
-        quill,
-        qlEditor,
-        setText: basicSetText,
-        setFontSize: basicSetFontSize,
-        setFontFace,
-        setWrap: basicSetWrap,
-    } = makeBasicTextWidget(editBox, userSettings);
+        this.viewSettingsDialog.append(controlRow, this.extraSettings, doneButton);
+        this.controlBar.append(settingsButton);
 
-    const lineElements = qlEditor.children;
-    function numberLines() {
-        numberColumn.innerHTML = "";
+        // set up the line numbering column
+        this.numberColumn = document.createElement("div");
+        this.numberColumn.classList.add("fixed-box");
+        this.numberColumn.id = "number_col";
+
+        const numberText = document.createElement("div");
+        numberText.classList.add("stretch-box", "row_flex");
+
+        numberText.append(this.numberColumn, editBox);
+
+        this.container.append(this.controlBar, numberText);
+
+        this.qlEditor.addEventListener("scroll", this.numberLines.bind(this));
+
+        // for polytonic greek
+        this.qlEditor.style.padding = "0 0 0 0.6em";
+
+        self.lineHeight = this.userSettings.lineHeight ?? 1.6;
+        this.setParaSpacing(self.lineHeight);
+
+        const fontFaceSelector = document.createElement("select");
+        for (const fontId of Object.keys(fonts)) {
+            fontFaceSelector.add(new Option(fonts[fontId].name, fontId));
+        }
+
+        fontFaceSelector.addEventListener(
+            "change",
+            function (fontFaceSelector) {
+                this.setFontFace(fontFaceSelector.value);
+                this.numberLines();
+            }.bind(this, fontFaceSelector),
+        );
+
+        const fontControl = makeLabel([translate.gettext("Font") + ": ", fontFaceSelector]);
+
+        const fontSizeSelector = document.createElement("select");
+        const fontSizes = [10, 12, 14, 17, 20, 24, 30, 36, 44];
+        fontSizes.forEach(function (fontSize) {
+            fontSizeSelector.add(new Option(`${fontSize}pt`, `${fontSize}pt`));
+        });
+
+        fontSizeSelector.addEventListener(
+            "change",
+            function (fontSizeSelector) {
+                this.setFontSize(fontSizeSelector.value);
+            }.bind(this, fontSizeSelector),
+        );
+
+        const fontSizeControl = makeLabel([translate.gettext("Size") + ": ", fontSizeSelector]);
+
+        const wrapCheck = makeCheckBox();
+        wrapCheck.addEventListener(
+            "change",
+            function (wrapCheck) {
+                this.setWrap(wrapCheck.checked);
+            }.bind(this, wrapCheck),
+        );
+        const wrapControl = makeLabel([wrapCheck, translate.gettext("Wrap")]);
+
+        controlRow.append(fontControl, fontSizeControl, wrapControl);
+
+        fontSizeSelector.value = this.userSettings.fontSize;
+        fontFaceSelector.value = this.userSettings.fontId;
+        wrapCheck.checked = this.userSettings.textWrap;
+        this.setFontSize();
+        this.setFontFace();
+        this.setWrap();
+    }
+
+    closeSettingsDialog() {
+        for (const func of this.onDoneSettings) {
+            func();
+        }
+        this.viewSettingsDialog.close();
+    }
+
+    openSettingsDialog() {
+        for (const func of this.onSettings) {
+            func();
+        }
+        this.viewSettingsDialog.showModal();
+    }
+
+    setFontSize(fontSize) {
+        super.setFontSize(fontSize);
+        this.numberColumn.style.fontSize = fontSize;
+        this.numberLines();
+    }
+
+    setWrap(wrap) {
+        super.setWrap(wrap);
+        this.numberLines();
+    }
+
+    setText(text) {
+        super.setText(text);
+        this.numberLines();
+    }
+
+    numberLines() {
+        this.numberColumn.innerHTML = "";
         let lineNumber = 1;
-        for (const child of lineElements) {
+        for (const child of this.qlEditor.children) {
             const para = child.getBoundingClientRect();
             const pnumb = document.createElement("p");
-            numberColumn.append(pnumb);
+            this.numberColumn.append(pnumb);
             pnumb.textContent = lineNumber;
             pnumb.classList.add("numb_para");
             pnumb.style.top = `${para.top}px`;
@@ -295,303 +382,202 @@ export function makeTextWidget(container, userSettings) {
         }
     }
 
-    qlEditor.addEventListener("scroll", function () {
-        numberLines();
-    });
+    setParaSpacing(lineHeight) {
+        this.qlEditor.style.lineHeight = lineHeight;
+        this.numberColumn.style.lineHeight = lineHeight;
+        this.numberLines();
+    }
 
-    const onDoneSettings = new Set();
-
-    doneButton.addEventListener("click", function () {
-        for (const func of onDoneSettings) {
-            func();
+    setup(splitVertical) {
+        if (this.container.contains(this.controlBar)) {
+            this.container.removeChild(this.controlBar);
         }
-        settingsDlg.close();
-    });
-
-    // for polytonic greek
-    qlEditor.style.padding = "0 0 0 0.6em";
-
-    function setParaSpacing(lineHeight) {
-        qlEditor.style.lineHeight = lineHeight;
-        numberColumn.style.lineHeight = lineHeight;
-        numberLines();
-    }
-
-    const lineHeight = userSettings.lineHeight ?? 1.6;
-    setParaSpacing(lineHeight);
-
-    const fontFaceSelector = document.createElement("select");
-    for (const fontId of Object.keys(fonts)) {
-        fontFaceSelector.add(new Option(fonts[fontId].name, fontId));
-    }
-
-    fontFaceSelector.addEventListener("change", function () {
-        userSettings.fontId = this.value;
-        setFontFace();
-        numberLines();
-    });
-
-    const fontControl = makeLabel([translate.gettext("Font") + ": ", fontFaceSelector]);
-
-    const fontSizeSelector = document.createElement("select");
-    const fontSizes = [10, 12, 14, 17, 20, 24, 30, 36, 44];
-    fontSizes.forEach(function (fontSize) {
-        fontSizeSelector.add(new Option(`${fontSize}pt`, `${fontSize}pt`));
-    });
-
-    function setFontSize() {
-        basicSetFontSize();
-        numberColumn.style.fontSize = userSettings.fontSize;
-        numberLines();
-    }
-
-    fontSizeSelector.addEventListener("change", function () {
-        userSettings.fontSize = fontSizeSelector.value;
-        setFontSize();
-    });
-
-    const fontSizeControl = makeLabel([translate.gettext("Size") + ": ", fontSizeSelector]);
-
-    function setWrap() {
-        basicSetWrap();
-        numberLines();
-    }
-
-    const wrapCheck = makeCheckBox();
-    wrapCheck.addEventListener("change", function () {
-        userSettings.textWrap = this.checked;
-        setWrap();
-    });
-    const wrapControl = makeLabel([wrapCheck, translate.gettext("Wrap")]);
-
-    controlRow.append(fontControl, fontSizeControl, wrapControl);
-
-    function setText(text) {
-        basicSetText(text);
-        numberLines();
-    }
-
-    fontSizeSelector.value = userSettings.fontSize;
-    setFontSize();
-
-    fontFaceSelector.value = userSettings.fontId;
-    setFontFace();
-
-    wrapCheck.checked = userSettings.textWrap;
-    setWrap();
-
-    const onSettings = new Set();
-    const settingsButton = actionButton(translate.gettext("Settings"));
-    settingsButton.addEventListener("click", function () {
-        for (const func of onSettings) {
-            func();
+        if (splitVertical) {
+            this.container.prepend(this.controlBar);
+            // top right bottom left
+            this.controlBar.style.borderWidth = "0 0 1px 0";
+        } else {
+            this.container.append(this.controlBar);
+            this.controlBar.style.borderWidth = "1px 0 0 0";
         }
-        settingsDlg.showModal();
-    });
+    }
 
-    settingsDlg.append(controlRow, extraSettings, doneButton);
-    controlBar.append(settingsButton);
-
-    container.append(controlBar, numberText);
-
-    return {
-        setup: function (splitVertical) {
-            if (container.contains(controlBar)) {
-                container.removeChild(controlBar);
-            }
-            if (splitVertical) {
-                container.prepend(controlBar);
-                // top right bottom left
-                controlBar.style.borderWidth = "0 0 1px 0";
-            } else {
-                container.append(controlBar);
-                controlBar.style.borderWidth = "1px 0 0 0";
-            }
-        },
-
-        reLayout: function () {
-            numberLines();
-        },
-
-        setText,
-        quill,
-        editBox,
-        controlBar,
-        setParaSpacing,
-        qlEditor,
-        extraSettings,
-        onDoneSettings,
-    };
+    reLayout() {
+        this.numberLines();
+    }
 }
 
-export function makeProofTextWidget(container, projectId, userSettings, languagesWithDictionaries, projectLanguages) {
-    const Parchment = Quill.import("parchment");
-    const config = { scope: Parchment.Scope.INLINE };
+export class ProofTextWidget extends TextWidget {
+    constructor(container, projectId, userSettings, languagesWithDictionaries, projectLanguages) {
+        super(container, userSettings);
+        const Parchment = Quill.import("parchment");
+        const config = { scope: Parchment.Scope.INLINE };
 
-    const qTitle = new Parchment.Attributor("title", "title", config);
-    Quill.register(qTitle);
+        const qTitle = new Parchment.Attributor("title", "title", config);
+        Quill.register(qTitle);
 
-    config.whiteList = ["italic"];
-    const qfontStyle = new Parchment.StyleAttributor("fontStyle", "font-style", config);
-    Quill.register(qfontStyle);
+        config.whiteList = ["italic"];
+        const qfontStyle = new Parchment.StyleAttributor("fontStyle", "font-style", config);
+        Quill.register(qfontStyle);
 
-    const qfontWeight = new Parchment.StyleAttributor("fontWeight", "font-weight", config);
-    Quill.register(qfontWeight);
+        const qfontWeight = new Parchment.StyleAttributor("fontWeight", "font-weight", config);
+        Quill.register(qfontWeight);
 
-    const qfontVariant = new Parchment.StyleAttributor("fontVariant", "font-variant", config);
-    Quill.register(qfontVariant);
+        const qfontVariant = new Parchment.StyleAttributor("fontVariant", "font-variant", config);
+        Quill.register(qfontVariant);
 
-    const qTextTransform = new Parchment.StyleAttributor("textTransform", "text-transform", config);
-    Quill.register(qTextTransform);
+        const qTextTransform = new Parchment.StyleAttributor("textTransform", "text-transform", config);
+        Quill.register(qTextTransform);
 
-    const qLetterSpacing = new Parchment.StyleAttributor("letterSpacing", "letter-spacing", config);
-    Quill.register(qLetterSpacing);
+        const qLetterSpacing = new Parchment.StyleAttributor("letterSpacing", "letter-spacing", config);
+        Quill.register(qLetterSpacing);
 
-    const qMarginRight = new Parchment.StyleAttributor("marginRight", "margin-right", config);
-    Quill.register(qMarginRight);
+        const qMarginRight = new Parchment.StyleAttributor("marginRight", "margin-right", config);
+        Quill.register(qMarginRight);
 
-    const qTextDecoration = new Parchment.StyleAttributor("textDecoration", "text-decoration", config);
-    Quill.register(qTextDecoration);
+        const qTextDecoration = new Parchment.StyleAttributor("textDecoration", "text-decoration", config);
+        Quill.register(qTextDecoration);
 
-    config.whiteList = ["none"];
-    const qHide = new Parchment.StyleAttributor("display", "display", config);
-    Quill.register(qHide);
+        config.whiteList = ["none"];
+        const qHide = new Parchment.StyleAttributor("display", "display", config);
+        Quill.register(qHide);
 
-    const Embed = Quill.import("blots/embed");
-    class DFormula extends Embed {
-        static blotName = "dformula";
-        static className = "ql-dformula";
-        static tagName = "SPAN";
+        const Embed = Quill.import("blots/embed");
+        class DFormula extends Embed {
+            static blotName = "dformula";
+            static className = "ql-dformula";
+            static tagName = "SPAN";
 
-        static create(value) {
-            // @ts-expect-error
-            if (window.katex == null) {
-                throw new Error("Formula module requires KaTeX.");
-            }
-            const node = super.create(value);
-            if (typeof value === "string") {
+            static create(value) {
                 // @ts-expect-error
-                window.katex.render(value, node, {
-                    throwOnError: false,
-                    errorColor: "#f00",
-                    displayMode: true,
-                    // output: "mathml",
-                });
-                node.setAttribute("data-value", value);
+                if (window.katex == null) {
+                    throw new Error("Formula module requires KaTeX.");
+                }
+                const node = super.create(value);
+                if (typeof value === "string") {
+                    // @ts-expect-error
+                    window.katex.render(value, node, {
+                        throwOnError: false,
+                        errorColor: "#f00",
+                        displayMode: true,
+                        // output: "mathml",
+                    });
+                    node.setAttribute("data-value", value);
+                }
+                return node;
             }
-            return node;
+
+            static value(domNode) {
+                return domNode.getAttribute("data-value");
+            }
+
+            html() {
+                const { dformula } = this.value();
+                return `<span>${dformula}</span>`;
+            }
         }
 
-        static value(domNode) {
-            return domNode.getAttribute("data-value");
-        }
+        Quill.register(DFormula);
 
-        html() {
-            const { dformula } = this.value();
-            return `<span>${dformula}</span>`;
-        }
+        const lineSpacer = document.createElement("input");
+        lineSpacer.type = "range";
+        lineSpacer.classList.add("middle-align");
+        lineSpacer.min = "1.5";
+        lineSpacer.max = "3";
+        lineSpacer.step = "0.01";
+        lineSpacer.title = translate.gettext("Adjust the line spacing");
+        lineSpacer.value = self.lineHeight;
+        lineSpacer.addEventListener("input", (event) => {
+            const lineHeight = event.target.value;
+            this.setParaSpacing(lineHeight);
+            this.userSettings.lineHeight = lineHeight;
+        });
+
+        this.oldScroll = this.qlEditor.scrollTop;
+        this.scrollListeners = new Set();
+        this.qlEditor.addEventListener("scroll", this.scroll.bind(this));
+
+        this.leave = this.leaveText;
+
+        this.wordChecker = makeWordchecker(
+            projectId,
+            this.quill,
+            languagesWithDictionaries,
+            projectLanguages,
+            this.editBox,
+            this.extraSettings,
+            this.onDoneSettings,
+            this.scrollListeners,
+        );
+
+        const statSpan = document.createElement("span");
+
+        // userSettings.formatting ??= {}; // needs chrome 85, FF 79, Safari 14
+        this.userSettings.formatting ?? (this.userSettings.formatting = {});
+        this.formatter = makePreview(this.userSettings.formatting, this.quill, this.extraSettings, statSpan);
+
+        this.textOnlyRadio = makeRadio("viewMode");
+        this.textOnlyRadio.checked = true;
+        this.textOnlyRadio.addEventListener("click", this.enterTextOnly.bind(this));
+        const textOnlyControl = makeLabel([this.textOnlyRadio, translate.gettext("Text Only")]);
+
+        const wordCheckRadio = makeRadio("viewMode");
+        wordCheckRadio.addEventListener("click", this.enterWordCheck.bind(this));
+        const wordCheckControl = makeLabel([wordCheckRadio, translate.gettext("WordCheck")]);
+
+        const formatPreviewRadio = makeRadio("viewMode");
+        formatPreviewRadio.addEventListener("click", this.enterFormatPreview.bind(this));
+        const formatPreviewControl = makeLabel([formatPreviewRadio, translate.gettext("Format Preview")]);
+
+        this.controlBar.prepend(textOnlyControl, wordCheckControl, formatPreviewControl);
+        this.controlBar.append(lineSpacer, statSpan);
+
+        this.validator = makeValidator(projectId, this.quill);
     }
 
-    Quill.register(DFormula);
+    enterTextOnly() {
+        this.leave();
+        this.leave = this.leaveText;
+    }
 
-    const { setup, reLayout, setText, quill, editBox, controlBar, setParaSpacing, qlEditor, extraSettings, onDoneSettings } = makeTextWidget(
-        container,
-        userSettings,
-    );
+    enterWordCheck() {
+        this.leave();
+        this.wordChecker.enter();
+        this.leave = this.wordChecker.leave;
+    }
 
-    const lineSpacer = document.createElement("input");
-    lineSpacer.type = "range";
-    lineSpacer.classList.add("middle-align");
-    lineSpacer.min = "1.5";
-    lineSpacer.max = "3";
-    lineSpacer.step = "0.01";
-    lineSpacer.title = translate.gettext("Adjust the line spacing");
-    lineSpacer.addEventListener("input", (event) => {
-        const lineHeight = event.target.value;
-        setParaSpacing(lineHeight);
-        userSettings.lineHeight = lineHeight;
-    });
+    enterFormatPreview() {
+        this.leave();
+        this.formatter.enter();
+        this.leave = this.formatter.leave;
+    }
 
-    const lineHeight = userSettings.lineHeight ?? 1.6;
-    setParaSpacing(lineHeight);
-    lineSpacer.value = lineHeight;
-
-    let oldScroll = qlEditor.scrollTop;
-    const scrollListeners = new Set();
-    // send difference in scroll position
-    qlEditor.addEventListener("scroll", function () {
-        const newScroll = qlEditor.scrollTop;
-        const deltaScroll = newScroll - oldScroll;
-        oldScroll = newScroll;
-        scrollListeners.forEach(function (scrollCallBack) {
+    scroll() {
+        const newScroll = this.qlEditor.scrollTop;
+        const deltaScroll = newScroll - this.oldScroll;
+        this.oldScroll = newScroll;
+        this.scrollListeners.forEach(function (scrollCallBack) {
             scrollCallBack(deltaScroll);
         });
-    });
-
-    let leaveText = function () {};
-    let leave = leaveText;
-
-    const wordChecker = makeWordchecker(projectId, quill, languagesWithDictionaries, projectLanguages, editBox, extraSettings, onDoneSettings, scrollListeners);
-
-    const statSpan = document.createElement("span");
-
-    // userSettings.formatting ??= {}; // needs chrome 85, FF 79, Safari 14
-    userSettings.formatting ?? (userSettings.formatting = {});
-    const formatter = makePreview(userSettings.formatting, quill, extraSettings, statSpan);
-
-    const textOnlyRadio = makeRadio("viewMode");
-    textOnlyRadio.checked = true;
-    textOnlyRadio.addEventListener("click", function () {
-        leave();
-        leave = leaveText;
-    });
-    const textOnlyControl = makeLabel([textOnlyRadio, translate.gettext("Text Only")]);
-
-    const wordCheckRadio = makeRadio("viewMode");
-    wordCheckRadio.addEventListener("click", function () {
-        leave();
-        wordChecker.enter();
-        leave = wordChecker.leave;
-    });
-    const wordCheckControl = makeLabel([wordCheckRadio, translate.gettext("WordCheck")]);
-
-    const formatPreviewRadio = makeRadio("viewMode");
-    formatPreviewRadio.addEventListener("click", function () {
-        leave();
-        formatter.enter();
-        leave = formatter.leave;
-    });
-    const formatPreviewControl = makeLabel([formatPreviewRadio, translate.gettext("Format Preview")]);
-
-    controlBar.prepend(textOnlyControl, wordCheckControl, formatPreviewControl);
-    controlBar.append(lineSpacer, statSpan);
-
-    const validator = makeValidator(projectId, quill);
-
-    function showValidate() {
-        validator.enter();
     }
 
-    function toTextMode() {
-        leave();
-        leave = leaveText;
-        textOnlyRadio.checked = true;
+    leaveText() {}
+
+    showValidate() {
+        this.validator.enter();
     }
 
-    const { surroundSelection, transformSelection, replaceSelection, getText } = editOperations(quill);
+    toTextMode() {
+        this.leave();
+        this.leave = this.leaveText;
+        this.textOnlyRadio.checked = true;
+    }
 
-    return {
-        setup,
-        reLayout,
-        scrollListeners,
-        getWCState: wordChecker.getWCState,
-        setText,
-        getText,
-        initWordCheck: wordChecker.initialise,
-        showValidate,
-        toTextMode,
-        surroundSelection,
-        transformSelection,
-        replaceSelection,
-    };
+    getWCState() {
+        this.wordChecker.getWCState();
+    }
+
+    initWordCheck() {
+        this.wordChecker.initialise();
+    }
 }

@@ -3,7 +3,7 @@
 /* eslint camelcase: "off" */
 
 import { ajax } from "../../scripts/api.js";
-import { makeProofTextWidget } from "../../scripts/text_widget.js";
+import { ProofTextWidget } from "../../scripts/text_widget.js";
 import { makeProofImageWidget } from "../../scripts/image_widget.js";
 import { viewSplitter } from "../../scripts/view_splitter.js";
 import { constructToolBox } from "../../scripts/toolbox.js";
@@ -51,11 +51,11 @@ window.addEventListener("DOMContentLoaded", async () => {
             imageWidget.setScroll(s);
         }
 
-        const textWidget = makeProofTextWidget(container, projectId, proofSettings, dictionaries, projectInfo.languages);
+        const textWidget = new ProofTextWidget(container, projectId, proofSettings, dictionaries, projectInfo.languages);
         const theSplitter = viewSplitter(imageTextDiv, proofSettings);
-        theSplitter.mainSplit.onResize.add(textWidget.reLayout);
-        theSplitter.mainSplit.onResize.add(imageWidget.reSize);
-        theSplitter.setSplitDirCallback.push(textWidget.setup, imageWidget.reset);
+        theSplitter.mainSplit.onResize.add(textWidget.reLayout.bind(textWidget));
+        theSplitter.mainSplit.onResize.add(imageWidget.reSize.bind(textWidget));
+        theSplitter.setSplitDirCallback.push(textWidget.setup.bind(textWidget), imageWidget.reset);
         textWidget.scrollListeners.add(syncScroll);
         theSplitter.fireSetSplitDir();
         document.getElementById("action_buttons").append(...theSplitter.buttons);
