@@ -41,6 +41,7 @@ module.exports = [
             "scripts/splitControl.js",
             "scripts/text_validator.js",
             "scripts/text_widget.js",
+            "scripts/text_widget_plugin.js",
             "scripts/toolbox.js",
             "scripts/validator.js",
             "scripts/view_splitter.js",
