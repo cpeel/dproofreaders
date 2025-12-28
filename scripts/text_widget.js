@@ -3,7 +3,7 @@
 /* eslint camelcase: "off" */
 
 import { FormatPreviewPlugin } from "./format_preview.js";
-import { makeWordchecker } from "./word_check.js";
+import { WordCheckPlugin } from "./word_check.js";
 import { makeValidator } from "./validator.js";
 import translate from "./gettext.js";
 
@@ -277,7 +277,7 @@ export class TextWidget extends BasicTextWidget {
         const numberText = document.createElement("div");
         numberText.classList.add("stretch-box", "row_flex");
 
-        numberText.append(this.numberColumn, editBox);
+        numberText.append(this.numberColumn, this.editBox);
 
         this.container.append(this.controlBar, numberText);
 
@@ -499,15 +499,15 @@ export class ProofTextWidget extends TextWidget {
 
         this.leave = this.leaveText;
 
-        this.wordChecker = makeWordchecker(
-            projectId,
+        this.wordChecker = new WordCheckPlugin(
             this.quill,
-            languagesWithDictionaries,
-            projectLanguages,
-            this.editBox,
             this.extraSettings,
             this.onDoneSettings,
+            this.editBox,
             this.scrollListeners,
+            projectId,
+            languagesWithDictionaries,
+            projectLanguages,
         );
 
         this.statSpan = document.createElement("span");
@@ -542,8 +542,8 @@ export class ProofTextWidget extends TextWidget {
 
     enterWordCheck() {
         this.leave();
-        this.wordChecker.enter();
-        this.leave = this.wordChecker.leave;
+        this.wordChecker.enter.bind(this.wordChecker)();
+        this.leave = this.wordChecker.leave.bind(this.wordChecker);
     }
 
     enterFormatPreview() {
@@ -574,7 +574,7 @@ export class ProofTextWidget extends TextWidget {
     }
 
     getWCState() {
-        this.wordChecker.getWCState();
+        return this.wordChecker.getWCState();
     }
 
     initWordCheck() {
