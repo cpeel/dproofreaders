@@ -1,54 +1,72 @@
 /* global hide */
-/* eslint no-use-before-define: "off" */
-/* eslint camelcase: "off" */
 
+import { TextWidgetPlugin } from "./text_widget_plugin.js";
 import translate from "./gettext.js";
 import { ajax } from "./api.js";
 
-export function makeWordchecker(projectId, quill, languagesWithDictionaries, projectLanguages, editBox, extraSettings, onDoneSettings, scrollListeners) {
-    const langGrid = document.createElement("div");
-    langGrid.classList.add("langcol");
-    langGrid.append(translate.gettext("Dictionaries") + ":");
+const WC_WORLD = 1;
+const puncCharacters = ".,;:?!*/()#@%+=[]{}<>\"$|_¬¢£¥©®§°±¶·'´¸º×¦¡¿-»«¯÷¹²³¼½¾¤";
 
-    const puncCharacters = ".,;:?!*/()#@%+=[]{}<>\"$|_¬¢£¥©®§°±¶·'´¸º×¦¡¿-»«¯÷¹²³¼½¾¤";
+export class WordCheckPlugin extends TextWidgetPlugin {
+    acceptedWords = [];
+    wordChecked = false;
+    caretPos = 0;
+    acceptableWord = "";
+    pageText = "";
 
-    const acceptButton = document.createElement("button");
-    acceptButton.type = "button";
-    acceptButton.classList.add("accept_button");
-    acceptButton.innerText = translate.gettext("Accept");
+    // on change, delay, then reload. If change again restart delay.
+    // Avoid caret misplaced after reload:
+    timerID = null;
 
-    const languages = [projectLanguages[0]];
+    constructor(quill, extraSettings, onDoneSettings, editBox, scrollListeners, projectId, languagesWithDictionaries, projectLanguages) {
+        super(quill, extraSettings, onDoneSettings, editBox, scrollListeners);
+        this.projectId = projectId;
+        this.languagesWithDictionaries = languagesWithDictionaries;
+        this.projectLanguages = projectLanguages;
 
-    for (const language of Object.values(languagesWithDictionaries)) {
-        const cBox = document.createElement("input");
-        cBox.type = "checkbox";
-        if (language === projectLanguages[0]) {
-            cBox.checked = true;
+        this.langGrid = document.createElement("div");
+        this.langGrid.classList.add("langcol");
+        this.langGrid.append(translate.gettext("Dictionaries") + ":");
+
+        this.acceptButton = document.createElement("button");
+        this.acceptButton.type = "button";
+        this.acceptButton.classList.add("accept_button");
+        this.acceptButton.innerText = translate.gettext("Accept");
+
+        this.languages = [projectLanguages[0]];
+
+        for (const language of Object.values(languagesWithDictionaries)) {
+            const cBox = document.createElement("input");
+            cBox.type = "checkbox";
+            if (language === projectLanguages[0]) {
+                cBox.checked = true;
+            }
+            const label = document.createElement("label");
+            label.classList.add("nowrap");
+            label.append(cBox, language, document.createElement("br"));
+            this.langGrid.append(label);
         }
-        const label = document.createElement("label");
-        label.classList.add("nowrap");
-        label.append(cBox, language, document.createElement("br"));
-        langGrid.append(label);
+
+        this.editBox.append(this.acceptButton);
+
+        this.acceptButton.addEventListener("click", this.acceptWord.bind(this));
+        this.acceptButton.addEventListener("keydown", this.keyAcceptWord.bind(this));
+
+        this.scrollListeners.add(this.maybeShowAcceptButton.bind(this));
     }
 
-    editBox.append(acceptButton);
-
-    function setLanguages() {
-        languages.length = 0;
-        const langCheckBoxes = langGrid.getElementsByTagName("input");
+    setLanguages() {
+        this.languages.length = 0;
+        const langCheckBoxes = this.langGrid.getElementsByTagName("input");
         for (const box of langCheckBoxes) {
             if (box.checked) {
-                languages.push(box.nextSibling.textContent);
+                this.languages.push(box.nextSibling.textContent);
             }
         }
-        wordCheck();
+        this.wordCheck();
     }
 
-    let caretPos = 0;
-
-    const WC_WORLD = 1;
-
-    function splitText(text) {
+    splitText(text) {
         //const base = "\\w{1,2}";    // pattern for: markable base character
         //const mark = '[=:.`\'v)(~,^*]'; // pattern for: diacritical mark
         //const bracketedCharacterPattern = `\\[(?:oe|OE|${mark}${base}|${base}${mark})\\]`;
@@ -66,11 +84,9 @@ export function makeWordchecker(projectId, quill, languagesWithDictionaries, pro
         return wordsWithOffsets;
     }
 
-    let acceptableWord = "";
-
-    function maybeShowAcceptButton() {
+    maybeShowAcceptButton() {
         // show accept button for suggestible word when caret is in it
-        const selection = quill.getSelection(false);
+        const selection = this.quill.getSelection(false);
         if (!selection) {
             return;
         }
@@ -78,167 +94,157 @@ export function makeWordchecker(projectId, quill, languagesWithDictionaries, pro
         if (length !== 0) {
             return;
         }
-        const format = quill.getFormat(index);
+        const format = this.quill.getFormat(index);
         if (format.underline) {
             // it is an acceptable word
-            const [leaf] = quill.getLeaf(index);
-            acceptableWord = leaf.text;
-            const bounds = quill.getBounds(index);
-            acceptButton.style.top = `${bounds.top + bounds.height}px`;
-            acceptButton.style.left = `${bounds.left}px`;
-            acceptButton.style.display = "block";
+            const [leaf] = this.quill.getLeaf(index);
+            this.acceptableWord = leaf.text;
+            const bounds = this.quill.getBounds(index);
+            this.acceptButton.style.top = `${bounds.top + bounds.height}px`;
+            this.acceptButton.style.left = `${bounds.left}px`;
+            this.acceptButton.style.display = "block";
         } else {
-            hide(acceptButton);
+            hide(this.acceptButton);
         }
     }
-
-    scrollListeners.add(maybeShowAcceptButton);
-
-    // on change, delay, then reload. If change again restart delay.
-    // Avoid caret misplaced after reload:
-    let timerID = null;
-    let pageText;
 
     // when a change occurs submit a wordcheck request, but to avoid several
     // in quick succession, set or reset a timer on each. When it times out
     // no changes have occured for e.g. 2 seconds, submit a request.
-    function triggerReload() {
-        clearTimeout(timerID);
-        timerID = setTimeout(wordCheck, 2000);
+    triggerReload() {
+        clearTimeout(this.timerID);
+        this.timerID = setTimeout(this.wordCheck.bind(this), 2000);
     }
 
-    function showWordCheck(wcData) {
+    checkPunc(index, end) {
+        while (index < end) {
+            const char = this.pageText.charAt(index);
+            if (puncCharacters.includes(char)) {
+                this.quill.formatText(index, 1, { background: "yellow" }, "silent");
+            }
+            index += 1;
+        }
+    }
+
+    showWordCheck(wcData) {
         // check that text and cursor pos. has not changed while waiting
         // for response.
-        const { index: newCaretPos } = quill.getSelection(false);
-        const newText = quill.getText();
-        if (newCaretPos !== caretPos || newText !== pageText) {
+        const { index: newCaretPos } = this.quill.getSelection(false);
+        const newText = this.quill.getText();
+        if (newCaretPos !== this.caretPos || newText !== this.pageText) {
             // another change has happened since we submitted wordcheck
-            caretPos = newCaretPos;
-            pageText = newText;
-            triggerReload();
+            this.caretPos = newCaretPos;
+            this.pageText = newText;
+            this.triggerReload();
             return;
         }
 
         const badWords = wcData.bad_words;
-        const wordsWithOffsets = splitText(pageText);
-        quill.setText(pageText, "silent");
-
-        function checkPunc(index, end) {
-            while (index < end) {
-                const char = pageText.charAt(index);
-                if (puncCharacters.includes(char)) {
-                    quill.formatText(index, 1, { background: "yellow" }, "silent");
-                }
-                index += 1;
-            }
-        }
+        const wordsWithOffsets = this.splitText(this.pageText);
+        this.quill.setText(this.pageText, "silent");
 
         let puncIndex = 0;
         for (const [word, startOffset, endOffset] of wordsWithOffsets) {
             // look for punc between words
-            checkPunc(puncIndex, startOffset);
+            this.checkPunc(puncIndex, startOffset);
             puncIndex = endOffset;
             // must not just check badWords[word] because object prototype
             // could have a property 'word', e.g. array has property 'values'
             // this avoids eslint error from "badWords.hasOwnProperty(word))"
             if (Object.prototype.hasOwnProperty.call(badWords, word)) {
                 const attributes = badWords[word] === WC_WORLD ? { underline: true } : { strike: true };
-                quill.formatText(startOffset, endOffset - startOffset, attributes, "silent");
+                this.quill.formatText(startOffset, endOffset - startOffset, attributes, "silent");
             }
         }
         // process text after last word
-        checkPunc(puncIndex, pageText.length);
+        this.checkPunc(puncIndex, this.pageText.length);
         // silent so don't scroll caret into view
-        quill.setSelection(caretPos, 0, "silent");
-        maybeShowAcceptButton();
+        this.quill.setSelection(this.caretPos, 0, "silent");
+        this.maybeShowAcceptButton();
     }
 
-    let acceptedWords = [];
-    let wordChecked = false;
-
-    async function wordCheck() {
-        wordChecked = true;
+    async wordCheck() {
+        this.wordChecked = true;
         // save pageText and caretPos so we can check if they have changed
         // before redrawing the page
-        pageText = quill.getText();
+        this.pageText = this.quill.getText();
         // Focus the editor, but don't scroll
-        quill.focus({ preventScroll: true });
-        ({ index: caretPos } = quill.getSelection(false));
+        this.quill.focus({ preventScroll: true });
+        ({ index: this.caretPos } = this.quill.getSelection(false));
         try {
-            const wcData = await ajax("PUT", `v1/projects/${projectId}/wordcheck`, {}, { text: pageText, accepted_words: acceptedWords, languages: languages });
-            showWordCheck(wcData);
+            const wcData = await ajax(
+                "PUT",
+                `v1/projects/${this.projectId}/wordcheck`,
+                {},
+                // eslint-disable-next-line camelcase
+                { text: this.pageText, accepted_words: this.acceptedWords, languages: this.languages },
+            );
+            this.showWordCheck(wcData);
         } catch (error) {
             alert(error.message);
         }
     }
 
-    function acceptWord(event) {
+    acceptWord(event) {
         event.stopPropagation();
-        acceptedWords.push(acceptableWord);
-        hide(acceptButton);
+        this.acceptedWords.push(this.acceptableWord);
+        hide(this.acceptButton);
         // resubmit so all same words will be unmarked
-        wordCheck();
+        this.wordCheck();
     }
 
     // if accept button is activated by keyboard we do not want the key
     // to propagate up to the text div
-    function keyAcceptWord(event) {
+    keyAcceptWord(event) {
         event.preventDefault();
         if (event.key === "Enter" || event.key === " ") {
-            acceptWord(event);
+            this.acceptWord(event);
         }
     }
 
-    acceptButton.addEventListener("click", acceptWord);
-    acceptButton.addEventListener("keydown", keyAcceptWord);
-
-    function onChange() {
-        const { index } = quill.getSelection(false);
-        let [leaf, offset] = quill.getLeaf(index);
-        const format = quill.getFormat(index);
+    onChange() {
+        const { index } = this.quill.getSelection(false);
+        let [leaf, offset] = this.quill.getLeaf(index);
+        const format = this.quill.getFormat(index);
         if (format.underline || format.strike) {
             // unmark it
-            quill.removeFormat(index - offset, leaf.text.length, "silent");
+            this.quill.removeFormat(index - offset, leaf.text.length, "silent");
         }
-        triggerReload();
+        this.triggerReload();
     }
 
-    function leave() {
+    initialise() {
+        this.acceptedWords = [];
+        this.wordChecked = false;
+    }
+
+    getWCState() {
+        return [this.wordChecked, this.acceptedWords];
+    }
+
+    enter() {
+        // assume this.quill shows text.
+        this.quill.on("text-change", this.onChange.bind(this));
+        this.editBox.addEventListener("click", this.maybeShowAcceptButton.bind(this));
+        this.editBox.addEventListener("keyup", this.maybeShowAcceptButton.bind(this));
+        this.quill.enable();
+        this.extraSettings.append(this.langGrid);
+        this.onDoneSettingsAction = this.setLanguages.bind(this);
+        this.onDoneSettings.add(this.onDoneSettingsAction);
+        this.wordCheck();
+    }
+
+    leave() {
         // remove any marking
-        pageText = quill.getText();
-        quill.setText(pageText, "silent");
-        quill.history.clear();
-        hide(acceptButton);
-        clearTimeout(timerID);
-        quill.off("text-change", onChange);
-        editBox.removeEventListener("click", maybeShowAcceptButton);
-        editBox.removeEventListener("keyup", maybeShowAcceptButton);
-        extraSettings.replaceChildren();
-        onDoneSettings.delete(setLanguages);
+        this.pageText = this.quill.getText();
+        this.quill.setText(this.pageText, "silent");
+        this.quill.history.clear();
+        hide(this.acceptButton);
+        clearTimeout(this.timerID);
+        this.quill.off("text-change", this.onChange.bind(this));
+        this.editBox.removeEventListener("click", this.maybeShowAcceptButton.bind(this));
+        this.editBox.removeEventListener("keyup", this.maybeShowAcceptButton.bind(this));
+        this.extraSettings.replaceChildren();
+        this.onDoneSettings.delete(this.onDoneSettingsAction);
     }
-
-    return {
-        enter: function () {
-            // assume quill shows text.
-            quill.on("text-change", onChange);
-            editBox.addEventListener("click", maybeShowAcceptButton);
-            editBox.addEventListener("keyup", maybeShowAcceptButton);
-            quill.enable();
-            extraSettings.append(langGrid);
-            onDoneSettings.add(setLanguages);
-            wordCheck();
-        },
-
-        leave,
-
-        initialise: function () {
-            acceptedWords = [];
-            wordChecked = false;
-        },
-
-        getWCState: function () {
-            return [wordChecked, acceptedWords];
-        },
-    };
 }
