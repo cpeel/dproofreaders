@@ -298,7 +298,7 @@ export function constructToolBox(textWidget, pickerSets, roundType, proofSetting
     });
 
     const toolStyle = roundType === "formatting" ? "inline" : "none";
-    for (const element of document.getElementsByClassName("format")) {
+    for (const element of document.getElementsByClassName("format_tool")) {
         element.style.display = toolStyle;
     }
 }
