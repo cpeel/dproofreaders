@@ -40,6 +40,12 @@
     background: white;
 }
 
+#settings_title {
+    font-weight: bold;
+    border-bottom: 1px solid gray;
+    margin-bottom: 1em;
+}
+
 .text_number {
     width: 1.9rem;
     text-align: right;
@@ -59,12 +65,19 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
     margin-right: 0.2em;
 }
 
+.settings_row button,
+.settings_row label,
+.settings_row input,
 .pane_settings_bar button,
 .pane_settings_bar label,
 .pane_settings_bar input,
 #action_buttons button,
 #action_buttons label {
     margin-right: 0.2em;
+}
+
+.settings_row {
+    margin: 1em 0;
 }
 
 .image_button {
@@ -147,8 +160,4 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
   box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.5);
   display: none;
   z-index: 1;
-}
-
-dialog {
-    width: 100%;
 }
