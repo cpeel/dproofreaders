@@ -14,12 +14,6 @@
     scrollbar-width: none;
 }
 
-.langcol {
-    /* 12em fits the longest language name */
-    column-width: 12em;
-    text-align: left;
-}
-
 .row_flex {
     display: flex;
     flex-direction: row;
@@ -123,22 +117,28 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
     text-decoration-thickness: 2px;
 }
 
-#number_col {
+#page_line_number {
     border-right: 1px solid gray;
     width: 2em;
     text-align: right;
     z-index: -10;
 }
 
-.numb_para {
+#page_line_number p {
     position: absolute;
     margin: 0;
     width: 1.8em;
 }
 
-.accept_button {
-  position: absolute;
-  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.5);
-  display: none;
-  z-index: 1;
+.wc_accept_button {
+    position: absolute;
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.5);
+    display: none;
+    z-index: 1;
+}
+
+.wc_settings_langcol {
+    /* 12em fits the longest language name */
+    column-width: 12em;
+    text-align: left;
 }

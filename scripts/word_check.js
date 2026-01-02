@@ -25,12 +25,12 @@ export class WordCheckPlugin extends TextWidgetPlugin {
         this.projectLanguages = projectLanguages;
 
         this.langGrid = document.createElement("div");
-        this.langGrid.classList.add("langcol");
+        this.langGrid.classList.add("wc_settings_langcol");
         this.langGrid.append(translate.gettext("Dictionaries") + ":");
 
         this.acceptButton = document.createElement("button");
         this.acceptButton.type = "button";
-        this.acceptButton.classList.add("accept_button");
+        this.acceptButton.classList.add("wc_accept_button");
         this.acceptButton.innerText = translate.gettext("Accept");
 
         this.languages = [projectLanguages[0]];

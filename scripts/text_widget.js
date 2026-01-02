@@ -322,7 +322,7 @@ export class TextWidget extends BasicTextWidget {
         // set up the line numbering column
         this.numberColumn = document.createElement("div");
         this.numberColumn.classList.add("fixed-box");
-        this.numberColumn.id = "number_col";
+        this.numberColumn.id = "page_line_number";
 
         const numberText = document.createElement("div");
         numberText.classList.add("stretch-box", "row_flex");
@@ -426,7 +426,6 @@ export class TextWidget extends BasicTextWidget {
             const pnumb = document.createElement("p");
             this.numberColumn.append(pnumb);
             pnumb.textContent = lineNumber;
-            pnumb.classList.add("numb_para");
             pnumb.style.top = `${para.top}px`;
             lineNumber += 1;
         }
