@@ -18,10 +18,14 @@
 @text-pane-background: #FFF8DC;
 @text-pane-text: black;
 
-/* Control panes */
+/* Page control pane */
 @control-pane-background: #CDC0B0;
 @control-pane-text: black;
-@control-pane-menu: Bisque;
+
+/* Toolbox pane */
+@toolbox-pane-background: #CDC0B0;
+@toolbox-pane-text: black;
+@toolbox-pane-menu: Bisque;
 
 /* Links */
 @page-interface-link-color: #0000ff;
@@ -39,7 +43,10 @@
 /* Classes*/
 
 .page-interface {
-    background-color: @page-interface-background;
+    /*
+    We can't apply 'background-color' here without impacting how page numbers
+    work in the PI. Each "pane" needs to apply their own background color.
+    */
     color: @page-interface-text;
     a:link {
         color: @page-interface-link-color;
@@ -51,12 +58,26 @@
         color: @page-interface-active-color;
     }
 
-    .text-pane {
+    /* Page Text entities */
+    .text-pane,
+    #quiz_text,
+    #page_line_number,
+    .ql-container {
         background-color: @text-pane-background;
         color: @text-pane-text;
     }
 
-    .control-pane {
+    /* Image entities */
+    #image_content {
+        background-color: @text-pane-background;
+    }
+
+    /* Top of page controls */
+    .control-pane,
+    #quiz_controls,
+    #page_control {
+        padding: 0.2em;
+
         background-color: @control-pane-background;
         color: @control-pane-text;
 
@@ -78,10 +99,14 @@
         input[type=image] {
             border: none;
         }
+    }
 
-        .menu {
-            background-color: @control-pane-menu;
-        }
+    /* Horizontal / Vertical change icon */
+    .image_button {
+        width: 1.7em;
+        height: 1.7em;
+        vertical-align: middle;
+        margin-right: 0.2em;
     }
 }
 
@@ -140,10 +165,31 @@
     .solid-border();
 
     .sans-serif();
-    .page-interface .control-pane();
+
+    background-color: @toolbox-pane-background;
+    color: @toolbox-pane-text;
+
+    input, select, button {
+        background-color: @text-pane-background;
+        color: @text-pane-text;
+        .solid-border();
+    }
+
+    input[type=submit]:disabled, input[type=button]:disabled, button:disabled {
+        background-color: shade(@text-pane-background, 30%);
+    }
+
+    button, input[type=submit], input[type=button] {
+        box-shadow: 1px 1px grey;
+        border-radius: 3px;
+    }
+
+    input[type=image] {
+        border: none;
+    }
 
     .selector_button {
-        .page-interface .control-pane .menu();
+        background-color: @toolbox-pane-menu;
         margin-top: 1px;
         font-size: 1em;
         padding: 0.1em 0.15em 0 0.15em;
@@ -155,14 +201,6 @@
         .bold();
         background-color: @text-pane-background;
         box-shadow: -1px -1px grey;
-    }
-
-    .proofbutton {
-        padding: 1px 6px;
-        margin: 1px 0px;
-        cursor: pointer;
-        font-size: 0.9em;
-        min-width: 2em;
     }
 
     .key-block {
@@ -227,9 +265,11 @@
 }
 
 /* ------------------------------------------------------------------------ */
-/* Page Browser */
+/* Page interfaces */
 
-#page-browser {
+#quiz-interface,
+#page-browser,
+#proofreading_interface {
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -241,49 +281,123 @@
         min-height: 10px;
     }
     .page-interface();
+}
 
-    .control-pane {
-        padding: 0 1em;
-        overflow: auto;
-        .solid-border-bottom(#999);
-        p {
-            margin: 0.2em 0;
-        }
-        input {
-            margin: 1px 0.2em;
-        }
-        select {
-            margin-right: 0.4em;
-        }
-        input[type=checkbox] {
-            vertical-align: middle;
-        }
-        input[type=number] {
-            width: 5em;
-        }
-        a {
-            margin-right: 0.4em;
-            margin-left: 0.4em;
-        }
-        button {
-            box-shadow: 1px 1px grey;
-            border-radius: 3px;
-            width: 1.7em;
-            background-repeat: no-repeat;
-            background-position: center;
-            background-size: 1.4em;
-        }
-    }
+/* Settings bar-related styles */
+.pane_settings_bar {
+    border: 1px solid black;
+    border-width: 0 0 1px 0;
+    background: white;
+    min-height: 2em;
+    padding: 0.1em;
+    flex: 0 0 auto;
+    text-align: center;
+    /* background hides overflowing line numbers */
+    background: white;
+}
 
-    .text-pane {
-        width: 100%;
-        box-sizing: border-box;
-        padding-left: .5em;
-        resize: none;
-        border: 0;
-        margin: 0;
-        display: block;
-    }
+#settings_title {
+    font-weight: bold;
+    border-bottom: 1px solid gray;
+    margin-bottom: 1em;
+}
+
+.text_number {
+    width: 1.9rem;
+    text-align: right;
+    -moz-appearance: textfield;
+}
+
+.text_number input::-webkit-outer-spin-button,
+.text_number input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.bordered_button,
+.bordered_icon_button {
+    border-radius: 3px;
+}
+
+.bordered_icon_button {
+    width: 1.7em;
+    height: 1.7em;
+    padding: 1px;
+}
+
+.bordered_icon_button_disabled {
+    filter: opacity(30%);
+}
+
+
+/* TODO: should these all be wrapped in <div>s to make them a unit
+         and the styling applied to the unit?
+*/
+.tool_row button,
+.tool_row label,
+.tool_row input,
+.settings_row button,
+.settings_row label,
+.settings_row input,
+.pane_settings_bar button,
+.pane_settings_bar label,
+.pane_settings_bar input,
+#action_buttons button,
+#action_buttons label {
+    margin-right: 0.2em;
+}
+
+.settings_row {
+    margin: 1em 0;
+}
+
+/* Image pane-related styles */
+#image_content::-webkit-scrollbar {
+    display: none;  /* Safari and Chrome */
+}
+
+#image_content {
+    overflow: auto;
+    flex: auto;
+    scrollbar-width: none;
+}
+
+/* Page pane-related styles */
+#page_line_number {
+    border-right: 1px solid gray;
+    width: 2em;
+    text-align: right;
+    z-index: -10;
+}
+
+#page_line_number p {
+    position: absolute;
+    margin: 0;
+    width: 1.8em;
+}
+
+.ql-editor u {
+    text-decoration-color: red;
+    text-decoration-style: wavy;
+}
+
+.ql-editor s {
+    text-decoration-color: red;
+    text-decoration-line: underline;
+    text-decoration-thickness: 2px;
+}
+
+.wc_accept_button {
+    position: absolute;
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.5);
+    display: none;
+    z-index: 1;
+}
+
+.wc_settings_langcol {
+    /* 12em fits the longest language name */
+    column-width: 12em;
+    text-align: left;
 }
 
 /* ------------------------------------------------------------------------ */

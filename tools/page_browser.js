@@ -7,6 +7,6 @@ window.addEventListener("DOMContentLoaded", function () {
         window.history.replaceState(null, "", url.href);
     }
 
-    const container = document.getElementById("page_browser");
+    const container = document.getElementById("page-browser");
     pageBrowse(container, url.searchParams, replaceUrl);
 });
