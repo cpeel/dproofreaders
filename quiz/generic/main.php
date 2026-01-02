@@ -45,19 +45,23 @@ echo "
                 <div id='quiz_controls' class='fixed-box'>
 
 <form action='./returnfeed.php?quiz_page_id=$quiz_page_id' target='right' method='post' name='editform' id='editform'>
-<input type='hidden' name='text_data' id='text_data'>
-<input type='submit' class='margin_a' value='" . _("Check") . "'>
-<input type='button' class='margin_a' id='restart' value='" . _("Restart") . "'>";
+    <div id='action_buttons'>
+        <input type='hidden' name='text_data' id='text_data'>
+        <input type='submit' value='" . _("Check") . "'>
+        <input type='button' id='restart' value='" . _("Restart") . "'>
+";
 
 if (SiteConfig::get()->testing) {
     $solution = attr_safe(qp_sample_solution());
-    echo "<input type='button' class='margin_a' id='cheat_button' data-cheat_text='$solution' value='". _("Cheat!") ."'>\n";
+    echo "<input type='button' id='cheat_button' data-cheat_text='$solution' value='". _("Cheat!") ."'>\n";
     echo "<span style='color: red;'>";
     echo _("(This button is present only during testing.)");
     echo "</span>\n";
 }
 
-echo"</form>
+echo "
+    </div>
+</form>
                 </div>
             </div>
         </div>

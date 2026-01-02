@@ -79,5 +79,5 @@ function draw_toolbox()
 
 function action_button($id, $label, $title = "", $class = "")
 {
-    return "<button type='button' class='margin_a $class' id='$id' title='$title'>$label</button>";
+    return "<button type='button' class='$class' id='$id' title='$title'>$label</button>";
 }

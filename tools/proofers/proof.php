@@ -37,8 +37,8 @@ echo "
 <div id='proofreading_interface' data-forum_url='$forum_url_encoded' class='column-flex'>
     <div class='fixed-box default-border' id='page_control'>
         <div class='row_flex'>
-            <span class='stretch-box margin_a'>
-                <b><a id='project_title' target='_blank' title='", _("View Project Comments in New Window"), "'></a></b>
+            <span class='stretch-box'>
+                <a id='project_title' target='_blank' title='", _("View Project Comments in New Window"), "' class='bold'></a>
             </span>
             <span class='fixed-box'>
                 <span id='page_number'></span> &middot;
@@ -92,8 +92,9 @@ echo "<p>" . sprintf(_("Rarely there are other issues that could be considered a
 echo "<h2>" . _("Submit a Bad Page Report") . "</h2>";
 echo "<p>" . sprintf(_("If you still think it is a bad page, please let us know by filling out the information below. If not, hit %s."), _("Cancel")) . "</p>\n";
 
-echo "<p><b>" . _("Reason") . ":</b>
-<select id='reason_selector' class='margin_a'>";
+echo "<div class='action_buttons'>
+<b>" . _("Reason") . ":</b>
+<select id='reason_selector'>";
 echo "<option disabled selected value=''>", _("Please select a reason"), "</option>";
 foreach ($PAGE_BADNESS_REASONS as $reason) {
     echo "<option value='" . $reason["name"] . "'>" . $reason["string"] . "</option>";
@@ -101,7 +102,8 @@ foreach ($PAGE_BADNESS_REASONS as $reason) {
 echo "</select>",
 action_button('submit_bad_report', _("Submit")),
 action_button('cancel_bad_report', _("Cancel")),
-"</div>";
+"</div>
+</div>";
 // report bad page -- end
 
 echo "
