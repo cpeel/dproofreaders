@@ -310,6 +310,7 @@ export class TextWidget extends BasicTextWidget {
 
         this.onSettings = new Set();
         const settingsButton = actionButton(translate.gettext("Settings"));
+        settingsButton.classList.add("bordered_button");
         settingsButton.addEventListener("click", this.openSettingsDialog.bind(this));
 
         this.onDoneSettings = new Set();

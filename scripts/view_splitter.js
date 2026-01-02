@@ -47,9 +47,9 @@ export var viewSplitter = function (container, userSettings) {
             ? [splitHorizontalButton, splitVerticalButton]
             : [splitVerticalButton, splitHorizontalButton];
         activeButton.disabled = false;
-        activeButton.classList.remove("opaque");
+        activeButton.classList.remove("bordered_icon_button_disabled");
         inactiveButton.disabled = true;
-        inactiveButton.classList.add("opaque");
+        inactiveButton.classList.add("bordered_icon_button_disabled");
     }
 
     function setSplitDirection(splitV) {

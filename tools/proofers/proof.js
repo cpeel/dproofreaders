@@ -26,7 +26,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
     const imageTextDiv = document.getElementById("image_text");
     const imageContainer = document.getElementById("image_container");
-    const container = document.getElementById("text_div");
+    const container = document.getElementById("text_container");
 
     const docMap = {
         proofreading: "proofreading_guidelines.php",
