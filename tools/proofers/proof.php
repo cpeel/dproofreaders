@@ -22,7 +22,6 @@ $header_args = [
         "$code_url/node_modules/quill/dist/quill.js",
     ],
     "css_files" => [
-        "$code_url/styles/struct.css",
         "$code_url/node_modules/katex/dist/katex.min.css",
         "$code_url/node_modules/quill/dist/quill.core.css",
     ],
@@ -110,7 +109,7 @@ echo "
 </div>
 <div class='stretch-box' id='image_text'>
 <div id='image_container' class='column-flex'></div>
-<div id='text_div' class='column-flex'></div>
+<div id='text_container' class='column-flex'></div>
 </div>";
 draw_toolbox();
 echo "</div>";
