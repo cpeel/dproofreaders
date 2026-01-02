@@ -50,27 +50,27 @@ function draw_toolbox()
         <button type='button' id='show_picker_button' class='show_hide_picker_button' style='display:none;' title='", attr_safe(_("Show the character picker")), "'>&rang;</button>
     </div>
     <div id='edit_box' class='stretch-box right-align'>
-    <div>",
-    action_button('italic', '<i>i</i>', _('italics'), "format"),
-    action_button('bold', '<b>B</b>', _('Bold'), "format"),
-    action_button('small_caps', '<span style="font-variant: small-caps;">Sc</span>', _('Small Caps markup'), "format"),
-    action_button('gesperrt', 'g', _('Gesperrt (spaced out)'), "format"),
-    action_button('antiqua', 'f', _('Antiqua'), "format"),
+    <div class='tool_row'>",
+    action_button('italic', '<i>i</i>', _('italics'), "format_tool"),
+    action_button('bold', '<b>B</b>', _('Bold'), "format_tool"),
+    action_button('small_caps', '<span style="font-variant: small-caps;">Sc</span>', _('Small Caps markup'), "format_tool"),
+    action_button('gesperrt', 'g', _('Gesperrt (spaced out)'), "format_tool"),
+    action_button('antiqua', 'f', _('Antiqua'), "format_tool"),
     action_button('remove_markup', "<span style='text-decoration: line-through;'>&lt;x&gt;</span>", _('Remove markup from selection')),
     action_button('upper_case', 'ABC', _('Uppercase selection')),
     action_button('title_case', 'Abc', _('Title case selection')),
     action_button('lower_case', 'abc', _('Lowercase selection')),
     "</div>
-    <div>",
-    action_button('sidenote', '[Sidenote: ]', '[Sidenote:', "format"),
-    action_button('illustration', '[Illustration: ]', '[Illustration:', "format"),
+    <div class='tool_row'>",
+    action_button('sidenote', '[Sidenote: ]', '[Sidenote:', "format_tool"),
+    action_button('illustration', '[Illustration: ]', '[Illustration:', "format_tool"),
     action_button('note', '[** ]', _('Note')),
     action_button('brackets', '[ ]', '[ ]'),
     action_button('braces', '{ }', '{ }'),
-    action_button('footnote', '[Footnote #: ]', '[Footnote #:', "format"),
-    action_button('slash_star', '/* */', _('Start poetry/table'), "format"),
-    action_button('slash_number', '/# #/', _('Start block quote'), "format"),
-    action_button('thought_break', '&lt;tb&gt;', _('Thought Break'), "format"),
+    action_button('footnote', '[Footnote #: ]', '[Footnote #:', "format_tool"),
+    action_button('slash_star', '/* */', _('Start poetry/table'), "format_tool"),
+    action_button('slash_number', '/# #/', _('Start block quote'), "format_tool"),
+    action_button('thought_break', '&lt;tb&gt;', _('Thought Break'), "format_tool"),
     action_button('blank_page', '[Blank Page]', '[Blank Page]'),
     "</div>
         </div>
@@ -79,5 +79,6 @@ function draw_toolbox()
 
 function action_button($id, $label, $title = "", $class = "")
 {
-    return "<button type='button' class='$class' id='$id' title='$title'>$label</button>";
+    $class_attr = $class ? "class='$class'" : "";
+    return "<button type='button' id='$id' title='$title' $class_attr>$label</button>";
 }

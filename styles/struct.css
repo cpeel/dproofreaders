@@ -65,6 +65,9 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
     margin-right: 0.2em;
 }
 
+.tool_row button,
+.tool_row label,
+.tool_row input,
 .settings_row button,
 .settings_row label,
 .settings_row input,
@@ -78,6 +81,11 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
 
 .settings_row {
     margin: 1em 0;
+}
+
+/* disable formatting tools by default, JS displays them for F* rounds */
+.format_tool {
+    display: none;
 }
 
 .image_button {
@@ -123,10 +131,6 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
     text-decoration-color: red;
     text-decoration-line: underline;
     text-decoration-thickness: 2px;
-}
-
-.format {
-    display: none;
 }
 
 .show_hide_picker_button {
