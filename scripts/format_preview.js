@@ -59,7 +59,7 @@ export class FormatPreviewPlugin extends TextWidgetPlugin {
         const allowMathControl = makeLabel([allowMathCheck, translate.gettext("Preview Math")]);
 
         this.optGrid = document.createElement("div");
-        this.optGrid.classList.add("grid2col");
+        this.optGrid.classList.add("grid-2col");
         this.optGrid.append(colorMarkupControl, hideTagsControl, allowMathControl, allowUnderlineControl);
 
         this.possIssBox = document.createElement("input");

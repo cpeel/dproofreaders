@@ -109,6 +109,10 @@
 .rotate {
   transform: rotate(90deg);
 }
+.grid-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
 /* ------------------------------------------------------------------------ */
 /* WEB FONTS */
 /* Because global.less is rendered as part of the themes the web-font URLs
