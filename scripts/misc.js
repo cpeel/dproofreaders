@@ -9,7 +9,6 @@ function makeUrl(locator, params = {}, hash = "") {
 
 function actionButton(label, title = "") {
     const button = document.createElement("button");
-    button.classList.add("margin_a");
     button.type = "button";
     button.innerText = label;
     button.title = title;
@@ -24,7 +23,7 @@ function makeCheckBox() {
 
 function makeLabel(contents) {
     const label = document.createElement("label");
-    label.classList.add("nowrap", "margin_a");
+    label.classList.add("nowrap");
     label.append(...contents);
     return label;
 }

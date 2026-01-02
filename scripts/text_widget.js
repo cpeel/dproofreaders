@@ -291,7 +291,7 @@ export class TextWidget extends BasicTextWidget {
         this.container = container;
 
         this.controlBar = document.createElement("div");
-        this.controlBar.classList.add("simple_bar", "top_settings_box");
+        this.controlBar.classList.add("pane_settings_bar");
 
         this.viewSettingsDialog = document.createElement("dialog");
         this.container.append(this.viewSettingsDialog);

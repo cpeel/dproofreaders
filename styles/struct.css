@@ -34,19 +34,8 @@
     min-height: 10px;
 }
 
-.margin_a {
-    margin: 0 0.13em;
-}
-
-/* background hides overflowing line numbers */
-.simple_bar {
-    background: white;
-    padding: 0.1em;
-    flex: 0 0 auto;
-    text-align: center;
-}
-
-#page_control {
+#page_control,
+#quiz_controls {
     padding: 0.2em;
     background: white;
 }
@@ -67,7 +56,15 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
     width: 1.7em;
     height: 1.7em;
     padding: 0;
-    margin: 0 0.1em 0 0.1em
+    margin-right: 0.2em;
+}
+
+.pane_settings_bar button,
+.pane_settings_bar label,
+.pane_settings_bar input,
+#action_buttons button,
+#action_buttons label {
+    margin-right: 0.2em;
 }
 
 .image_button {
@@ -75,21 +72,28 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
     height: 1.7em;
     vertical-align: middle;
     background: beige;
+    margin-right: 0.2em;
 }
 
 .opaque {
     filter: opacity(30%);
 }
 
-.text_box {
-    white-space: pre;
-    height: 100%;
-}
-
-.top_settings_box {
+.pane_settings_bar {
     border: 1px solid black;
     border-width: 0 0 1px 0;
     background: white;
+    min-height: 2em;
+    padding: 0.1em;
+    flex: 0 0 auto;
+    text-align: center;
+    /* background hides overflowing line numbers */
+    background: white;
+}
+
+.text_box {
+    white-space: pre;
+    height: 100%;
 }
 
 .tool_box {

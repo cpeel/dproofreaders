@@ -92,21 +92,26 @@ export async function pageBrowse(container, params, replaceUrl, setShowFile = fu
     // declare this here to avoid use before define warning
     let getProjectData;
 
-    const titlePara = document.createElement("p");
-    const projectTitleSpan = document.createElement("span");
-    const projectLink = document.createElement("a");
-    projectLink.textContent = translate.gettext("Project Page");
-    titlePara.append(projectTitleSpan, " ", projectLink);
-
     const pageControlDiv = document.createElement("div");
-    pageControlDiv.classList.add("fixed-box", "top_settings_box");
+    pageControlDiv.id = "page_control";
+    pageControlDiv.classList.add("fixed-box", "default-border");
+
+    const projectLink = document.createElement("a");
+    projectLink.classList.add("bold");
+    const projectTitleDiv = document.createElement("div");
+    projectTitleDiv.appendChild(projectLink);
+
+    if (!simpleHeader) {
+        pageControlDiv.appendChild(projectTitleDiv);
+    }
+
+    const actionButtonsDiv = document.createElement("div");
+    actionButtonsDiv.id = "action_buttons";
+    pageControlDiv.appendChild(actionButtonsDiv);
 
     const imageTextDiv = document.createElement("div");
     imageTextDiv.classList.add("stretch-box");
 
-    if (!simpleHeader) {
-        container.append(titlePara);
-    }
     container.append(pageControlDiv, imageTextDiv);
 
     const textButton = actionButton(translate.gettext("Show Text only"));
@@ -202,13 +207,13 @@ export async function pageBrowse(container, params, replaceUrl, setShowFile = fu
             imageDiv.classList.add("column-flex");
             imageWidget = makeImageWidget(imageDiv, userSettings);
         }
-        pageControlDiv.innerHTML = "";
+        actionButtonsDiv.innerHTML = "";
         switch (displayMode) {
             case "image":
                 if (simpleHeader) {
-                    pageControlDiv.append(...pageControls);
+                    actionButtonsDiv.append(...pageControls);
                 } else {
-                    pageControlDiv.append(resetButton, textButton, imageTextButton, ...pageControls);
+                    actionButtonsDiv.append(resetButton, textButton, imageTextButton, ...pageControls);
                 }
                 imageTextDiv.append(imageDiv);
                 break;
@@ -222,7 +227,7 @@ export async function pageBrowse(container, params, replaceUrl, setShowFile = fu
                 theSplitter.mainSplit.onResize.add(textWidget.reLayout.bind(textWidget));
                 theSplitter.mainSplit.onResize.add(imageWidget.reSize);
                 theSplitter.setSplitDirCallback.push(textWidget.setup.bind(textWidget), imageWidget.reset);
-                pageControlDiv.append(resetButton, imageButton, textButton, ...pageControls, roundControl, ...theSplitter.buttons);
+                actionButtonsDiv.append(resetButton, imageButton, textButton, ...pageControls, roundControl, ...theSplitter.buttons);
                 theSplitter.fireSetSplitDir();
                 break;
             }
@@ -273,16 +278,15 @@ export async function pageBrowse(container, params, replaceUrl, setShowFile = fu
         replaceUrl();
         document.title = translate.gettext("Browse pages");
         // just show the project input
-        projectTitleSpan.textContent = translate.gettext("Browse pages");
         hide(projectLink);
-        pageControlDiv.innerHTML = "";
+        actionButtonsDiv.innerHTML = "";
         imageTextDiv.innerHTML = "";
 
         const projectInput = document.createElement("input");
         projectInput.type = "text";
         const projectSelectButton = actionButton(translate.gettext("Select Project"));
         const projectInputLabel = makeLabel([translate.gettext("Project ID") + ": ", projectInput]);
-        pageControlDiv.append(projectInputLabel, projectSelectButton);
+        actionButtonsDiv.append(projectInputLabel, projectSelectButton);
 
         projectSelectButton.addEventListener("click", function () {
             projectId = projectInput.value;
@@ -310,7 +314,7 @@ export async function pageBrowse(container, params, replaceUrl, setShowFile = fu
     function showProjectTitle(projectData) {
         projectLink.href = makeUrl(`${codeUrl}/project.php`, { id: projectId });
         show(projectLink);
-        projectTitleSpan.textContent = projectData.title;
+        projectLink.textContent = projectData.title;
         getPages();
     }
 

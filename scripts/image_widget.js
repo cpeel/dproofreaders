@@ -352,7 +352,7 @@ export function makeImageWidget(container, userSettings) {
     // end of touch section
 
     const controlBar = document.createElement("div");
-    controlBar.classList.add("simple_bar", "top_settings_box");
+    controlBar.classList.add("pane_settings_bar");
     controlBar.append(fitHeightButton, fitWidthButton, percentInput, "%", zoomInButton, zoomOutButton, clockRotateButton, counterClockRotateButton);
     container.append(controlBar, content);
 
