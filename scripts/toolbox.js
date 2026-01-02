@@ -2,23 +2,23 @@
 import translate from "./gettext.js";
 
 export function constructToolBox(textWidget, pickerSets, roundType, proofSettings, projectId) {
-    const midPickerBox = document.getElementById("mid_picker_box");
-    const showPickerButton = document.getElementById("show_picker_button");
+    const pickerWidgets = document.getElementById("picker-widgets");
+    const showPickerButton = document.getElementById("show-picker-button");
     const pickerDiv = document.getElementById("picker_box");
-    const largeChar = document.getElementById("large_char");
+    const largeChar = document.getElementById("large-char");
 
     function hidePicker() {
-        midPickerBox.style.display = "none";
+        pickerWidgets.style.display = "none";
         showPickerButton.style.display = "";
     }
 
-    document.getElementById("hide_picker_button").addEventListener("click", function () {
+    document.getElementById("hide-picker-button").addEventListener("click", function () {
         hidePicker();
         proofSettings.showPicker = false;
     });
 
     function showPicker() {
-        midPickerBox.style.display = "flex";
+        pickerWidgets.style.display = "flex";
         showPickerButton.style.display = "none";
     }
 
