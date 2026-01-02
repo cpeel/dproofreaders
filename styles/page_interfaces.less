@@ -137,6 +137,8 @@
 
 #toolbox {
     padding: 2px;
+    .solid-border();
+
     .sans-serif();
     .page-interface .control-pane();
 
@@ -171,14 +173,6 @@
         display: table;
     }
 
-    .table-row {
-        display: table-row;
-    }
-
-    .table-cell {
-        display: table-cell;
-    }
-
     .char_box {
         padding-top: 1px;
     }
@@ -201,20 +195,8 @@
         padding: 0;
     }
 
-    #hide-picker {
-        box-shadow: -1px -1px grey;
-    }
-
-    /* adjust so tools do not jump around with different character pickers */
-    #char-selector {
-        min-width: 225px;
-    }
-
-    #char-picker {
-        display: inherit;
-    }
-
-    .hide-picker-button {
+    #hide-picker-button,
+    #show-picker-button {
         font-size: 2em;
         height: 2.5em;
         padding: 0;
@@ -235,6 +217,11 @@
         }
         a:active {
             color: @page-interface-active-color;
+        }
+
+        /* disable formatting tools by default, JS displays them for F* rounds */
+        .format_tool {
+            display: none;
         }
     }
 }

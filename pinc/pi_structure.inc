@@ -40,16 +40,16 @@ function draw_toolbox()
 {
     echo "
 <div class='fixed-box tool_box row_flex' id='toolbox'>
-    <div id='outer_picker_box' class='fixed-box'>
-        <div id='mid_picker_box' class='row_flex'>
-            <button type='button' id='hide_picker_button' class='show_hide_picker_button' title='", attr_safe(_("Hide the character picker")), "'>&lang;</button>
-            <div class='char_box'><input type='text' readonly class='big_text' id='large_char'></div>
+    <div id='character-picker' class='fixed-box'>
+        <div id='picker-widgets' class='row_flex'>
+            <button type='button' id='hide-picker-button' title='", attr_safe(_("Hide the character picker")), "'>&lang;</button>
+            <div class='char_box'><input type='text' readonly class='big_text' id='large-char'></div>
             <div id='picker_box'>
             </div>
         </div>
-        <button type='button' id='show_picker_button' class='show_hide_picker_button' style='display:none;' title='", attr_safe(_("Show the character picker")), "'>&rang;</button>
+        <button type='button' id='show-picker-button' style='display: none;' title='", attr_safe(_("Show the character picker")), "'>&rang;</button>
     </div>
-    <div id='edit_box' class='stretch-box right-align'>
+    <div id='tools' class='stretch-box right-align'>
     <div class='tool_row'>",
     action_button('italic', '<i>i</i>', _('italics'), "format_tool"),
     action_button('bold', '<b>B</b>', _('Bold'), "format_tool"),

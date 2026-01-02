@@ -287,10 +287,10 @@
 /* Proofreading Toolbox */
 #toolbox {
   padding: 2px;
+  border: thin solid #000000;
   font-family: Verdana, Helvetica, sans-serif;
   background-color: #CDC0B0;
   color: black;
-  /* adjust so tools do not jump around with different character pickers */
 }
 #toolbox input,
 #toolbox select,
@@ -342,12 +342,6 @@
 #toolbox .show {
   display: table;
 }
-#toolbox .table-row {
-  display: table-row;
-}
-#toolbox .table-cell {
-  display: table-cell;
-}
 #toolbox .char_box {
   padding-top: 1px;
 }
@@ -367,16 +361,8 @@
   margin-top: 1px;
   padding: 0;
 }
-#toolbox #hide-picker {
-  box-shadow: -1px -1px grey;
-}
-#toolbox #char-selector {
-  min-width: 225px;
-}
-#toolbox #char-picker {
-  display: inherit;
-}
-#toolbox .hide-picker-button {
+#toolbox #hide-picker-button,
+#toolbox #show-picker-button {
   font-size: 2em;
   height: 2.5em;
   padding: 0;
@@ -387,6 +373,7 @@
   margin-right: 0.5em;
   text-align: right;
   width: 100%;
+  /* disable formatting tools by default, JS displays them for F* rounds */
 }
 #toolbox #tools a:link {
   color: #0000ff;
@@ -396,6 +383,9 @@
 }
 #toolbox #tools a:active {
   color: #ff0000;
+}
+#toolbox #tools .format_tool {
+  display: none;
 }
 /* ------------------------------------------------------------------------ */
 /* Page Browser */

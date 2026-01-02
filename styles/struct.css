@@ -83,11 +83,6 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
     margin: 1em 0;
 }
 
-/* disable formatting tools by default, JS displays them for F* rounds */
-.format_tool {
-    display: none;
-}
-
 .image_button {
     width: 1.7em;
     height: 1.7em;
@@ -117,11 +112,6 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
     height: 100%;
 }
 
-.tool_box {
-    border: 1px solid black;
-    border-width: 1px 0 0 0;
-}
-
 .ql-editor u {
     text-decoration-color: red;
     text-decoration-style: wavy;
@@ -131,13 +121,6 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
     text-decoration-color: red;
     text-decoration-line: underline;
     text-decoration-thickness: 2px;
-}
-
-.show_hide_picker_button {
-    font-size: 2em;
-    height: 2.5em;
-    padding: 0;
-    background: transparent;
 }
 
 #number_col {
