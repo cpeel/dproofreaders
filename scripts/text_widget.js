@@ -294,12 +294,19 @@ export class TextWidget extends BasicTextWidget {
         this.controlBar.classList.add("pane_settings_bar");
 
         this.viewSettingsDialog = document.createElement("dialog");
+        this.viewSettingsDialog.id = "settings_dialog";
+        const dialogTitle = document.createElement("div");
+        dialogTitle.id = "settings_title";
+        dialogTitle.innerHTML = translate.gettext("Settings");
+        this.viewSettingsDialog.appendChild(dialogTitle);
         this.container.append(this.viewSettingsDialog);
 
-        const controlRow = document.createElement("p");
+        const commonSettings = document.createElement("div");
+        commonSettings.classList.add("settings_row");
 
         // Set up settings dialog & controls
         this.extraSettings = document.createElement("div");
+        this.extraSettings.classList.add("settings_row");
 
         this.onSettings = new Set();
         const settingsButton = actionButton(translate.gettext("Settings"));
@@ -309,7 +316,7 @@ export class TextWidget extends BasicTextWidget {
         const doneButton = actionButton(translate.gettext("Done"));
         doneButton.addEventListener("click", this.closeSettingsDialog.bind(this));
 
-        this.viewSettingsDialog.append(controlRow, this.extraSettings, doneButton);
+        this.viewSettingsDialog.append(commonSettings, this.extraSettings, doneButton);
         this.controlBar.append(settingsButton);
 
         // set up the line numbering column
@@ -371,7 +378,7 @@ export class TextWidget extends BasicTextWidget {
         );
         const wrapControl = makeLabel([wrapCheck, translate.gettext("Wrap")]);
 
-        controlRow.append(fontControl, fontSizeControl, wrapControl);
+        commonSettings.append(fontControl, fontSizeControl, wrapControl);
 
         fontSizeSelector.value = this.userSettings.fontSize;
         fontFaceSelector.value = this.userSettings.fontId;
