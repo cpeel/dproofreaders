@@ -206,7 +206,7 @@
 .page-interface .control-pane,
 .page-interface #quiz_controls,
 .page-interface #page_control {
-  padding: 0.2em;
+  padding: 0.4em;
   background-color: #dddddd;
   color: #000000;
 }
@@ -245,7 +245,7 @@
 .fixedbox {
   flex: 0 0 auto;
   padding: 2px;
-  padding: 0.2em;
+  padding: 0.4em;
   background-color: #dddddd;
   color: #000000;
 }
@@ -419,7 +419,7 @@
 #quiz-interface #page_control,
 #page-browser #page_control,
 #proofreading_interface #page_control {
-  padding: 0.2em;
+  padding: 0.4em;
   background-color: #dddddd;
   color: #000000;
 }
