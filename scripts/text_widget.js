@@ -529,12 +529,17 @@ export class ProofTextWidget extends TextWidget {
 
         Quill.register(DFormula);
 
+        const lineSpacerUnit = document.createElement("label");
+        lineSpacerUnit.innerHTML = translate.gettext("Spacing") + ":";
+
         const lineSpacer = document.createElement("input");
+        lineSpacer.classList.add("line-spacer");
         lineSpacer.type = "range";
         lineSpacer.classList.add("middle-align");
         lineSpacer.min = "1.5";
         lineSpacer.max = "3";
         lineSpacer.step = "0.01";
+        lineSpacer.width = "5em";
         lineSpacer.title = translate.gettext("Adjust the line spacing");
         lineSpacer.value = self.lineHeight;
         lineSpacer.addEventListener("input", (event) => {
@@ -542,6 +547,7 @@ export class ProofTextWidget extends TextWidget {
             this.setParaSpacing(lineHeight);
             this.userSettings.lineHeight = lineHeight;
         });
+        lineSpacerUnit.appendChild(lineSpacer);
 
         this.oldScroll = this.qlEditor.scrollTop;
         this.scrollListeners = new Set();
@@ -569,7 +575,7 @@ export class ProofTextWidget extends TextWidget {
         this.textOnlyRadio = makeRadio("viewMode");
         this.textOnlyRadio.checked = true;
         this.textOnlyRadio.addEventListener("click", this.enterTextOnly.bind(this));
-        const textOnlyControl = makeLabel([this.textOnlyRadio, translate.gettext("Text Only")]);
+        const textOnlyControl = makeLabel([this.textOnlyRadio, translate.gettext("Text")]);
 
         const wordCheckRadio = makeRadio("viewMode");
         wordCheckRadio.addEventListener("click", this.enterWordCheck.bind(this));
@@ -580,7 +586,7 @@ export class ProofTextWidget extends TextWidget {
         const formatPreviewControl = makeLabel([formatPreviewRadio, translate.gettext("Format Preview")]);
 
         this.controlBar.prepend(textOnlyControl, wordCheckControl, formatPreviewControl);
-        this.controlBar.append(lineSpacer, this.statSpan);
+        this.controlBar.append(lineSpacerUnit, this.statSpan);
 
         this.validator = makeValidator(projectId, this.quill);
     }
