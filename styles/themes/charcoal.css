@@ -175,8 +175,8 @@
  * validator, display image interface, etc.
  */
 /* variables */
-/* Base layer for page interface */
 /* Text pane */
+/* Image pane */
 /* Page control pane */
 /* Toolbox pane */
 /* Links */
@@ -188,73 +188,27 @@
     We can't apply 'background-color' here without impacting how page numbers
     work in the PI. Each "pane" needs to apply their own background color.
     */
-  color: black;
   /* Page Text entities */
   /* Image entities */
   /* Top of page controls */
   /* Horizontal / Vertical change icon */
 }
-.page-interface a:link {
-  color: #0000ff;
-}
-.page-interface a:visited {
-  color: #990099;
-}
-.page-interface a:active {
-  color: #ff0000;
-}
 .page-interface .text-pane,
 .page-interface #quiz_text,
 .page-interface #page_line_number,
 .page-interface .ql-container {
-  background-color: #FFF8DC;
+  background-color: white;
   color: black;
 }
 .page-interface #image_content {
-  background-color: #FFF8DC;
+  background-color: #BDBDBD;
 }
 .page-interface .control-pane,
 .page-interface #quiz_controls,
 .page-interface #page_control {
   padding: 0.2em;
-  background-color: #CDC0B0;
-  color: black;
-}
-.page-interface .control-pane input,
-.page-interface #quiz_controls input,
-.page-interface #page_control input,
-.page-interface .control-pane select,
-.page-interface #quiz_controls select,
-.page-interface #page_control select,
-.page-interface .control-pane button,
-.page-interface #quiz_controls button,
-.page-interface #page_control button {
-  background-color: #FFF8DC;
-  color: black;
-  border: thin solid #565656;
-}
-.page-interface .control-pane input[type=submit]:disabled,
-.page-interface #quiz_controls input[type=submit]:disabled,
-.page-interface #page_control input[type=submit]:disabled,
-.page-interface .control-pane input[type=button]:disabled,
-.page-interface #quiz_controls input[type=button]:disabled,
-.page-interface #page_control input[type=button]:disabled,
-.page-interface .control-pane button:disabled,
-.page-interface #quiz_controls button:disabled,
-.page-interface #page_control button:disabled {
-  background-color: #b3ae9a;
-}
-.page-interface .control-pane button,
-.page-interface #quiz_controls button,
-.page-interface #page_control button,
-.page-interface .control-pane input[type=submit],
-.page-interface #quiz_controls input[type=submit],
-.page-interface #page_control input[type=submit],
-.page-interface .control-pane input[type=button],
-.page-interface #quiz_controls input[type=button],
-.page-interface #page_control input[type=button] {
-  box-shadow: 1px 1px grey;
-  border-radius: 3px;
+  background-color: #1a1a1a;
+  color: #d5d5d5;
 }
 .page-interface .control-pane input[type=image],
 .page-interface #quiz_controls input[type=image],
@@ -266,6 +220,8 @@
   height: 1.7em;
   vertical-align: middle;
   margin-right: 0.2em;
+  /* TODO: these are SVGs and we can't change the color on them;
+                 probably need to invert them for dark theme */
 }
 /* ------------------------------------------------------------------------ */
 /* WordCheck Interface */
@@ -290,26 +246,8 @@
   flex: 0 0 auto;
   padding: 2px;
   padding: 0.2em;
-  background-color: #CDC0B0;
-  color: black;
-}
-.fixedbox input,
-.fixedbox select,
-.fixedbox button {
-  background-color: #FFF8DC;
-  color: black;
-  border: thin solid #565656;
-}
-.fixedbox input[type=submit]:disabled,
-.fixedbox input[type=button]:disabled,
-.fixedbox button:disabled {
-  background-color: #b3ae9a;
-}
-.fixedbox button,
-.fixedbox input[type=submit],
-.fixedbox input[type=button] {
-  box-shadow: 1px 1px grey;
-  border-radius: 3px;
+  background-color: #1a1a1a;
+  color: #d5d5d5;
 }
 .fixedbox input[type=image] {
   border: none;
@@ -318,7 +256,7 @@
   flex: auto;
   min-height: 10px;
   overflow: auto;
-  background-color: #FFF8DC;
+  background-color: white;
   color: black;
 }
 .ws-pre {
@@ -336,20 +274,20 @@
   padding: 2px;
   border: thin solid #565656;
   font-family: Verdana, Helvetica, sans-serif;
-  background-color: #CDC0B0;
+  background-color: #8E8E8E;
   color: black;
 }
 #toolbox input,
 #toolbox select,
 #toolbox button {
-  background-color: #FFF8DC;
+  background-color: white;
   color: black;
   border: thin solid #565656;
 }
 #toolbox input[type=submit]:disabled,
 #toolbox input[type=button]:disabled,
 #toolbox button:disabled {
-  background-color: #b3ae9a;
+  background-color: #b3b3b3;
 }
 #toolbox button,
 #toolbox input[type=submit],
@@ -361,7 +299,7 @@
   border: none;
 }
 #toolbox .selector_button {
-  background-color: Bisque;
+  background-color: white;
   margin-top: 1px;
   font-size: 1em;
   padding: 0.1em 0.15em 0 0.15em;
@@ -370,7 +308,7 @@
 }
 #toolbox .selected-tab {
   font-weight: bold;
-  background-color: #FFF8DC;
+  background-color: white;
   box-shadow: -1px -1px grey;
 }
 #toolbox .key-block {
@@ -436,7 +374,6 @@
     We can't apply 'background-color' here without impacting how page numbers
     work in the PI. Each "pane" needs to apply their own background color.
     */
-  color: black;
   /* Page Text entities */
   /* Image entities */
   /* Top of page controls */
@@ -453,21 +390,6 @@
   flex: 1 1 100%;
   min-height: 10px;
 }
-#quiz-interface a:link,
-#page-browser a:link,
-#proofreading_interface a:link {
-  color: #0000ff;
-}
-#quiz-interface a:visited,
-#page-browser a:visited,
-#proofreading_interface a:visited {
-  color: #990099;
-}
-#quiz-interface a:active,
-#page-browser a:active,
-#proofreading_interface a:active {
-  color: #ff0000;
-}
 #quiz-interface .text-pane,
 #page-browser .text-pane,
 #proofreading_interface .text-pane,
@@ -480,13 +402,13 @@
 #quiz-interface .ql-container,
 #page-browser .ql-container,
 #proofreading_interface .ql-container {
-  background-color: #FFF8DC;
+  background-color: white;
   color: black;
 }
 #quiz-interface #image_content,
 #page-browser #image_content,
 #proofreading_interface #image_content {
-  background-color: #FFF8DC;
+  background-color: #BDBDBD;
 }
 #quiz-interface .control-pane,
 #page-browser .control-pane,
@@ -498,98 +420,8 @@
 #page-browser #page_control,
 #proofreading_interface #page_control {
   padding: 0.2em;
-  background-color: #CDC0B0;
-  color: black;
-}
-#quiz-interface .control-pane input,
-#page-browser .control-pane input,
-#proofreading_interface .control-pane input,
-#quiz-interface #quiz_controls input,
-#page-browser #quiz_controls input,
-#proofreading_interface #quiz_controls input,
-#quiz-interface #page_control input,
-#page-browser #page_control input,
-#proofreading_interface #page_control input,
-#quiz-interface .control-pane select,
-#page-browser .control-pane select,
-#proofreading_interface .control-pane select,
-#quiz-interface #quiz_controls select,
-#page-browser #quiz_controls select,
-#proofreading_interface #quiz_controls select,
-#quiz-interface #page_control select,
-#page-browser #page_control select,
-#proofreading_interface #page_control select,
-#quiz-interface .control-pane button,
-#page-browser .control-pane button,
-#proofreading_interface .control-pane button,
-#quiz-interface #quiz_controls button,
-#page-browser #quiz_controls button,
-#proofreading_interface #quiz_controls button,
-#quiz-interface #page_control button,
-#page-browser #page_control button,
-#proofreading_interface #page_control button {
-  background-color: #FFF8DC;
-  color: black;
-  border: thin solid #565656;
-}
-#quiz-interface .control-pane input[type=submit]:disabled,
-#page-browser .control-pane input[type=submit]:disabled,
-#proofreading_interface .control-pane input[type=submit]:disabled,
-#quiz-interface #quiz_controls input[type=submit]:disabled,
-#page-browser #quiz_controls input[type=submit]:disabled,
-#proofreading_interface #quiz_controls input[type=submit]:disabled,
-#quiz-interface #page_control input[type=submit]:disabled,
-#page-browser #page_control input[type=submit]:disabled,
-#proofreading_interface #page_control input[type=submit]:disabled,
-#quiz-interface .control-pane input[type=button]:disabled,
-#page-browser .control-pane input[type=button]:disabled,
-#proofreading_interface .control-pane input[type=button]:disabled,
-#quiz-interface #quiz_controls input[type=button]:disabled,
-#page-browser #quiz_controls input[type=button]:disabled,
-#proofreading_interface #quiz_controls input[type=button]:disabled,
-#quiz-interface #page_control input[type=button]:disabled,
-#page-browser #page_control input[type=button]:disabled,
-#proofreading_interface #page_control input[type=button]:disabled,
-#quiz-interface .control-pane button:disabled,
-#page-browser .control-pane button:disabled,
-#proofreading_interface .control-pane button:disabled,
-#quiz-interface #quiz_controls button:disabled,
-#page-browser #quiz_controls button:disabled,
-#proofreading_interface #quiz_controls button:disabled,
-#quiz-interface #page_control button:disabled,
-#page-browser #page_control button:disabled,
-#proofreading_interface #page_control button:disabled {
-  background-color: #b3ae9a;
-}
-#quiz-interface .control-pane button,
-#page-browser .control-pane button,
-#proofreading_interface .control-pane button,
-#quiz-interface #quiz_controls button,
-#page-browser #quiz_controls button,
-#proofreading_interface #quiz_controls button,
-#quiz-interface #page_control button,
-#page-browser #page_control button,
-#proofreading_interface #page_control button,
-#quiz-interface .control-pane input[type=submit],
-#page-browser .control-pane input[type=submit],
-#proofreading_interface .control-pane input[type=submit],
-#quiz-interface #quiz_controls input[type=submit],
-#page-browser #quiz_controls input[type=submit],
-#proofreading_interface #quiz_controls input[type=submit],
-#quiz-interface #page_control input[type=submit],
-#page-browser #page_control input[type=submit],
-#proofreading_interface #page_control input[type=submit],
-#quiz-interface .control-pane input[type=button],
-#page-browser .control-pane input[type=button],
-#proofreading_interface .control-pane input[type=button],
-#quiz-interface #quiz_controls input[type=button],
-#page-browser #quiz_controls input[type=button],
-#proofreading_interface #quiz_controls input[type=button],
-#quiz-interface #page_control input[type=button],
-#page-browser #page_control input[type=button],
-#proofreading_interface #page_control input[type=button] {
-  box-shadow: 1px 1px grey;
-  border-radius: 3px;
+  background-color: #1a1a1a;
+  color: #d5d5d5;
 }
 #quiz-interface .control-pane input[type=image],
 #page-browser .control-pane input[type=image],
@@ -609,6 +441,8 @@
   height: 1.7em;
   vertical-align: middle;
   margin-right: 0.2em;
+  /* TODO: these are SVGs and we can't change the color on them;
+                 probably need to invert them for dark theme */
 }
 /* Settings bar-related styles */
 .pane_settings_bar {
@@ -619,9 +453,11 @@
   flex: 0 0 auto;
   text-align: center;
   /* background hides overflowing line numbers */
-  background: white;
+  background: black;
+  color: #cdcdcd;
 }
 #settings_title {
+  color: #bcbcbc;
   font-weight: bold;
   border-bottom: 1px solid gray;
   margin-bottom: 1em;
@@ -833,6 +669,10 @@ body a:active {
 }
 img {
   border: 0;
+}
+dialog {
+  background-color: #262626;
+  color: #e2e2e2;
 }
 table {
   border-collapse: collapse;
