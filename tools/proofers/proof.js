@@ -250,14 +250,16 @@ window.addEventListener("DOMContentLoaded", async () => {
         });
 
         revertToOrigButton.addEventListener("click", async () => {
-            disableAction();
-            const pageText = textWidget.getText();
-            try {
-                const data = await ajaxPage("PUT", "revert", { text: pageText });
-                setPageState(data);
-                enableAction();
-            } catch (error) {
-                checkValidateText(error);
+            if (confirm(translate.gettext("Are you sure you want to revert to the original version?"))) {
+                disableAction();
+                const pageText = textWidget.getText();
+                try {
+                    const data = await ajaxPage("PUT", "revert", { text: pageText });
+                    setPageState(data);
+                    enableAction();
+                } catch (error) {
+                    checkValidateText(error);
+                }
             }
         });
 
