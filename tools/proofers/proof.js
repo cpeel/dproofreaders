@@ -261,6 +261,14 @@ window.addEventListener("DOMContentLoaded", async () => {
             }
         });
 
+        revertToOrigButton.addEventListener("click", async () => {
+            if (confirm(translate.gettext("Are you sure you want to revert to the original version?"))) {
+                disableAction();
+                await resumePage();
+                enableAction();
+            }
+        });
+
         revertToSavedButton.addEventListener("click", async () => {
             if (confirm(translate.gettext("Are you sure you want to revert to your last save?"))) {
                 disableAction();
