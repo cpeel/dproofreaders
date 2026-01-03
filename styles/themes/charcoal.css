@@ -456,6 +456,9 @@
   background: black;
   color: #cdcdcd;
 }
+.line-spacer {
+  width: 5em;
+}
 #settings_title {
   color: #bcbcbc;
   font-weight: bold;
