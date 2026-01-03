@@ -10,22 +10,21 @@
 
 /* variables */
 
-/* Base layer for page interface */
-@page-interface-background: #CDCDC1;
-@page-interface-text: black;
-
 /* Text pane */
-@text-pane-background: #FFF8DC;
+@text-pane-background: white;
 @text-pane-text: black;
 
+/* Image pane */
+@image-pane-background: #BDBDBD;
+
 /* Page control pane */
-@control-pane-background: #CDC0B0;
-@control-pane-text: black;
+@control-pane-background: @header-background;
+@control-pane-text: @header-text;
 
 /* Toolbox pane */
-@toolbox-pane-background: #CDC0B0;
+@toolbox-pane-background: #8E8E8E;
 @toolbox-pane-text: black;
-@toolbox-pane-menu: Bisque;
+@toolbox-pane-menu: white;
 
 /* Links */
 @page-interface-link-color: #0000ff;
@@ -47,16 +46,6 @@
     We can't apply 'background-color' here without impacting how page numbers
     work in the PI. Each "pane" needs to apply their own background color.
     */
-    color: @page-interface-text;
-    a:link {
-        color: @page-interface-link-color;
-    }
-    a:visited {
-        color: @page-interface-visited-color;
-    }
-    a:active {
-        color: @page-interface-active-color;
-    }
 
     /* Page Text entities */
     .text-pane,
@@ -69,7 +58,7 @@
 
     /* Image entities */
     #image_content {
-        background-color: @text-pane-background;
+        background-color: @image-pane-background;
     }
 
     /* Top of page controls */
@@ -80,21 +69,6 @@
 
         background-color: @control-pane-background;
         color: @control-pane-text;
-
-        input, select, button {
-            background-color: @text-pane-background;
-            color: @text-pane-text;
-            .solid-border();
-        }
-
-        input[type=submit]:disabled, input[type=button]:disabled, button:disabled {
-            background-color: shade(@text-pane-background, 30%);
-        }
-
-        button, input[type=submit], input[type=button] {
-            box-shadow: 1px 1px grey;
-            border-radius: 3px;
-        }
 
         input[type=image] {
             border: none;
@@ -107,6 +81,8 @@
         height: 1.7em;
         vertical-align: middle;
         margin-right: 0.2em;
+        /* TODO: these are SVGs and we can't change the color on them;
+                 probably need to invert them for dark theme */
     }
 }
 
@@ -287,16 +263,17 @@
 .pane_settings_bar {
     border: 1px solid black;
     border-width: 0 0 1px 0;
-    background: white;
     min-height: 2em;
     padding: 0.1em;
     flex: 0 0 auto;
     text-align: center;
     /* background hides overflowing line numbers */
-    background: white;
+    background: @navbar-background;
+    color: @navbar-text;
 }
 
 #settings_title {
+    color: @heading-color;
     font-weight: bold;
     border-bottom: 1px solid gray;
     margin-bottom: 1em;
