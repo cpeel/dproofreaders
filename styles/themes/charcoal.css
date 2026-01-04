@@ -223,6 +223,9 @@
   /* TODO: these are SVGs and we can't change the color on them;
                  probably need to invert them for dark theme */
 }
+.page-interface .image_button_disabled {
+  filter: opacity(30%);
+}
 /* ------------------------------------------------------------------------ */
 /* WordCheck Interface */
 .preWC {
@@ -444,6 +447,21 @@
   /* TODO: these are SVGs and we can't change the color on them;
                  probably need to invert them for dark theme */
 }
+#quiz-interface .image_button_disabled,
+#page-browser .image_button_disabled,
+#proofreading_interface .image_button_disabled {
+  filter: opacity(30%);
+}
+#quiz-interface .image_button,
+#page-browser .image_button,
+#proofreading_interface .image_button {
+  filter: invert();
+}
+#quiz-interface .image_button_disabled,
+#page-browser .image_button_disabled,
+#proofreading_interface .image_button_disabled {
+  filter: invert() opacity(30%);
+}
 /* Settings bar-related styles */
 .pane_settings_bar {
   border: 1px solid black;
@@ -483,9 +501,6 @@
   width: 1.7em;
   height: 1.7em;
   padding: 1px;
-}
-.bordered_icon_button_disabled {
-  filter: opacity(30%);
 }
 /* TODO: should these all be wrapped in <div>s to make them a unit
          and the styling applied to the unit?
@@ -2673,3 +2688,10 @@ table.striped tr:nth-child(even) td {
  * a dark theme background for WC management for PMs.
  */
 /* WordCheck */
+/* Page / Proofreading Interfaces */
+.page-interface .image_button {
+  filter: invert();
+}
+.page-interface .image_button_disabled {
+  filter: invert() opacity(30%);
+}
