@@ -24,17 +24,11 @@ export class WordCheckPlugin extends TextWidgetPlugin {
         this.languagesWithDictionaries = languagesWithDictionaries;
         this.projectLanguages = projectLanguages;
 
-        this.langGrid = document.createElement("div");
-        this.langGrid.classList.add("wc_settings_langcol");
-        this.langGrid.append(translate.gettext("Dictionaries") + ":");
-
-        this.acceptButton = document.createElement("button");
-        this.acceptButton.type = "button";
-        this.acceptButton.classList.add("wc_accept_button");
-        this.acceptButton.innerText = translate.gettext("Accept");
-
         this.languages = [projectLanguages[0]];
 
+        // Build the dictionaries listing for the Settings dialog
+        this.dictGrid = document.createElement("div");
+        this.dictGrid.classList.add("grid-3col");
         for (const language of Object.values(languagesWithDictionaries)) {
             const cBox = document.createElement("input");
             cBox.type = "checkbox";
@@ -43,21 +37,27 @@ export class WordCheckPlugin extends TextWidgetPlugin {
             }
             const label = document.createElement("label");
             label.classList.add("nowrap");
-            label.append(cBox, language, document.createElement("br"));
-            this.langGrid.append(label);
+            label.append(cBox, language);
+            this.dictGrid.append(label);
         }
+        this.dictionaries = document.createElement("div");
+        this.dictionaries.append(translate.gettext("Dictionaries") + ":");
+        this.dictionaries.appendChild(this.dictGrid);
 
-        this.editBox.append(this.acceptButton);
-
+        this.acceptButton = document.createElement("button");
+        this.acceptButton.type = "button";
+        this.acceptButton.classList.add("wc_accept_button");
+        this.acceptButton.innerText = translate.gettext("Accept");
         this.acceptButton.addEventListener("click", this.acceptWord.bind(this));
         this.acceptButton.addEventListener("keydown", this.keyAcceptWord.bind(this));
+        this.editBox.append(this.acceptButton);
 
         this.scrollListeners.add(this.maybeShowAcceptButton.bind(this));
     }
 
     setLanguages() {
         this.languages.length = 0;
-        const langCheckBoxes = this.langGrid.getElementsByTagName("input");
+        const langCheckBoxes = this.dictGrid.getElementsByTagName("input");
         for (const box of langCheckBoxes) {
             if (box.checked) {
                 this.languages.push(box.nextSibling.textContent);
@@ -228,7 +228,7 @@ export class WordCheckPlugin extends TextWidgetPlugin {
         this.editBox.addEventListener("click", this.maybeShowAcceptButton.bind(this));
         this.editBox.addEventListener("keyup", this.maybeShowAcceptButton.bind(this));
         this.quill.enable();
-        this.extraSettings.append(this.langGrid);
+        this.extraSettings.append(this.dictionaries);
         this.onDoneSettingsAction = this.setLanguages.bind(this);
         this.onDoneSettings.add(this.onDoneSettingsAction);
         this.wordCheck();
