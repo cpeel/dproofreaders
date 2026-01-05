@@ -467,6 +467,12 @@
   /* background hides overflowing line numbers */
   background: #336633;
   color: #ffffff;
+  /* remove the spinners in WebKit-based browsers */
+}
+.pane_settings_bar input::-webkit-outer-spin-button,
+.pane_settings_bar input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 .line-spacer {
   width: 5em;
@@ -480,12 +486,8 @@
 .text_number {
   width: 1.9rem;
   text-align: right;
+  /* remove the spinners in Firefox-based browsers */
   -moz-appearance: textfield;
-}
-.text_number input::-webkit-outer-spin-button,
-.text_number input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
 }
 .bordered_button,
 .bordered_icon_button {

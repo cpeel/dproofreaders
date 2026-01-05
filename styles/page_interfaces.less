@@ -274,6 +274,13 @@
     /* background hides overflowing line numbers */
     background: @navbar-background;
     color: @navbar-text;
+
+    /* remove the spinners in WebKit-based browsers */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
 }
 
 .line-spacer {
@@ -290,13 +297,8 @@
 .text_number {
     width: 1.9rem;
     text-align: right;
+    /* remove the spinners in Firefox-based browsers */
     -moz-appearance: textfield;
-}
-
-.text_number input::-webkit-outer-spin-button,
-.text_number input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
 }
 
 .bordered_button,
