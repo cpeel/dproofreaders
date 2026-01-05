@@ -218,7 +218,7 @@ export class WordCheckPlugin extends TextWidgetPlugin {
         this.wordChecked = false;
     }
 
-    getWCState() {
+    getWCStatus() {
         return [this.wordChecked, this.acceptedWords];
     }
 

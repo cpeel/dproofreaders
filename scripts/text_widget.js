@@ -629,8 +629,12 @@ export class ProofTextWidget extends TextWidget {
         this.textOnlyRadio.checked = true;
     }
 
-    getWCState() {
-        return this.wordChecker.getWCState();
+    getWCStatus() {
+        return this.wordChecker.getWCStatus();
+    }
+
+    getFPStatus() {
+        return this.formatter.getFPStatus();
     }
 
     initWordCheck() {
