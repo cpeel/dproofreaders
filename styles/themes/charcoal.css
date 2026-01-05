@@ -466,6 +466,11 @@
 #proofreading_interface .image_button_disabled {
   filter: invert() opacity(30%);
 }
+#quiz-interface #image_content img,
+#page-browser #image_content img,
+#proofreading_interface #image_content img {
+  filter: invert(90%);
+}
 /* Settings bar-related styles */
 .pane_settings_bar {
   border: 1px solid black;
@@ -2693,4 +2698,7 @@ table.striped tr:nth-child(even) td {
 }
 .page-interface .image_button_disabled {
   filter: invert() opacity(30%);
+}
+.page-interface #image_content img {
+  filter: invert(90%);
 }
