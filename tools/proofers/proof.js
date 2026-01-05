@@ -221,7 +221,11 @@ window.addEventListener("DOMContentLoaded", async () => {
         });
 
         exitButton.addEventListener("click", async () => {
-            if (confirm(translate.gettext("Are you sure you want to stop proofreading?"))) {
+            if (
+                confirm(
+                    translate.gettext("Are you sure you want to stop proofreading?") + "\n" + translate.gettext("Changes since your last save will be lost."),
+                )
+            ) {
                 disableAction();
                 try {
                     await maybeReportWC();

@@ -47,14 +47,14 @@ echo "
         <div class='row_flex'>
             <span class='stretch-box'>
                 <div id='action_buttons'>",
-action_button('save_button', _("Save")),
-action_button('exit_button', _("Exit")),
-action_button('done_and_exit_button', _("Done & Exit")),
-action_button('done_and_next_button', _("Done & Next")),
-action_button('revert_to_original_button', _("Revert to Original")),
-action_button('revert_to_saved_button', _("Revert to Saved")),
-action_button('abandon_button', _("Abandon")),
-action_button('report_bad_button', _("Report Bad Page")),
+action_button('save_button', _("Save"), _("Save changes and continue editing")),
+action_button('exit_button', _("Exit"), _("Stop editing, but keep page checked out to work on later")),
+action_button('done_and_exit_button', _("Done & Exit"), _("Mark page as Done, and return to project page")),
+action_button('done_and_next_button', _("Done & Next"), _("Mark page as Done, and start editing next available page")),
+action_button('revert_to_original_button', _("Revert to Original"), _("Revert the page to its original state, losing all changes")),
+action_button('revert_to_saved_button', _("Revert to Saved"), _("Revert the page to its last saved state")),
+action_button('abandon_button', _("Abandon"), _("Revert changes and return the page so others can work on it")),
+action_button('report_bad_button', _("Report Bad Page"), _("Inform project manager that there is a serious problem with the page text or scanned page image")),
 "
                 </div>
             </span>

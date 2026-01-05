@@ -80,5 +80,6 @@ function draw_toolbox()
 function action_button($id, $label, $title = "", $class = "")
 {
     $class_attr = $class ? "class='$class'" : "";
-    return "<button type='button' id='$id' title='$title' $class_attr>$label</button>";
+    $title_attr = $title ? sprintf("title='%s'", attr_safe($title)) : "";
+    return "<button type='button' id='$id' $title_attr $class_attr>$label</button>";
 }
