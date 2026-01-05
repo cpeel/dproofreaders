@@ -66,7 +66,7 @@ action_button('report_bad_button', _("Report Bad Page")),
 ";
 
 // report bad page -- begin
-echo "<div id='bad_page_report' style='display:none;'>";
+echo "<dialog id='bad_page_report'>";
 
 echo "<h1>" . _("Report Bad Page") . "</h1>";
 echo "<p>" . _("If you are unable to proofread the page you were presented, you can mark it bad with this form to let the Project Manager know it requires attention. Before doing so, let's review what constitutes a bad page and some possible fixes you can try first.") . "</p>";
@@ -102,7 +102,7 @@ echo "</select>",
 action_button('submit_bad_report', _("Submit")),
 action_button('cancel_bad_report', _("Cancel")),
 "</div>
-</div>";
+</dialog>";
 // report bad page -- end
 
 echo "

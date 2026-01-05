@@ -1,4 +1,4 @@
-/*global codeUrl makeUrl hide show */
+/*global codeUrl makeUrl */
 /* eslint no-use-before-define: "warn" */
 /* eslint camelcase: "off" */
 
@@ -289,18 +289,14 @@ window.addEventListener("DOMContentLoaded", async () => {
             }
         });
 
-        const actionDiv = document.getElementById("action_buttons");
         const badPageReport = document.getElementById("bad_page_report");
         reportBadButton.addEventListener("click", () => {
-            hide(actionDiv);
-            imageTextDiv.style.visibility = "hidden";
-            show(badPageReport);
+            badPageReport.showModal();
+            badPageReport.scrollTop = 0;
         });
 
         document.getElementById("cancel_bad_report").addEventListener("click", () => {
-            show(actionDiv);
-            imageTextDiv.style.visibility = "visible";
-            hide(badPageReport);
+            badPageReport.close();
         });
 
         document.getElementById("submit_bad_report").addEventListener("click", async () => {
