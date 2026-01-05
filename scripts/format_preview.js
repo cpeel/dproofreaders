@@ -8,6 +8,7 @@ export class FormatPreviewPlugin extends TextWidgetPlugin {
     anlaysis;
     ok;
     pageText = "";
+    wasRun = false;
 
     constructor(quill, extraSettings, formatting, statSpan) {
         super(quill, extraSettings);
@@ -350,6 +351,10 @@ export class FormatPreviewPlugin extends TextWidgetPlugin {
         }
     }
 
+    getFPStatus() {
+        return this.wasRun;
+    }
+
     enter() {
         this.quill.enable(false);
         // save text so can restore when leave formatting mode
@@ -357,6 +362,7 @@ export class FormatPreviewPlugin extends TextWidgetPlugin {
         this.extraSettings.append(this.optGrid);
         this.statSpan.append("poss. iss: ", this.possIssBox);
         this.markFormat();
+        this.wasRun = true;
     }
 
     leave() {

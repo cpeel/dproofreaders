@@ -191,12 +191,20 @@ window.addEventListener("DOMContentLoaded", async () => {
             }
         }
 
-        // we need to report wordcheck results just before leaving the page by
-        // Exit, Done & exit, Done & next, probably not before Abandon
+        // we need to report WordCheck and Format Preview results/usage
+        // just before leaving the page by Exit, Done & exit, Done & next,
+        // but not before Abandon
         async function maybeReportWC() {
-            const [wordChecked, acceptedWords] = textWidget.getWCState();
+            const [wordChecked, acceptedWords] = textWidget.getWCStatus();
             if (wordChecked) {
                 await ajax("PUT", `v1/projects/${projectId}/pages/${pageName}/wordcheck`, {}, { accepted_words: acceptedWords });
+            }
+        }
+
+        async function maybeReportFP() {
+            const fpRun = textWidget.getFPStatus();
+            if (fpRun) {
+                await ajax("PUT", `v1/projects/${projectId}/pages/${pageName}/formatpreview`);
             }
         }
 
@@ -217,6 +225,7 @@ window.addEventListener("DOMContentLoaded", async () => {
                 disableAction();
                 try {
                     await maybeReportWC();
+                    await maybeReportFP();
                 } catch (error) {
                     alert(error.messsage);
                 }
@@ -229,6 +238,7 @@ window.addEventListener("DOMContentLoaded", async () => {
             const pageText = textWidget.getText();
             try {
                 await maybeReportWC();
+                await maybeReportFP();
                 await ajaxPage("PUT", "checkin", { text: pageText });
                 toProjectPage();
             } catch (error) {
@@ -241,6 +251,7 @@ window.addEventListener("DOMContentLoaded", async () => {
             const pageText = textWidget.getText();
             try {
                 await maybeReportWC();
+                await maybeReportFP();
                 await ajaxPage("PUT", "checkin", { text: pageText });
                 await nextPage();
                 enableAction();
