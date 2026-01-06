@@ -70,9 +70,13 @@ window.addEventListener("DOMContentLoaded", async () => {
 
         let dataSaved = false;
         function setPageState(data) {
-            // remove \r
-            const nlText = data.text.replace(/\r/g, "");
-            textWidget.setText(nlText);
+            // remove \r append a final \n which is always there in Quill
+            const nlText = data.text.replace(/\r/g, "") + "\n";
+            // only update Quill if the text has actually changed so as to
+            // not further influence the undo buffer
+            if (nlText != textWidget.getText()) {
+                textWidget.setText(nlText);
+            }
             pageState = data.pagestate;
             dataSaved = data.saved;
             params.set("page_state", pageState);
