@@ -592,8 +592,10 @@ export class ProofTextWidget extends TextWidget {
     }
 
     enterTextOnly() {
-        this.leave();
-        this.leave = this.leaveText;
+        if (this.leave != this.leaveText) {
+            this.leave();
+            this.leave = this.leaveText;
+        }
     }
 
     enterWordCheck() {
@@ -624,8 +626,7 @@ export class ProofTextWidget extends TextWidget {
     }
 
     toTextMode() {
-        this.leave();
-        this.leave = this.leaveText;
+        this.enterTextOnly();
         this.textOnlyRadio.checked = true;
     }
 
