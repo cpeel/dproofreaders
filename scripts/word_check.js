@@ -13,6 +13,7 @@ export class WordCheckPlugin extends TextWidgetPlugin {
     caretPos = 0;
     acceptableWord = "";
     pageText = "";
+    enableOnChange = false;
 
     // on change, delay, then reload. If change again restart delay.
     // Avoid caret misplaced after reload:
@@ -203,6 +204,10 @@ export class WordCheckPlugin extends TextWidgetPlugin {
     }
 
     onChange() {
+        if (!this.enableOnChange) {
+            return;
+        }
+
         const { index } = this.quill.getSelection(false);
         let [leaf, offset] = this.quill.getLeaf(index);
         const format = this.quill.getFormat(index);
@@ -232,18 +237,25 @@ export class WordCheckPlugin extends TextWidgetPlugin {
         this.onDoneSettingsAction = this.setLanguages.bind(this);
         this.onDoneSettings.add(this.onDoneSettingsAction);
         this.wordCheck();
+        this.enableOnChange = true;
     }
 
     leave() {
+        // we use this.enableOnChange to prevent onChange from being fired from
+        // Quill during WC shutdown. This shouldn't be necessary if we're
+        // removing the text-change event, but that doesn't seem to work "fast
+        // enough" in some cases.
+        this.enableOnChange = false;
+        this.quill.off("text-change", this.onChange.bind(this));
+        clearTimeout(this.timerID);
+        hide(this.acceptButton);
+        this.editBox.removeEventListener("click", this.maybeShowAcceptButton.bind(this));
+        this.editBox.removeEventListener("keyup", this.maybeShowAcceptButton.bind(this));
+
         // remove any marking
         this.pageText = this.quill.getText();
         this.quill.setText(this.pageText, "silent");
         this.quill.history.clear();
-        hide(this.acceptButton);
-        clearTimeout(this.timerID);
-        this.quill.off("text-change", this.onChange.bind(this));
-        this.editBox.removeEventListener("click", this.maybeShowAcceptButton.bind(this));
-        this.editBox.removeEventListener("keyup", this.maybeShowAcceptButton.bind(this));
         this.extraSettings.replaceChildren();
         this.onDoneSettings.delete(this.onDoneSettingsAction);
     }
