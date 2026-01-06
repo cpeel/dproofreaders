@@ -227,15 +227,18 @@ class BasicTextWidget {
     }
 
     setFontSize(fontSize) {
-        this.qlEditor.style.fontSize = fontSize ?? this.userSettings.fontSize;
+        this.userSettings.fontSize = fontSize ?? this.userSettings.fontSize;
+        this.qlEditor.style.fontSize = this.userSettings.fontSize;
     }
 
     setFontFace(fontId) {
-        this.qlEditor.style.fontFamily = fonts[fontId ?? this.userSettings.fontId].face;
+        this.userSettings.fontId = fontId ?? this.userSettings.fontId;
+        this.qlEditor.style.fontFamily = fonts[this.userSettings.fontId].face;
     }
 
     setWrap(wrap) {
-        this.qlEditor.style.whiteSpace = (wrap ?? this.userSettings.textWrap) ? "pre-wrap" : "pre";
+        this.userSettings.textWrap = wrap ?? this.userSettings.textWrap;
+        this.qlEditor.style.whiteSpace = this.userSettings.textWrap ? "pre-wrap" : "pre";
     }
 
     surroundSelection(before, after) {
@@ -337,8 +340,8 @@ export class TextWidget extends BasicTextWidget {
         // for polytonic greek
         this.qlEditor.style.padding = "0 0 0 0.6em";
 
-        self.lineHeight = this.userSettings.lineHeight ?? 1.6;
-        this.setParaSpacing(self.lineHeight);
+        this.userSettings.lineHeight ?? (this.userSettings.lineHeight = 1.6);
+        this.setParaSpacing(this.userSettings.lineHeight);
 
         const fontFaceSelector = document.createElement("select");
         for (const fontId of Object.keys(fonts)) {
@@ -541,7 +544,7 @@ export class ProofTextWidget extends TextWidget {
         lineSpacer.step = "0.01";
         lineSpacer.width = "5em";
         lineSpacer.title = translate.gettext("Adjust the line spacing");
-        lineSpacer.value = self.lineHeight;
+        lineSpacer.value = this.userSettings.lineHeight;
         lineSpacer.addEventListener("input", (event) => {
             const lineHeight = event.target.value;
             this.setParaSpacing(lineHeight);
