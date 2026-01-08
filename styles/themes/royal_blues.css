@@ -343,13 +343,6 @@
   margin-top: 1px;
   padding: 0;
 }
-#toolbox #hide-picker-button,
-#toolbox #show-picker-button {
-  font-size: 2em;
-  height: 2.5em;
-  padding: 0;
-  background: transparent;
-}
 #toolbox #tools {
   margin-left: 2px;
   margin-right: 0.5em;
@@ -368,6 +361,22 @@
 }
 #toolbox #tools .format_tool {
   display: none;
+}
+#hide-picker-button,
+#show-picker-button {
+  font-size: 2em;
+  height: 2.5em;
+  padding: 0;
+  border: thin solid #000000;
+  background-color: #8E8E8E;
+  color: black;
+}
+#show-picker-button {
+  margin: 2px;
+  display: none;
+  position: absolute;
+  left: 0;
+  bottom: 0;
 }
 /* ------------------------------------------------------------------------ */
 /* Page interfaces */

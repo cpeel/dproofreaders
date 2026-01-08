@@ -41,7 +41,7 @@ echo "
             </div>
             <div class='column-flex' id='quiz_text_outer'>
                 <div id='quiz_text' class='stretch-box' data-initial_text='$text' data-pickersets='$quiz_pickersets' data-round_type='$round_type'></div>
-                <div id='quiz_controls' class='fixed-box'>
+                <div id='quiz_controls' class='fixed-box' style='text-align: center'>
 
 <form action='./returnfeed.php?quiz_page_id=$quiz_page_id' target='right' method='post' name='editform' id='editform'>
     <div id='action_buttons'>

@@ -213,14 +213,6 @@
         padding: 0;
     }
 
-    #hide-picker-button,
-    #show-picker-button {
-        font-size: 2em;
-        height: 2.5em;
-        padding: 0;
-        background: transparent;
-    }
-
     #tools {
         margin-left: 2px;
         margin-right: 0.5em;
@@ -242,6 +234,24 @@
             display: none;
         }
     }
+}
+
+#hide-picker-button,
+#show-picker-button {
+    font-size: 2em;
+    height: 2.5em;
+    padding: 0;
+    .solid-border();
+    background-color: @toolbox-pane-background;
+    color: @toolbox-pane-text;
+}
+
+#show-picker-button {
+    margin: 2px;
+    display: none;
+    position: absolute;
+    left: 0;
+    bottom: 0;
 }
 
 /* ------------------------------------------------------------------------ */
