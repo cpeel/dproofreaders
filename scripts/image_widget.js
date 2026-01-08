@@ -386,7 +386,10 @@ export function makeProofImageWidget(container, userSettings) {
     const { setImage, content, controlBar, reSize, reset } = makeImageWidget(container, userSettings);
 
     const scrollWithTextBox = makeCheckBox();
-    const scrollControl = makeLabel([scrollWithTextBox, translate.gettext("Scroll with Text")]);
+    const scrollControl = makeLabel(
+        [scrollWithTextBox, translate.gettext("Scroll with Text")],
+        translate.gettext("Scroll the image when the page text is scrolled"),
+    );
     controlBar.append(scrollControl);
 
     userSettings.scrollWithText ?? (userSettings.scrollWithText = false);
