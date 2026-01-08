@@ -384,7 +384,7 @@ export class FormatPreviewPlugin extends TextWidgetPlugin {
         // save text so can restore when leave formatting mode
         this.pageText = this.quill.getText();
         this.extraSettings.append(this.optGrid);
-        this.statSpan.append("poss. iss: ", this.possIssBox);
+        this.statSpan.append("- " + translate.gettext("Issues:") + " ", this.possIssBox);
         this.markFormat();
         this.wasRun = true;
     }

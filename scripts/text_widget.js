@@ -588,8 +588,9 @@ export class ProofTextWidget extends TextWidget {
         formatPreviewRadio.addEventListener("click", this.enterFormatPreview.bind(this));
         const formatPreviewControl = makeLabel([formatPreviewRadio, translate.gettext("Format Preview")]);
 
-        this.controlBar.prepend(textOnlyControl, wordCheckControl, formatPreviewControl);
-        this.controlBar.append(lineSpacerUnit, this.statSpan);
+        const spacer = document.createElement("span");
+        spacer.classList.add("spacer");
+        this.controlBar.prepend(textOnlyControl, wordCheckControl, formatPreviewControl, this.statSpan, spacer.cloneNode(), lineSpacerUnit, spacer.cloneNode());
 
         this.validator = makeValidator(projectId, this.quill);
     }
