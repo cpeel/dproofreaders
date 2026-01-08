@@ -312,7 +312,7 @@ export class TextWidget extends BasicTextWidget {
         this.extraSettings.classList.add("settings_row");
 
         this.onSettings = new Set();
-        const settingsButton = actionButton(translate.gettext("Settings"));
+        const settingsButton = actionButton(translate.gettext("Settings"), translate.gettext("Set various configurations for the given viewing mode"));
         settingsButton.classList.add("bordered_button");
         settingsButton.addEventListener("click", this.openSettingsDialog.bind(this));
 
@@ -532,9 +532,6 @@ export class ProofTextWidget extends TextWidget {
 
         Quill.register(DFormula);
 
-        const lineSpacerUnit = document.createElement("label");
-        lineSpacerUnit.innerHTML = translate.gettext("Spacing") + ":";
-
         const lineSpacer = document.createElement("input");
         lineSpacer.classList.add("line-spacer");
         lineSpacer.type = "range";
@@ -543,14 +540,13 @@ export class ProofTextWidget extends TextWidget {
         lineSpacer.max = "3";
         lineSpacer.step = "0.01";
         lineSpacer.width = "5em";
-        lineSpacer.title = translate.gettext("Adjust the line spacing");
         lineSpacer.value = this.userSettings.lineHeight;
         lineSpacer.addEventListener("input", (event) => {
             const lineHeight = event.target.value;
             this.setParaSpacing(lineHeight);
             this.userSettings.lineHeight = lineHeight;
         });
-        lineSpacerUnit.appendChild(lineSpacer);
+        const lineSpacerControl = makeLabel([translate.gettext("Spacing") + ":", lineSpacer], translate.gettext("Adjust the line spacing"));
 
         this.oldScroll = this.qlEditor.scrollTop;
         this.scrollListeners = new Set();
@@ -590,7 +586,15 @@ export class ProofTextWidget extends TextWidget {
 
         const spacer = document.createElement("span");
         spacer.classList.add("spacer");
-        this.controlBar.prepend(textOnlyControl, wordCheckControl, formatPreviewControl, this.statSpan, spacer.cloneNode(), lineSpacerUnit, spacer.cloneNode());
+        this.controlBar.prepend(
+            textOnlyControl,
+            wordCheckControl,
+            formatPreviewControl,
+            this.statSpan,
+            spacer.cloneNode(),
+            lineSpacerControl,
+            spacer.cloneNode(),
+        );
 
         this.validator = makeValidator(projectId, this.quill);
     }

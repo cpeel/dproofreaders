@@ -21,10 +21,11 @@ function makeCheckBox() {
     return checkBox;
 }
 
-function makeLabel(contents) {
+function makeLabel(contents, title = "") {
     const label = document.createElement("label");
     label.classList.add("nowrap");
     label.append(...contents);
+    label.title = title;
     return label;
 }
 
