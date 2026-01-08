@@ -489,6 +489,9 @@
   -webkit-appearance: none;
   margin: 0;
 }
+.pane_settings_bar .spacer {
+  padding: 0 0.5em;
+}
 .line-spacer {
   width: 5em;
 }
