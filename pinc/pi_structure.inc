@@ -39,15 +39,15 @@ function url_for_pi_do_particular_page(string $projectid, string $proj_state, st
 function draw_toolbox()
 {
     echo "
+<button type='button' id='show-picker-button' title='", attr_safe(_("Show the toolbox")), "'>&rang;</button>
 <div class='fixed-box tool_box row_flex' id='toolbox'>
     <div id='character-picker' class='fixed-box'>
         <div id='picker-widgets' class='row_flex'>
-            <button type='button' id='hide-picker-button' title='", attr_safe(_("Hide the character picker")), "'>&lang;</button>
+            <button type='button' id='hide-picker-button' title='", attr_safe(_("Hide the toolbox")), "'>&lang;</button>
             <div class='char_box'><input type='text' readonly class='big_text' id='large-char'></div>
             <div id='picker_box'>
             </div>
         </div>
-        <button type='button' id='show-picker-button' style='display: none;' title='", attr_safe(_("Show the character picker")), "'>&rang;</button>
     </div>
     <div id='tools' class='stretch-box right-align'>
     <div class='tool_row'>",

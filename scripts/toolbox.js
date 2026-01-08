@@ -2,14 +2,14 @@
 import translate from "./gettext.js";
 
 export function constructToolBox(textWidget, pickerSets, roundType, proofSettings, projectId) {
-    const pickerWidgets = document.getElementById("picker-widgets");
+    const toolbox = document.getElementById("toolbox");
     const showPickerButton = document.getElementById("show-picker-button");
     const pickerDiv = document.getElementById("picker_box");
     const largeChar = document.getElementById("large-char");
 
     function hidePicker() {
-        pickerWidgets.style.display = "none";
-        showPickerButton.style.display = "";
+        toolbox.style.display = "none";
+        showPickerButton.style.display = "block";
     }
 
     document.getElementById("hide-picker-button").addEventListener("click", function () {
@@ -18,8 +18,8 @@ export function constructToolBox(textWidget, pickerSets, roundType, proofSetting
     });
 
     function showPicker() {
-        pickerWidgets.style.display = "flex";
-        showPickerButton.style.display = "none";
+        toolbox.style.display = "flex";
+        showPickerButton.style.display = "";
     }
 
     showPickerButton.addEventListener("click", function () {
