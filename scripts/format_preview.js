@@ -4,6 +4,19 @@ import { TextWidgetPlugin } from "./text_widget_plugin.js";
 import { analyse, getILTags } from "./analyse_format.js";
 import translate from "./gettext.js";
 
+const tagNames = {
+    i: translate.gettext("Italic"),
+    b: translate.gettext("Bold"),
+    g: translate.gettext("Gesperrt"),
+    sc: translate.gettext("Small caps"),
+    f: translate.gettext("Font change"),
+    etc: translate.gettext("Other tags"),
+    err: translate.gettext("Issues"),
+    hlt: translate.gettext("Poss. Issues"),
+    "#": translate.gettext("Block quote"),
+    "*": translate.gettext("No wrap"),
+};
+
 export class FormatPreviewPlugin extends TextWidgetPlugin {
     anlaysis;
     ok;
@@ -63,6 +76,81 @@ export class FormatPreviewPlugin extends TextWidgetPlugin {
         this.optGrid.classList.add("grid-2col");
         this.optGrid.append(colorMarkupControl, hideTagsControl, allowMathControl, allowUnderlineControl);
 
+        // Construct the color table for each tag
+        this.colorChoices = document.createElement("fieldset");
+        const colorChoicesLegend = document.createElement("legend");
+        colorChoicesLegend.innerHTML = translate.gettext("Color Choices");
+        this.colorChoices.append(colorChoicesLegend);
+
+        const colorTable = document.createElement("table");
+        colorTable.id = "color_table";
+
+        let dataRow = document.createElement("tr");
+        const tdBlank = document.createElement("th");
+        const tdText = document.createElement("th");
+        tdText.innerHTML = translate.gettext("Text");
+        tdText.colSpan = 2;
+
+        const tdBackground = document.createElement("th");
+        tdBackground.innerHTML = translate.gettext("Background");
+        tdBackground.colSpan = 2;
+
+        dataRow.append(tdBlank, tdText, tdBackground);
+        colorTable.append(dataRow);
+
+        Object.keys(tagNames).forEach(function (tag) {
+            let dataRow = document.createElement("tr");
+            const rowLabel = document.createElement("td");
+            rowLabel.innerHTML = tagNames[tag];
+            dataRow.append(rowLabel);
+            ["color", "background"].forEach(function (ground) {
+                const hideColor = "" === this.formatting.colors[tag][ground];
+
+                const checkBox = document.createElement("input");
+                checkBox.type = "checkbox";
+                checkBox.checked = !hideColor;
+                checkBox.dataset.tag = tag;
+                checkBox.dataset.ground = ground;
+                checkBox.addEventListener(
+                    "change",
+                    function (colorCheckbox) {
+                        const colorInput = document.getElementById(colorCheckbox.dataset.tag + "_" + colorCheckbox.dataset.ground);
+                        if (colorCheckbox.checked) {
+                            colorInput.style.display = "";
+                            this.setTagColor(colorCheckbox.dataset.tag, colorCheckbox.dataset.ground, colorInput.value);
+                        } else {
+                            colorInput.style.display = "none";
+                            this.setTagColor(colorCheckbox.dataset.tag, colorCheckbox.dataset.ground, "");
+                        }
+                    }.bind(this, checkBox),
+                );
+                const checkBoxCell = document.createElement("td");
+                checkBoxCell.append(checkBox);
+
+                let colorInput = document.createElement("input");
+                colorInput.id = tag + "_" + ground;
+                colorInput.type = "color";
+                colorInput.value = this.formatting.colors[tag][ground];
+                colorInput.dataset.tag = tag;
+                colorInput.dataset.ground = ground;
+                if (hideColor) {
+                    colorInput.style.display = "none";
+                }
+                colorInput.addEventListener(
+                    "change",
+                    function (colorField) {
+                        this.setTagColor(colorField.dataset.tag, colorField.dataset.ground, colorField.value);
+                    }.bind(this, colorInput),
+                );
+                const colorInputCell = document.createElement("td");
+                colorInputCell.append(colorInput);
+
+                dataRow.append(checkBoxCell, colorInputCell);
+            }, this);
+            colorTable.append(dataRow);
+        }, this);
+        this.colorChoices.append(colorTable);
+
         this.possIssBox = document.createElement("input");
         this.possIssBox.type = "text";
         this.possIssBox.size = "1";
@@ -103,6 +191,11 @@ export class FormatPreviewPlugin extends TextWidgetPlugin {
             }.bind(this, allowUnderlineCheck),
         );
         allowUnderlineCheck.checked = this.formatting.allowUnderline;
+    }
+
+    setTagColor(tag, ground, color) {
+        this.formatting.colors[tag][ground] = color;
+        this.markFormat();
     }
 
     showInlineStyle(text) {
@@ -359,7 +452,7 @@ export class FormatPreviewPlugin extends TextWidgetPlugin {
         this.quill.enable(false);
         // save text so can restore when leave formatting mode
         this.pageText = this.quill.getText();
-        this.extraSettings.append(this.optGrid);
+        this.extraSettings.append(this.optGrid, this.colorChoices);
         this.statSpan.append("- " + translate.gettext("Issues:") + " ", this.possIssBox);
         this.markFormat();
         this.wasRun = true;
