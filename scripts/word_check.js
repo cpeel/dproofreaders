@@ -30,7 +30,15 @@ export class WordCheckPlugin extends TextWidgetPlugin {
         // Build the dictionaries listing for the Settings dialog
         this.dictGrid = document.createElement("div");
         this.dictGrid.classList.add("grid-3col");
+        let dictColumn = document.createElement("div");
+        let dictsPerColumn = Math.ceil(Object.values(languagesWithDictionaries).length / 3);
+        let dictIndex = 0;
         for (const language of Object.values(languagesWithDictionaries)) {
+            if (dictIndex != 0 && dictIndex % dictsPerColumn == 0) {
+                this.dictGrid.append(dictColumn);
+                dictColumn = document.createElement("div");
+            }
+
             const cBox = document.createElement("input");
             cBox.type = "checkbox";
             if (language === projectLanguages[0]) {
@@ -39,8 +47,11 @@ export class WordCheckPlugin extends TextWidgetPlugin {
             const label = document.createElement("label");
             label.classList.add("nowrap");
             label.append(cBox, language);
-            this.dictGrid.append(label);
+            dictColumn.append(label);
+            dictColumn.append(document.createElement("br"));
+            dictIndex += 1;
         }
+        this.dictGrid.append(dictColumn);
         this.dictionaries = document.createElement("div");
         this.dictionaries.append(translate.gettext("Dictionaries") + ":");
         this.dictionaries.appendChild(this.dictGrid);
