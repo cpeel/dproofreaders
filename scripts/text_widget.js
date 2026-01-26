@@ -423,15 +423,27 @@ export class TextWidget extends BasicTextWidget {
     }
 
     numberLines() {
-        this.numberColumn.innerHTML = "";
-        let lineNumber = 1;
-        for (const child of this.qlEditor.children) {
-            const para = child.getBoundingClientRect();
-            const pnumb = document.createElement("p");
-            this.numberColumn.append(pnumb);
-            pnumb.textContent = lineNumber;
-            pnumb.style.top = `${para.top}px`;
-            lineNumber += 1;
+        // populate the line numbers initially
+        if (this.numberColumn.children.length != this.qlEditor.children.length) {
+            this.numberColumn.innerHTML = "";
+            for (let lineNumber = 1; lineNumber <= this.qlEditor.children.length; lineNumber++) {
+                const pnumb = document.createElement("p");
+                const child = this.qlEditor.children[lineNumber - 1];
+                const para = child.getBoundingClientRect();
+                pnumb.textContent = lineNumber;
+                pnumb.style.top = `${para.top}px`;
+                this.numberColumn.append(pnumb);
+            }
+        }
+        // adjust existing numbers upon scroll; the hope is that not
+        // recreating all the paragraph tags will reduce redraws
+        else {
+            for (let i = 0; i < this.numberColumn.children.length; i++) {
+                const child = this.qlEditor.children[i];
+                const pnumb = this.numberColumn.children[i];
+                const para = child.getBoundingClientRect();
+                pnumb.style.top = `${para.top}px`;
+            }
         }
     }
 
