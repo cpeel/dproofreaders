@@ -60,7 +60,8 @@ export class WordCheckPlugin extends TextWidgetPlugin {
         this.acceptButton = document.createElement("button");
         this.acceptButton.type = "button";
         this.acceptButton.classList.add("wc_accept_button");
-        this.acceptButton.innerText = translate.gettext("Accept");
+        this.acceptButton.innerText = translate.gettext("Unflag and Suggest");
+        this.acceptButton.title = translate.gettext("Unflag this word and suggest it for the 'Good Words' list");
         this.acceptButton.addEventListener("click", this.acceptWord.bind(this));
         this.acceptButton.addEventListener("keydown", this.keyAcceptWord.bind(this));
         this.editBox.append(this.acceptButton);
@@ -126,7 +127,7 @@ export class WordCheckPlugin extends TextWidgetPlugin {
     // no changes have occured for e.g. 2 seconds, submit a request.
     triggerReload() {
         clearTimeout(this.timerID);
-        this.timerID = setTimeout(this.wordCheck.bind(this), 2000);
+        this.timerID = setTimeout(this.wordCheck.bind(this), 1700);
     }
 
     checkPunc(index, end) {
