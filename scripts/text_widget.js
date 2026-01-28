@@ -339,6 +339,7 @@ export class TextWidget extends BasicTextWidget {
         this.controlBar.append(settingsButton);
 
         // set up the line numbering column
+        this.userSettings.numberColumn ?? (this.userSettings.numberColumn = true);
         this.numberColumn = document.createElement("div");
         this.numberColumn.classList.add("fixed-box");
         this.numberColumn.id = "page_line_number";
@@ -397,18 +398,29 @@ export class TextWidget extends BasicTextWidget {
         );
         const wrapControl = makeLabel([wrapCheck, translate.gettext("Wrap")]);
 
+        const numberColumnCheck = makeCheckBox();
+        numberColumnCheck.addEventListener(
+            "change",
+            function (numberColumnCheck) {
+                this.setNumberColumn(numberColumnCheck.checked);
+            }.bind(this, numberColumnCheck),
+        );
+        const numberColumnControl = makeLabel([numberColumnCheck, translate.gettext("Line numbers")]);
+
         const commonSettingsFieldset = document.createElement("fieldset");
         const commonSettingsFieldsetLegend = document.createElement("legend");
         commonSettingsFieldsetLegend.innerHTML = translate.gettext("Common");
-        commonSettingsFieldset.append(commonSettingsFieldsetLegend, fontControl, fontSizeControl, wrapControl);
+        commonSettingsFieldset.append(commonSettingsFieldsetLegend, fontControl, fontSizeControl, wrapControl, numberColumnControl);
         commonSettings.append(commonSettingsFieldset);
 
         fontSizeSelector.value = this.userSettings.fontSize;
         fontFaceSelector.value = this.userSettings.fontId;
         wrapCheck.checked = this.userSettings.textWrap;
+        numberColumnCheck.checked = this.userSettings.numberColumn;
         this.setFontSize();
         this.setFontFace();
         this.setWrap();
+        this.setNumberColumn();
     }
 
     closeSettingsDialog() {
@@ -441,7 +453,17 @@ export class TextWidget extends BasicTextWidget {
         this.numberLines();
     }
 
+    setNumberColumn(enabled) {
+        this.userSettings.numberColumn = enabled ?? this.userSettings.numberColumn;
+        this.numberColumn.style.display = this.userSettings.numberColumn ? "" : "none";
+        this.numberLines();
+    }
+
     numberLines() {
+        if (!this.userSettings.numberColumn) {
+            return;
+        }
+
         // populate the line numbers initially
         if (this.numberColumn.children.length != this.qlEditor.children.length) {
             this.numberColumn.innerHTML = "";
