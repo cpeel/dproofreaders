@@ -1,7 +1,7 @@
 export class TextWidgetPlugin {
-    constructor(quill, extraSettings, onDoneSettings, editBox, scrollListeners) {
+    constructor(quill, settingsElement, onDoneSettings, editBox, scrollListeners) {
         this.quill = quill;
-        this.extraSettings = extraSettings;
+        this.settingsElement = settingsElement;
         this.onDoneSettings = onDoneSettings;
         this.editBox = editBox;
         this.scrollListeners = scrollListeners;

@@ -308,19 +308,34 @@ export class TextWidget extends BasicTextWidget {
         commonSettings.classList.add("settings_row");
 
         // Set up settings dialog & controls
-        this.extraSettings = document.createElement("div");
-        this.extraSettings.classList.add("settings_row");
+        const wcSettingsFieldsetLegend = document.createElement("legend");
+        wcSettingsFieldsetLegend.innerHTML = translate.gettext("WordCheck");
+        this.wcSettings = document.createElement("fieldset");
+        this.wcSettings.append(wcSettingsFieldsetLegend);
+
+        const fpSettingsFieldsetLegend = document.createElement("legend");
+        fpSettingsFieldsetLegend.innerHTML = translate.gettext("Format Preview");
+        this.fpSettings = document.createElement("fieldset");
+        this.fpSettings.append(fpSettingsFieldsetLegend);
+
+        const pluginSettings = document.createElement("div");
+        pluginSettings.classList.add("settings_row");
+        pluginSettings.classList.add("grid-2col");
+        pluginSettings.append(this.wcSettings, this.fpSettings);
 
         this.onSettings = new Set();
         const settingsButton = actionButton(translate.gettext("Settings"), translate.gettext("Set various configurations for the given viewing mode"));
         settingsButton.classList.add("bordered_button");
         settingsButton.addEventListener("click", this.openSettingsDialog.bind(this));
 
+        const doneRow = document.createElement("div");
+        doneRow.classList.add("right-align");
         this.onDoneSettings = new Set();
         const doneButton = actionButton(translate.gettext("Done"));
         doneButton.addEventListener("click", this.closeSettingsDialog.bind(this));
+        doneRow.append(doneButton);
 
-        this.viewSettingsDialog.append(commonSettings, this.extraSettings, doneButton);
+        this.viewSettingsDialog.append(commonSettings, pluginSettings, doneRow);
         this.controlBar.append(settingsButton);
 
         // set up the line numbering column
@@ -382,7 +397,11 @@ export class TextWidget extends BasicTextWidget {
         );
         const wrapControl = makeLabel([wrapCheck, translate.gettext("Wrap")]);
 
-        commonSettings.append(fontControl, fontSizeControl, wrapControl);
+        const commonSettingsFieldset = document.createElement("fieldset");
+        const commonSettingsFieldsetLegend = document.createElement("legend");
+        commonSettingsFieldsetLegend.innerHTML = translate.gettext("Common");
+        commonSettingsFieldset.append(commonSettingsFieldsetLegend, fontControl, fontSizeControl, wrapControl);
+        commonSettings.append(commonSettingsFieldset);
 
         fontSizeSelector.value = this.userSettings.fontSize;
         fontFaceSelector.value = this.userSettings.fontId;
@@ -568,7 +587,7 @@ export class ProofTextWidget extends TextWidget {
 
         this.wordChecker = new WordCheckPlugin(
             this.quill,
-            this.extraSettings,
+            this.wcSettings,
             this.onDoneSettings,
             this.editBox,
             this.scrollListeners,
@@ -581,7 +600,7 @@ export class ProofTextWidget extends TextWidget {
 
         // userSettings.formatting ??= {}; // needs chrome 85, FF 79, Safari 14
         this.userSettings.formatting ?? (this.userSettings.formatting = {});
-        this.formatter = new FormatPreviewPlugin(this.quill, this.extraSettings, this.userSettings.formatting, this.statSpan);
+        this.formatter = new FormatPreviewPlugin(this.quill, this.fpSettings, this.userSettings.formatting, this.statSpan);
 
         this.textOnlyRadio = makeRadio("viewMode");
         this.textOnlyRadio.checked = true;

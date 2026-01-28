@@ -23,8 +23,8 @@ export class FormatPreviewPlugin extends TextWidgetPlugin {
     pageText = "";
     wasRun = false;
 
-    constructor(quill, extraSettings, formatting, statSpan) {
-        super(quill, extraSettings);
+    constructor(quill, settingsElement, formatting, statSpan) {
+        super(quill, settingsElement);
 
         this.formatting = formatting;
         this.statSpan = statSpan;
@@ -150,6 +150,8 @@ export class FormatPreviewPlugin extends TextWidgetPlugin {
             colorTable.append(dataRow);
         }, this);
         this.colorChoices.append(colorTable);
+
+        this.settingsElement.append(this.optGrid, this.colorChoices);
 
         this.possIssBox = document.createElement("input");
         this.possIssBox.type = "text";
@@ -452,7 +454,6 @@ export class FormatPreviewPlugin extends TextWidgetPlugin {
         this.quill.enable(false);
         // save text so can restore when leave formatting mode
         this.pageText = this.quill.getText();
-        this.extraSettings.append(this.optGrid, this.colorChoices);
         this.statSpan.append("- " + translate.gettext("Issues:") + " ", this.possIssBox);
         this.markFormat();
         this.wasRun = true;
@@ -464,7 +465,6 @@ export class FormatPreviewPlugin extends TextWidgetPlugin {
         // it should be possible to suspend history while in preview
         // since text is unchanged by using "silent" but doesn't work
         this.quill.history.clear();
-        this.extraSettings.replaceChildren();
         this.statSpan.replaceChildren();
         this.quill.enable();
     }

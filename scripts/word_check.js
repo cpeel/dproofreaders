@@ -19,8 +19,8 @@ export class WordCheckPlugin extends TextWidgetPlugin {
     // Avoid caret misplaced after reload:
     timerID = null;
 
-    constructor(quill, extraSettings, onDoneSettings, editBox, scrollListeners, projectId, languagesWithDictionaries, projectLanguages) {
-        super(quill, extraSettings, onDoneSettings, editBox, scrollListeners);
+    constructor(quill, settingsElement, onDoneSettings, editBox, scrollListeners, projectId, languagesWithDictionaries, projectLanguages) {
+        super(quill, settingsElement, onDoneSettings, editBox, scrollListeners);
         this.projectId = projectId;
         this.languagesWithDictionaries = languagesWithDictionaries;
         this.projectLanguages = projectLanguages;
@@ -29,9 +29,9 @@ export class WordCheckPlugin extends TextWidgetPlugin {
 
         // Build the dictionaries listing for the Settings dialog
         this.dictGrid = document.createElement("div");
-        this.dictGrid.classList.add("grid-3col");
+        this.dictGrid.classList.add("grid-2col");
         let dictColumn = document.createElement("div");
-        let dictsPerColumn = Math.ceil(Object.values(languagesWithDictionaries).length / 3);
+        let dictsPerColumn = Math.ceil(Object.values(languagesWithDictionaries).length / 2);
         let dictIndex = 0;
         for (const language of Object.values(languagesWithDictionaries)) {
             if (dictIndex != 0 && dictIndex % dictsPerColumn == 0) {
@@ -55,6 +55,7 @@ export class WordCheckPlugin extends TextWidgetPlugin {
         this.dictionaries = document.createElement("div");
         this.dictionaries.append(translate.gettext("Dictionaries") + ":");
         this.dictionaries.appendChild(this.dictGrid);
+        this.settingsElement.append(this.dictionaries);
 
         this.acceptButton = document.createElement("button");
         this.acceptButton.type = "button";
@@ -244,7 +245,6 @@ export class WordCheckPlugin extends TextWidgetPlugin {
         this.editBox.addEventListener("click", this.maybeShowAcceptButton.bind(this));
         this.editBox.addEventListener("keyup", this.maybeShowAcceptButton.bind(this));
         this.quill.enable();
-        this.extraSettings.append(this.dictionaries);
         this.onDoneSettingsAction = this.setLanguages.bind(this);
         this.onDoneSettings.add(this.onDoneSettingsAction);
         this.wordCheck();
@@ -267,7 +267,6 @@ export class WordCheckPlugin extends TextWidgetPlugin {
         this.pageText = this.quill.getText();
         this.quill.setText(this.pageText, "silent");
         this.quill.history.clear();
-        this.extraSettings.replaceChildren();
         this.onDoneSettings.delete(this.onDoneSettingsAction);
     }
 }
