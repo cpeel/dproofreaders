@@ -277,7 +277,8 @@
 }
 /* ------------------------------------------------------------------------ */
 /* Proofreading Toolbox */
-#toolbox {
+#toolbox,
+#fpcontrols {
   padding: 2px;
   border: thin solid #000000;
   font-family: Verdana, Helvetica, sans-serif;
@@ -285,27 +286,38 @@
   color: black;
 }
 #toolbox input,
+#fpcontrols input,
 #toolbox select,
-#toolbox button {
+#fpcontrols select,
+#toolbox button,
+#fpcontrols button {
   background-color: white;
   color: black;
   border: thin solid #000000;
 }
 #toolbox input[type=submit]:disabled,
+#fpcontrols input[type=submit]:disabled,
 #toolbox input[type=button]:disabled,
-#toolbox button:disabled {
+#fpcontrols input[type=button]:disabled,
+#toolbox button:disabled,
+#fpcontrols button:disabled {
   background-color: #b3b3b3;
 }
 #toolbox button,
+#fpcontrols button,
 #toolbox input[type=submit],
-#toolbox input[type=button] {
+#fpcontrols input[type=submit],
+#toolbox input[type=button],
+#fpcontrols input[type=button] {
   box-shadow: 1px 1px grey;
   border-radius: 3px;
 }
-#toolbox input[type=image] {
+#toolbox input[type=image],
+#fpcontrols input[type=image] {
   border: none;
 }
-#toolbox .selector_button {
+#toolbox .selector_button,
+#fpcontrols .selector_button {
   background-color: white;
   margin-top: 1px;
   font-size: 1em;
@@ -313,54 +325,70 @@
   margin-right: 2px;
   min-width: 1em;
 }
-#toolbox .selected-tab {
+#toolbox .selected-tab,
+#fpcontrols .selected-tab {
   font-weight: bold;
   background-color: white;
   box-shadow: -1px -1px grey;
 }
-#toolbox .key-block {
+#toolbox .key-block,
+#fpcontrols .key-block {
   display: none;
 }
-#toolbox .show {
+#toolbox .show,
+#fpcontrols .show {
   display: table;
 }
-#toolbox .char_box {
+#toolbox .char_box,
+#fpcontrols .char_box {
   padding-top: 1px;
 }
 #toolbox .big_text,
-#toolbox .picker {
+#fpcontrols .big_text,
+#toolbox .picker,
+#fpcontrols .picker {
   font-family: DejaVu Sans Mono;
   vertical-align: middle;
   text-align: center;
   width: 1.1em;
 }
-#toolbox .big_text {
+#toolbox .big_text,
+#fpcontrols .big_text {
   font-size: 300%;
   margin: 2px;
 }
-#toolbox .picker {
+#toolbox .picker,
+#fpcontrols .picker {
   font-size: 1em;
   margin-top: 1px;
   padding: 0;
 }
-#toolbox #tools {
+#toolbox #tools,
+#fpcontrols #tools {
   margin-left: 2px;
   margin-right: 0.5em;
   text-align: right;
   width: 100%;
   /* disable formatting tools by default, JS displays them for F* rounds */
 }
-#toolbox #tools a:link {
+#toolbox #tools a:link,
+#fpcontrols #tools a:link {
   color: #0000ff;
 }
-#toolbox #tools a:visited {
+#toolbox #tools a:visited,
+#fpcontrols #tools a:visited {
   color: #990099;
 }
-#toolbox #tools a:active {
+#toolbox #tools a:active,
+#fpcontrols #tools a:active {
   color: #ff0000;
 }
-#toolbox #tools .format_tool {
+#toolbox #tools .format_tool,
+#fpcontrols #tools .format_tool {
   display: none;
+}
+#fpcontrols {
+  padding: 5px;
 }
 #hide-picker-button,
 #show-picker-button {

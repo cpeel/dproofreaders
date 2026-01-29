@@ -39,6 +39,7 @@ function url_for_pi_do_particular_page(string $projectid, string $proj_state, st
 function draw_toolbox()
 {
     echo "
+<div id='toolbox-meta'>
 <button type='button' id='show-picker-button' title='", attr_safe(_("Show the toolbox")), "'>&rang;</button>
 <div class='fixed-box tool_box row_flex' id='toolbox'>
     <div id='character-picker' class='fixed-box'>
@@ -74,6 +75,7 @@ function draw_toolbox()
     action_button('blank_page', '[Blank Page]', '[Blank Page]'),
     "</div>
         </div>
+</div>
 </div>";
 }
 

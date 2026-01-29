@@ -23,11 +23,11 @@ export class FormatPreviewPlugin extends TextWidgetPlugin {
     pageText = "";
     wasRun = false;
 
-    constructor(quill, settingsElement, formatting, statSpan) {
+    constructor(quill, settingsElement, formatting, fpControls) {
         super(quill, settingsElement);
 
         this.formatting = formatting;
-        this.statSpan = statSpan;
+        this.fpControls = fpControls;
 
         // These are the default values. If the user changes anything the new
         // styles are saved in local storage and reloaded next time.
@@ -72,9 +72,9 @@ export class FormatPreviewPlugin extends TextWidgetPlugin {
         const allowMathCheck = makeCheckBox();
         const allowMathControl = makeLabel([allowMathCheck, translate.gettext("Preview Math")]);
 
-        this.optGrid = document.createElement("div");
-        this.optGrid.classList.add("grid-2col");
-        this.optGrid.append(colorMarkupControl, hideTagsControl, allowMathControl, allowUnderlineControl);
+        this.settingsGrid = document.createElement("div");
+        this.settingsGrid.classList.add("grid-2col");
+        this.settingsGrid.append(allowMathControl, allowUnderlineControl);
 
         // Construct the color table for each tag
         this.colorChoices = document.createElement("fieldset");
@@ -151,12 +151,26 @@ export class FormatPreviewPlugin extends TextWidgetPlugin {
         }, this);
         this.colorChoices.append(colorTable);
 
-        this.settingsElement.append(this.optGrid, this.colorChoices);
+        this.settingsElement.append(this.settingsGrid, this.colorChoices);
 
-        this.possIssBox = document.createElement("input");
-        this.possIssBox.type = "text";
-        this.possIssBox.size = "1";
-        this.possIssBox.readOnly = true;
+        this.issuesBox = document.createElement("span");
+        this.issuesBox.classList.add("bold");
+
+        this.possIssBox = document.createElement("span");
+        this.possIssBox.classList.add("bold");
+
+        this.optGrid = document.createElement("div");
+        this.optGrid.classList.add("grid-3col");
+        const issuesStatus = document.createElement("div");
+        const span1 = document.createElement("span");
+        span1.innerHTML = translate.gettext("Issues:") + " ";
+        const span2 = document.createElement("span");
+        span2.innerHTML = " (+";
+        const span3 = document.createElement("span");
+        span3.innerHTML = " " + translate.gettext("potential") + ")";
+        issuesStatus.append(span1, this.issuesBox, span2, this.possIssBox, span3);
+        this.optGrid.append(colorMarkupControl, hideTagsControl, issuesStatus);
+        this.fpControls.append(this.optGrid);
 
         colorMarkupCheck.addEventListener(
             "change",
@@ -405,7 +419,8 @@ export class FormatPreviewPlugin extends TextWidgetPlugin {
         });
         // ok true if no errors which would cause showstyle() or reWrap() to fail
         this.ok = nIssues === 0;
-        this.possIssBox.value = possIss;
+        this.issuesBox.innerHTML = nIssues;
+        this.possIssBox.innerHTML = possIss;
         this.showStyle();
     }
 
@@ -454,7 +469,6 @@ export class FormatPreviewPlugin extends TextWidgetPlugin {
         this.quill.enable(false);
         // save text so can restore when leave formatting mode
         this.pageText = this.quill.getText();
-        this.statSpan.append("- " + translate.gettext("Issues:") + " ", this.possIssBox);
         this.markFormat();
         this.wasRun = true;
     }
@@ -465,7 +479,6 @@ export class FormatPreviewPlugin extends TextWidgetPlugin {
         // it should be possible to suspend history while in preview
         // since text is unchanged by using "silent" but doesn't work
         this.quill.history.clear();
-        this.statSpan.replaceChildren();
         this.quill.enable();
     }
 }

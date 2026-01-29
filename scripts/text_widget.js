@@ -640,11 +640,14 @@ export class ProofTextWidget extends TextWidget {
             projectLanguages,
         );
 
-        this.statSpan = document.createElement("span");
+        this.fpControls = document.createElement("div");
+        this.fpControls.id = "fpcontrols";
+        this.fpControls.style.display = "none";
+        container.append(this.fpControls);
 
         // userSettings.formatting ??= {}; // needs chrome 85, FF 79, Safari 14
         this.userSettings.formatting ?? (this.userSettings.formatting = {});
-        this.formatter = new FormatPreviewPlugin(this.quill, this.fpSettings, this.userSettings.formatting, this.statSpan);
+        this.formatter = new FormatPreviewPlugin(this.quill, this.fpSettings, this.userSettings.formatting, this.fpControls);
 
         this.textOnlyRadio = makeRadio("viewMode");
         this.textOnlyRadio.checked = true;
@@ -665,7 +668,6 @@ export class ProofTextWidget extends TextWidget {
             textOnlyControl,
             wordCheckControl,
             formatPreviewControl,
-            this.statSpan,
             spacer.cloneNode(),
             lineSpacerControl,
             spacer.cloneNode(),
@@ -676,18 +678,24 @@ export class ProofTextWidget extends TextWidget {
 
     enterTextOnly() {
         if (this.leave != this.leaveText) {
+            document.getElementById('toolbox-meta').style.display = "";
+            document.getElementById('fpcontrols').style.display = "none";
             this.leave();
             this.leave = this.leaveText;
         }
     }
 
     enterWordCheck() {
+        document.getElementById('toolbox-meta').style.display = "";
+        document.getElementById('fpcontrols').style.display = "none";
         this.leave();
         this.wordChecker.enter.bind(this.wordChecker)();
         this.leave = this.wordChecker.leave.bind(this.wordChecker);
     }
 
     enterFormatPreview() {
+        document.getElementById('toolbox-meta').style.display = "none";
+        document.getElementById('fpcontrols').style.display = "";
         this.leave();
         this.formatter.enter.bind(this.formatter)();
         this.leave = this.formatter.leave.bind(this.formatter);
