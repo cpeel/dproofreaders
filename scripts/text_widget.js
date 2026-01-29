@@ -356,7 +356,7 @@ export class TextWidget extends BasicTextWidget {
         // for polytonic greek
         this.qlEditor.style.padding = "0 0 0 0.6em";
 
-        this.userSettings.lineHeight ?? (this.userSettings.lineHeight = 1.6);
+        this.userSettings.lineHeight ?? (this.userSettings.lineHeight = 16);
         this.setParaSpacing(this.userSettings.lineHeight);
 
         const fontFaceSelector = document.createElement("select");
@@ -489,8 +489,8 @@ export class TextWidget extends BasicTextWidget {
     }
 
     setParaSpacing(lineHeight) {
-        this.qlEditor.style.lineHeight = lineHeight;
-        this.numberColumn.style.lineHeight = lineHeight;
+        this.qlEditor.style.lineHeight = lineHeight / 10;
+        this.numberColumn.style.lineHeight = lineHeight / 10;
         this.numberLines();
     }
 
@@ -585,21 +585,43 @@ export class ProofTextWidget extends TextWidget {
 
         Quill.register(DFormula);
 
-        const lineSpacer = document.createElement("input");
-        lineSpacer.classList.add("line-spacer");
-        lineSpacer.type = "range";
-        lineSpacer.classList.add("middle-align");
-        lineSpacer.min = "1.5";
-        lineSpacer.max = "3";
-        lineSpacer.step = "0.01";
-        lineSpacer.width = "5em";
-        lineSpacer.value = this.userSettings.lineHeight;
-        lineSpacer.addEventListener("input", (event) => {
+        const lineSpaceMin = "10";
+        const lineSpaceMax = "30";
+        const lineSpaceStep = "1";
+        this.lineSpacer = document.createElement("input");
+        this.lineSpacer.classList.add("line-spacer");
+        this.lineSpacer.type = "range";
+        this.lineSpacer.classList.add("middle-align");
+        this.lineSpacer.min = lineSpaceMin;
+        this.lineSpacer.max = lineSpaceMax;
+        this.lineSpacer.step = lineSpaceStep;
+        this.lineSpacer.width = "5em";
+        this.lineSpacer.value = this.userSettings.lineHeight;
+        this.lineSpacer.addEventListener("input", (event) => {
             const lineHeight = event.target.value;
             this.setParaSpacing(lineHeight);
+            this.lineSpacerInput.value = lineHeight;
             this.userSettings.lineHeight = lineHeight;
         });
-        const lineSpacerControl = makeLabel([translate.gettext("Spacing") + ":", lineSpacer], translate.gettext("Adjust the line spacing"));
+
+        this.lineSpacerInput = document.createElement("input");
+        this.lineSpacerInput.type = "number";
+        this.lineSpacerInput.min = lineSpaceMin;
+        this.lineSpacerInput.max = lineSpaceMax;
+        this.lineSpacerInput.step = lineSpaceStep;
+        this.lineSpacerInput.classList.add("text_number");
+        this.lineSpacerInput.value = this.userSettings.lineHeight;
+        this.lineSpacerInput.addEventListener("input", (event) => {
+            const lineHeight = event.target.value;
+            this.setParaSpacing(lineHeight);
+            this.lineSpacer.value = lineHeight;
+            this.userSettings.lineHeight = lineHeight;
+        });
+
+        const lineSpacerControl = makeLabel(
+            [translate.gettext("Spacing") + ":", this.lineSpacer, this.lineSpacerInput],
+            translate.gettext("Adjust the line spacing"),
+        );
 
         this.oldScroll = this.qlEditor.scrollTop;
         this.scrollListeners = new Set();
