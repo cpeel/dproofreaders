@@ -517,6 +517,11 @@
 .line-spacer {
   width: 5em;
 }
+label button,
+label input[type=checkbox],
+label input[type=radio] {
+  margin-right: 5px;
+}
 #settings_title {
   color: #333333;
   font-weight: bold;
@@ -541,18 +546,11 @@
 /* TODO: should these all be wrapped in <div>s to make them a unit
          and the styling applied to the unit?
 */
-.tool_row button,
-.tool_row label,
-.tool_row input,
-.settings_row button,
-.settings_row label,
-.settings_row input,
-.pane_settings_bar button,
-.pane_settings_bar label,
-.pane_settings_bar input,
-#action_buttons button,
-#action_buttons label {
-  margin-right: 0.2em;
+.tool_row :is(button, label, input),
+.settings_row :is(button, label, input),
+.pane_settings_bar :is(button, label, input),
+#action_buttons :is(button, label) {
+  margin: 2px;
 }
 .settings_row {
   margin: 1em 0;

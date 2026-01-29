@@ -351,9 +351,12 @@ export function makeImageWidget(container, userSettings) {
 
     // end of touch section
 
+    const spacer = document.createElement("span");
+    spacer.classList.add("spacer");
+
     const controlBar = document.createElement("div");
     controlBar.classList.add("pane_settings_bar");
-    controlBar.append(fitHeightButton, fitWidthButton, percentInput, "%", zoomInButton, zoomOutButton, clockRotateButton, counterClockRotateButton);
+    controlBar.append(fitHeightButton, fitWidthButton, spacer.cloneNode(), percentInput, "%", zoomInButton, zoomOutButton, spacer.cloneNode(), clockRotateButton, counterClockRotateButton);
     container.append(controlBar, content);
 
     // when split dirn. changes reset so that the following resize
@@ -390,7 +393,10 @@ export function makeProofImageWidget(container, userSettings) {
         [scrollWithTextBox, translate.gettext("Scroll with Text")],
         translate.gettext("Scroll the image when the page text is scrolled"),
     );
-    controlBar.append(scrollControl);
+
+    const spacer = document.createElement("span");
+    spacer.classList.add("spacer");
+    controlBar.append(spacer, scrollControl);
 
     userSettings.scrollWithText ?? (userSettings.scrollWithText = false);
     scrollWithTextBox.checked = userSettings.scrollWithText;
