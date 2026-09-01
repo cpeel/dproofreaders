@@ -131,4 +131,6 @@ $default_project_char_suites = <<DEFAULT_CHAR_SUITES>>;
 
 // The maximum runtime in seconds a script should try to stay within,
 // this should be below the TimeOut for the webserver.
-define("MAX_RUNTIME_TARGET_S", 120);
+if (!defined("MAX_RUNTIME_TARGET_S")) {
+    define("MAX_RUNTIME_TARGET_S", 120);
+}

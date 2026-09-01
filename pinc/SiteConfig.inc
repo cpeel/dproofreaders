@@ -161,10 +161,6 @@ class SiteConfig
 
     public static function load(string $filename): void
     {
-        if (self::$_site_config) {
-            return;
-        }
-
         self::$_site_config = new SiteConfig($filename);
     }
 
