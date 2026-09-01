@@ -34,7 +34,7 @@ echo $rssfeed;
  * @return string
  *   The XML document for the RSS feed
  */
-function generate_rss_feed(string $content, string $site_name, string $code_url, string $site_manager_email_addr)
+function generate_rss_feed(string $content, string $site_name, string $code_url, ?string $site_manager_email_addr)
 {
     $limit = 20; // Number of rows we query from the table, number of items in RSS feed
 
@@ -111,7 +111,7 @@ function generate_rss_feed(string $content, string $site_name, string $code_url,
             <title>".xmlencode($site_name)." - " . _("Latest Releases") . "</title>
             <link>".xmlencode($link)."</link>
             <description>".xmlencode($desc)."</description>
-            <webMaster>".xmlencode($site_manager_email_addr)." (" . xmlencode(_("Site Manager")) . ")</webMaster>
+            <webMaster>".xmlencode($site_manager_email_addr ?? "")." (" . xmlencode(_("Site Manager")) . ")</webMaster>
             <pubDate>".xmlencode($lastupdated)."</pubDate>
             <lastBuildDate>".xmlencode($lastupdated)."</lastBuildDate>
             $data
