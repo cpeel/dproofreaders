@@ -70,7 +70,7 @@ are created. Disabled character suites can still be used by projects that are
 using them, but cannot be added to new projects.
 
 If you want all new projects to use one or more character suites by default,
-set `_DEFAULT_CHAR_SUITES` in your `configuration.sh` file.
+set `$default_project_char_suites` in your `site_vars.php` file.
 
 ## Bypassing Character Suites
 

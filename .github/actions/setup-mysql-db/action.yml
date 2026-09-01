@@ -12,7 +12,7 @@ runs:
         mysql -uroot -proot -e "GRANT ALL ON dp_test_db.* TO dp_test_user@localhost;"
     - name: Configure site setup
       shell: bash
-      run: SETUP/configure SETUP/tests/ci_configuration.sh .
+      run: cp SETUP/tests/ci_site_vars.php pinc/site_vars.php
     - name: Install DB schema
       shell: bash
       run: cd SETUP && php install_db.php

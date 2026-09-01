@@ -1,11 +1,12 @@
 #!/bin/bash
 
 if [ ! -f pinc/site_vars.php ]; then
-    echo "$0: must be run from \$_CODE_DIR (checkout dir)"
+    echo "$0: must be run from \$CODE_DIR (checkout dir)"
     exit 1
 fi
 
-source SETUP/tests/ci_configuration.sh
+_DYN_DIR=$(SETUP/get_config_value.php dyn_dir)
+_PROJECTS_DIR=$(SETUP/get_config_value.php projects_dir)
 
 # Populate some DB tables used by the smoketests
 mysql -uroot -proot < SETUP/tests/smoketests/test_tables.sql

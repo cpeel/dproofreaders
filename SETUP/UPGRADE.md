@@ -7,7 +7,7 @@ release.
 ## Disable the site and cron jobs
 Generally, it's important that when doing an upgrade _nothing else is
 changing your database_ (specifically, the one whose name is bound to
-`_DB_NAME` in your `configuration.sh`). To that end, it's best done offline
+`$db_name` in your `site_vars.php`). To that end, it's best done offline
 during a maintenance window.
 
 You can disable the site by putting it into maintenance mode. Set the following
@@ -41,23 +41,10 @@ a new 'c' hierarchy.
 
 ## Configure the new DP code
 Follow the 'Installing from scratch' instructions in [INSTALL.md](INSTALL.md).
-Note that the modified `configuration.sh` that you used to
-configure your old code is probably not sufficient to configure the
-new code; however, it does have lots of settings that you should carry
-forward to the new config file.
 
-You can use `import_old_configuration.php` to import values from your old
-configuration file into the new one included with with this distribution.
-Use it like:
-
-```bash
-c/SETUP/import_old_configuration.php \
-    old_config_file.sh c/SETUP/configuration.sh > new_config_file.sh
-```
-
-The script will notify you of parameters in the old configuration file
-that are no longer used in the new one, as well as new parameters in
-`configuration.sh` that you will want to take a closer look at.
+Copy over your existing `site_vars.php` and compare it to the `site_vars.php.template`
+in the new code to find new settings. New configuration settings will
+come with sensible defaults but you may want to override them.
 
 ## Update your composer dependencies
 

@@ -11,19 +11,15 @@ The database instructions in this file resemble those for the main database. See
 To enable archiving you must set up the archive database and the archive
 project directory.
 
-1. Set the two archive settings in `configuration.sh`:
+1. Set the two archive settings in `site_vars.php`:
 
-   * `_ARCHIVE_DB_NAME` sets the name of the archive database. In the rest of
+   * `$archive_db_name` sets the name of the archive database. In the rest of
      this document we use the name `dp_archive` for this value.
 
-   * `_ARCHIVE_PROJECTS_DIR` sets the directory where project filesystem
+   * `$archive_projects_dir` sets the directory where project filesystem
      artifacts are moved.
 
-2. Run the `configure` script to update the site configuration with the new
-   archive settings. See [INSTALL.md](INSTALL.md) for more information on how
-   to do this.
-
-3. Create the database and grant access to it using the **same credentials used
+2. Create the database and grant access to it using the **same credentials used
    for the primary database**. For example, from within a `mysql` client
    session:
    ```sql
@@ -31,14 +27,14 @@ project directory.
    GRANT ALL  ON dp_archive.* TO dp_user@localhost IDENTIFIED BY 'dp_password';
    ```
 
-4. Create the `page_events`, `wordcheck_events`, and `format_preview_events` tables
+3. Create the `page_events`, `wordcheck_events`, and `format_preview_events` tables
    in the archive database. Find the 'CREATE TABLE' commands for those 2 tables in
    `db_schema.sql`. These commands create those tables in the main database;
    the corresponding tables in the archive database have exactly the same
    structure. So to create them, make the archive db the current database
    (e.g. `use dp_archive`), and then run those 2 'CREATE TABLE' commands.
 
-5. Create the archive directory referenced in `_ARCHIVE_PROJECTS_DIR`. A common
+4. Create the archive directory referenced in `_ARCHIVE_PROJECTS_DIR`. A common
    location for this is in the document root at the same level as the `projects`
    directory. (It doesn't have to be in the document root; the DP code doesn't
    assume that it's web-accessible. But you might choose to make it so [for

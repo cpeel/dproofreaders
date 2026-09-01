@@ -4,8 +4,8 @@
 // bots from signing up.
 //
 // To activate the code in this file, remove the .example portion of
-// the filename, update _SITE_REGISTRATION_PROTECTION in your
-// configuration.sh file, and reconfigure your site.
+// the filename, update $site_registration_protection_code in your
+// site_vars.php to point to it, and reconfigure your site.
 
 
 function get_registration_form_inserters()

@@ -74,7 +74,7 @@ jobs:
       # We don't install MySQL, but we do need pinc/site_vars.php & co.
       # so the static analysis doesn't fail trying to include_once those files.
       - name: Configure site setup
-        run: SETUP/configure SETUP/tests/ci_configuration.sh .
+        run: cp SETUP/tests/ci_site_vars.php pinc/site_vars.php
       - name: Run PHPStan
         run: ./vendor/bin/phpstan --no-ansi --no-progress --memory-limit=512M
   misc_checks:

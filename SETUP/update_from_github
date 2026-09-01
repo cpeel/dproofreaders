@@ -21,14 +21,14 @@ export config_dir=`dirname $site_config_file`
 # ------------------------
 #
 # The code snapshot will be installed at
-#     $_CODE_DIR.new
+#     $CODE_DIR.new
 # (i.e., that directory will contain pinc, tools, etc.)
 #
 # If $SHIFT_TO_LIVE (defined in the config file) is 'yes',
 # or it's 'prompt' and the user answers 'y',
-# then $_CODE_DIR.new will be moved to $_CODE_DIR.
+# then $CODE_DIR.new will be moved to $CODE_DIR.
 # If that directory already exists, it will first be renamed as
-#     $_CODE_DIR.bak
+#     $CODE_DIR.bak
 # and if *that* directory already exists, it will be REMOVED.
 #
 # So if this script is being invoked periodically, any "manual"
@@ -55,7 +55,7 @@ check()
 
 # ------------------------------------------------------------------------------
 
-# Set _CODE_DIR
+# Set CODE_DIR
 . $site_config_file
 
 abort=/bin/false
@@ -63,8 +63,8 @@ if [ "$TAG" = "" ]; then
     echo "Error: config file did not define TAG."
     abort=/bin/true
 fi
-if [ "$_CODE_DIR" = "" ]; then
-    echo "Error: config file did not define _CODE_DIR."
+if [ "$CODE_DIR" = "" ]; then
+    echo "Error: config file did not define CODE_DIR."
     abort=/bin/true
 fi
 if [ "$GROUP" = "" ]; then
@@ -73,6 +73,11 @@ if [ "$GROUP" = "" ]; then
 fi
 if [ "$SHIFT_TO_LIVE" = "" ]; then
     echo "Error: config file did not define SHIFT_TO_LIVE."
+    abort=/bin/true
+fi
+
+if [ "$SITE_VARS" = "" ]; then
+    echo "Error: config file did not define SITE_VARS."
     abort=/bin/true
 fi
 
@@ -89,21 +94,21 @@ echo
 # ------------------------------------------------------------------------------
 # Get snapshot of code from github.com
 
-$script_dir/get_git_clone $TAG $GROUP $_CODE_DIR.new
+$script_dir/get_git_clone $TAG $GROUP $CODE_DIR.new
 check "get_git_clone"
 
 # ------------------------------------------------------------------------------
 # Install site-specific info.
 
-configure_script_file=$script_dir/configure
-$configure_script_file $site_config_file $_CODE_DIR.new
+cp $SITE_VARS $CODE_DIR.new/pinc/site_vars.php
+chgrp $GROUP $CODE_DIR.new/pinc/site_vars.php
 
 # ------------------------------------------------------------------------------
 # Install dependencies
 
-$script_dir/install_dependencies.sh -p -d $_CODE_DIR.new
-chgrp -R $GROUP $_CODE_DIR.new/vendor
-chgrp -R $GROUP $_CODE_DIR.new/node_modules
+$script_dir/install_dependencies.sh -p -d $CODE_DIR.new
+chgrp -R $GROUP $CODE_DIR.new/vendor
+chgrp -R $GROUP $CODE_DIR.new/node_modules
 
 # ------------------------------------------------------------------------------
 # Apply any local customizations.
@@ -116,7 +121,7 @@ fi
 # ------------------------------------------------------------------------------
 
 echo ""
-$script_dir/diff_rq $_CODE_DIR $_CODE_DIR.new
+$script_dir/diff_rq $CODE_DIR $CODE_DIR.new
 echo ""
 
 echo "NOTE: using TAG = $TAG"
@@ -131,7 +136,7 @@ elif [ $SHIFT_TO_LIVE = no ]; then
     exit 1
 
 elif [ $SHIFT_TO_LIVE = prompt ]; then
-    echo -n "Install $_CODE_DIR.new? [yn] "
+    echo -n "Install $CODE_DIR.new? [yn] "
     read response
     echo -n "Your response was '$response', so "
     if [ "$response" != y ]; then
@@ -151,18 +156,18 @@ fi
 # "Install" the new hierarchy.
 echo "installing the new hierarchy..."
 
-if [ -d $_CODE_DIR.bak ]; then
-    rm -rf $_CODE_DIR.bak
-    check "rm $_CODE_DIR.bak"
+if [ -d $CODE_DIR.bak ]; then
+    rm -rf $CODE_DIR.bak
+    check "rm $CODE_DIR.bak"
 fi
 
-if [ -d $_CODE_DIR ]; then
-    mv $_CODE_DIR $_CODE_DIR.bak
-    check "mv $_CODE_DIR $_CODE_DIR.bak"
+if [ -d $CODE_DIR ]; then
+    mv $CODE_DIR $CODE_DIR.bak
+    check "mv $CODE_DIR $CODE_DIR.bak"
 fi
 
-mv $_CODE_DIR.new $_CODE_DIR
-check "mv $_CODE_DIR.new $_CODE_DIR"
+mv $CODE_DIR.new $CODE_DIR
+check "mv $CODE_DIR.new $CODE_DIR"
 
 # ------------------------------------------------------------------------------
 # vim: ai sw=4 ts=100

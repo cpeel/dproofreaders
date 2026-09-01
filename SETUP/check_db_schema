@@ -32,47 +32,25 @@ echo "Dumping the schema of the current database..."
 $setup_dir/dump_db_schema --table-list-from-db > $testing_dir/current_schema_dump
 
 echo ""
-echo "Creating a config file for a test install..."
+echo "Creating a site config file for a test install..."
+echo "
+<?php
+    \$code_dir = '$testing_code_dir';
+
+    \$db_name = '$testing_db_name';
+    \$db_server = '$db_server';
+    \$db_user = '$db_user';
+    \$db_password = '$db_password';
+" > $testing_dir/site_vars.php
+
+echo ""
+echo "Creating a deploy config file for a test install..."
 echo "
     TAG=$curr_tag
     GROUP=www-data
     SHIFT_TO_LIVE=yes
-
-    _CODE_DIR=$testing_code_dir
-    _DB_NAME=$testing_db_name
-    _DB_SERVER=$db_server
-    _DB_USER=$db_user
-    _DB_PASSWORD='$db_password'
-
-    # Need to set booleans/integers, otherwise site_vars.php will raise syntax errors.
-    _TESTING=true
-    _USE_SECURE_COOKIES=true
-    _MAINTENANCE=false
-    _AUTO_POST_TO_PROJECT_TOPIC=false
-    _ORDINARY_USERS_CAN_SEE_QUEUE_SETTINGS=true
-    _PUBLIC_PAGE_DETAILS=false
-    _ARCHIVE_DB_NAME=ARCHIVE_DB_NAME
-    _API_ENABLED=false
-    _API_RATE_LIMIT=0
-    _API_RATE_LIMIT_REQUESTS_PER_WINDOW=0
-    _API_RATE_LIMIT_SECONDS_IN_WINDOW=0
-
-    # String values
-    _FORUM_TYPE='phpbb3'
-    _DEFAULT_CHAR_SUITES='[ \"basic-latin\" ]'
-    _PHPMAILER_SMTP_CONFIG='[]'
-    _API_STORAGE_KEYS='[]'
-
-    # Integer values that must be filled in
-    _FORUMS_PROJECT_WAITING_IDX=99
-    _FORUMS_PROJECT_AVAIL_IDX=99
-    _FORUMS_PROJECT_PP_IDX=99
-    _FORUMS_PROJECT_POSTED_IDX=99
-    _FORUMS_BEGIN_SITE_IDX=99
-    _FORUMS_PROJECT_DELETED_IDX=99
-    _FORUMS_PROJECT_COMPLETED_IDX=99
-    _FORUMS_POST_PROCESSORS_IDX=99
-    _FORUMS_TEAMS_IDX=99
+    CODE_DIR=$testing_code_dir
+    SITE_VARS=$testing_dir/site_vars.php
 " > $testing_dir/config.sh
 
 echo "Getting a test copy of the '$curr_tag' code..."
@@ -88,10 +66,6 @@ cp `find $testing_code_dir -name db_schema.sql` /tmp/db_schema.sql
 git checkout -q $curr_tag
 testing_code_setup_dir=`find $testing_code_dir -name SETUP -type d`
 mv /tmp/db_schema.sql $testing_code_setup_dir/db_schema.sql
-
-echo ""
-echo "Applying configuration..."
-$testing_code_setup_dir/configure $testing_dir/config.sh $testing_code_dir
 
 echo ""
 cd $testing_code_setup_dir

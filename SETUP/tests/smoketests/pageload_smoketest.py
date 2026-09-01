@@ -9,7 +9,7 @@ import sys
 import time
 
 from http.cookiejar import CookieJar, DefaultCookiePolicy
-from subprocess import Popen, DEVNULL, run, STDOUT, PIPE
+from subprocess import Popen, DEVNULL, run, STDOUT, PIPE, CalledProcessError
 from urllib.error import URLError
 from urllib.parse import urlencode, urlparse
 from urllib.request import build_opener, HTTPCookieProcessor, HTTPErrorProcessor, Request
@@ -536,23 +536,38 @@ CRON_JOBS = [
 def get_site_config() -> dict:
     config = {}
     try:
-        with open('pinc/site_vars.php', 'r') as site_vars:
-            for l in site_vars:
-                m = re.match(r"\$site_url\s*=\s*'(.*?)';", l)
-                if m:
-                    u = urlparse(m[1])
-                    config.update({
-                        'site_url': m[1].rstrip('/'),
-                        'scheme': u.scheme,
-                        'netloc': u.netloc, # hostname:port
-                    })
-                    continue
-                m = re.match(r"\$code_dir\s*=\s*'(.*?)';", l)
-                if m:
-                    config.update({'code_dir': m[1]})
-                    continue
-    except FileNotFoundError:
-        raise Exception("Script must be run from $_CODE_DIR (checkout dir)")
+        # read the site_url
+        cmd_result = run(
+            [
+                "SETUP/get_config_value.php",
+                "site_url",
+            ],
+            capture_output=True,
+            encoding='utf-8',
+            check=True,
+        )
+
+        u = urlparse(cmd_result.stdout.strip())
+        config.update({
+            'site_url': cmd_result.stdout.strip().rstrip('/'),
+            'scheme': u.scheme,
+            'netloc': u.netloc, # hostname:port
+        })
+
+        # read the code_dir
+        cmd_result = run(
+            [
+                "SETUP/get_config_value.php",
+                "code_dir",
+            ],
+            capture_output=True,
+            encoding='utf-8',
+            check=True,
+        )
+
+        config.update({'code_dir': cmd_result.stdout.strip()})
+    except CalledProcessError:
+        raise Exception("Error getting site_url and code_dir settings")
     return config
 
 def start_server(host_port: str):

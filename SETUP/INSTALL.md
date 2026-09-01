@@ -138,8 +138,8 @@ The following components are optional and provide additional functionality.
 #### Memcached
 If a memcached instance is available on localhost, the code can use it in
 two ways:
-* Implementing API rate limiting (enabled with `_API_RATE_LIMIT` in
-  `configuration.sh`). If `_API_RATE_LIMIT` is set to `true` and memcached
+* Implementing API rate limiting (enabled with `$api_rate_limit` in
+  `site_vars.php`). If `$api_rate_limit` is set to `true` and memcached
   is not available, API calls will fail and an error will be logged.
 * Caching some statistics data (automatic, no configuration necessary). If
   memcached is not available everything still functions but no caching is done.
@@ -152,8 +152,8 @@ If an anti-virus scanner is installed and configured, the code will use it to
 test uploaded files for viruses. Any command-line scanner that returns 0 on
 pass and 1 on failure will work. pgdp.net uses [ClamAV](https://www.clamav.net/).
 
-To configure the software to use the virus scanner, set `_ANTIVIRUS_EXECUTABLE`
-in `configuration.sh`.
+To configure the software to use the virus scanner, set `$antivirus_executable`
+in your `site_vars.php`.
 
 The ClamAV CLI client, `clamscan`, can be slow to scan files due to its
 start-up time. To scan files faster, install and run the
@@ -340,7 +340,7 @@ directory located inside that user's home directory. Ensure that
 new files and directories within this space have permissions set
 to 777 so that the web server has full access to them.
 
-See the 'Uploading and Creating Projects' section of `configuration.sh`
+See the 'Uploading and Creating Projects' section of `site_vars.php.template`
 for more details.
 
 ### Install DP code package dependencies
@@ -359,16 +359,10 @@ This will:
    browser at runtime
 
 ### Configure the DP code (with site-specific settings)
-Make an editable copy of `c/SETUP/configuration.sh`, and put it outside
-your webserver's document hierarchy.
+Make an editable copy of `c/pinc/site_vars.php.template` as `c/pinc/site_vars.php`.
 
-Modify your copy of `configuration.sh` as appropriate. Details about each
-parameter are included in `configuration.sh`. Run:
-```bash
-c/SETUP/configure path-to-modified-configuration.sh path-to-code-dir
-```
-The configure script will use your modified `configuration.sh` to update
-the DP code with your site-specific settings.
+Modify your copy of `site_vars.php` as appropriate. Details about each
+parameter are included in the file.
 
 ### Create the tables of the DP database
 ```bash
@@ -393,7 +387,7 @@ You could just create a foo/index.html that redirects.
 None of the DP code relies on the presence of a wiki, MediaWiki or
 otherwise, but most DP sites have some form of wiki for user
 contributions, coordination, documentation, etc. If you have a wiki,
-set `_WIKI_URL` in `configuration.sh` to have a link show up in the navbar.
+set `$wiki_url` in `site_vars.php` to have a link show up in the navbar.
 
 pgdp.net uses MediaWiki and the `MediaWiki_extensions/` directory
 includes some useful extensions you might want to use.

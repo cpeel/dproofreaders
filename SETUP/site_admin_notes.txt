@@ -48,8 +48,8 @@ installed).
 Notes on the SQL commands shown here:
 
  -- If your SQL installation has multiple databases, you have to be using the
-    correct one, i.e. the one whose name is bound to _DB_NAME in your
-    configuration.sh. For example, if that name is 'dp_main', you could issue
+    correct one, i.e. the one whose name is bound to $db_name in your
+    site_vars.php. For example, if that name is 'dp_main', you could issue
     the command "USE dp_main", or invoke 'mysql' with "-D dp_main", or select
     dp_main from the database list in phpMyAdmin, etc.
 

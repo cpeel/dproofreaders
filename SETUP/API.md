@@ -9,10 +9,10 @@ The API is enabled by default because some UI features, like the Page Browser,
 require it.
 
 While disabling the API will break these features, you can still do so by
-updating the `API_ENABLE` setting in your `configuration.sh` file and
+updating the `$api_enabled` setting in your `site_vars.php` file and
 re-configuring your site.
 
-* `API_ENABLE` - if set to `FALSE` the API is disabled.
+* `$api_enabled` - if set to `false` the API is disabled.
 
 While not required for the DP UI, for external users it is also highly
 recommended that you update your web server to rewrite requests for `/api/`
@@ -59,19 +59,19 @@ installed and a local memcached process running and accessible via localhost.
 If rate limiting is enabled and memcached is not accessible, API requests will
 fail and an error will be logged to `php_errors`.
 
-Three settings in `configuration.sh` control limiting:
+Three settings in `site_vars.php` control limiting:
 
-* `_API_RATE_LIMIT` - enables or disables rate limiting.
-* `_API_RATE_LIMIT_REQUESTS_PER_WINDOW` - the number of API requests that are
+* `$api_rate_limit` - enables or disables rate limiting.
+* `$api_rate_limit_requests_per_window` - the number of API requests that are
   allowed per given window.
-* `_API_RATE_LIMIT_SECONDS_IN_WINDOW` - the number of seconds within a given
+* `$api_rate_limit_seconds_in_window` - the number of seconds within a given
   window.
 
 ## Storage
 
 To facilitate javascript UI clients persisting data across browsers and devices,
 the API includes an optional endpoint for clients to store and fetch JSON blobs.
-To enable this feature, add a storage key to the `_API_STORAGE_KEYS`
+To enable this feature, add a storage key to the `$api_storage_keys`
 configuration setting and have the client use that string with the endpoint
 as the `storagekey`.
 

@@ -2,7 +2,7 @@
 #
 # You should review this file, and likely make changes, before using it.
 # In particular, ensure the directories and paths referenced here match
-# those set in your configuration.sh.
+# those set in your site configuration.
 
 # To ensure that word lists and other project artifacts are downloaded
 # with the correct character set, tell Apache to use UTF-8 for those
