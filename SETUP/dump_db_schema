@@ -3,12 +3,13 @@
 
 set -euo pipefail
 
-db_user='<<DB_USER>>'
-db_password='<<DB_PASSWORD>>'
-db_name='<<DB_NAME>>'
-code_dir='<<CODE_DIR>>'
-
 setup_dir=$(realpath $(dirname $0))
+
+db_server=$($setup_dir/get_config_value.php db_server)
+db_user=$($setup_dir/get_config_value.php db_user)
+db_password=$($setup_dir/get_config_value.php db_password)
+db_name=$($setup_dir/get_config_value.php db_name)
+code_dir=$($setup_dir/get_config_value.php code_dir)
 
 export LC_ALL=POSIX
 # because on www.pgdp.net, none of the LC_* are defined,
@@ -32,7 +33,7 @@ fi
 get_table_names()
 {
     if [ $table_list_source = db ]; then
-        mysql --user=$db_user --password="$db_password" \
+        mysql --host $db_server --user=$db_user --password="$db_password" \
             -D $db_name \
             --skip-column-names --batch --execute='show tables' |
         grep -v \
@@ -47,11 +48,12 @@ get_table_names()
 
         xargs grep -E '(FROM|INTO|JOIN) ' |
 
-        # Suppress some non-SQL occurrences of those keywords and vendor code
+        # Suppress some non-SQL occurrences of those keywords and vendor & test code
         grep -v \
             -e /vendor/ \
+            -e /SETUP/tests/ \
+            -e /SETUP/upgrade/ \
             -e 'the FROM clause' \
-            -e 'FAR FROM HOME' \
         |
 
         sed -n -e'
@@ -62,21 +64,13 @@ get_table_names()
             s/^`\([^`]*\)`.*/\1/p
         ' |
 
-        # 'member_stats', 'user_teams_stats', and 'pagestats' are obsolete
-        #     tables that are referenced by some upgrade scripts.
-        # The rest are temporary tables.
+        # Exclude temporary & MySQL internal tables.
         grep -v -x \
-            -e member_stats -e user_teams_stats -e pagestats \
             -e access_log_summary \
             -e active_page_counts \
-            -e information_schema \
             -e genre_translations \
             -e project_event_subscriptions_grouped_by_project \
-        |
-        # Tables with phpbb_ prefix are managed / installed by phpBB.
-        #     and we shouldn't be dumping them.
-        grep -v \
-            -e '^phpbb_' \
+            -e information_schema \
         |
 
         sort -u
@@ -95,7 +89,7 @@ if true; then
     # foreign key checks for this session.
     echo "SET FOREIGN_KEY_CHECKS=0;"
 
-    mysqldump --user=$db_user --password="$db_password" \
+    mysqldump --host $db_server --user=$db_user --password="$db_password" \
         --no-data --quote-names --add-drop-table=FALSE --force \
         $db_name $tables |
 

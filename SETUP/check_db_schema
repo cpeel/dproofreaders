@@ -20,10 +20,10 @@ testing_dir=/tmp/dp_schema_check
 testing_code_dir=$testing_dir/c
 testing_db_name=temp_dp_schema_check
 
-db_server='<<DB_SERVER>>'
-db_user='<<DB_USER>>'
-db_password='<<DB_PASSWORD>>'
-php_cli_exec='<<PHP_CLI_EXECUTABLE>>'
+db_server=$($setup_dir/get_config_value.php db_server)
+db_user=$($setup_dir/get_config_value.php db_user)
+db_password=$($setup_dir/get_config_value.php db_password)
+php_cli_exec=$($setup_dir/get_config_value.php php_cli_executable)
 
 mkdir -p $testing_dir
 
@@ -98,7 +98,7 @@ cd $testing_code_setup_dir
 
 echo ""
 echo "Creating and/or cleaning out the test database..."
-mysql -h $db_server -u $db_user -p"$db_password" -e "DROP   DATABASE $testing_db_name"
+mysql -h $db_server -u $db_user -p"$db_password" -e "DROP DATABASE IF EXISTS $testing_db_name"
 mysql -h $db_server -u $db_user -p"$db_password" -e "CREATE DATABASE $testing_db_name"
 if [ $? != 0 ]; then
     echo "CREATE DATABASE failed."
