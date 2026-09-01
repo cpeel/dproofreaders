@@ -427,10 +427,10 @@ for more information.
 ### Set up project archiving (optional)
 If you want to enable project archiving, see [ARCHIVING.md](ARCHIVING.md).
 
-### Install the modified `dp.cron`
-`dp.cron` contains entries for various processes necessary for site
+### Install DP cron
+`dp.cron.template` contains entries for various processes necessary for site
 statistics and project archiving, as well as managing the project release
 queues, various user notifications, and the like.
 
-Check that the values inserted by the DP configuration script are correct,
+Update the `<<CODE_DIR>>` values for your installation,
 then install the crontab onto your system as an appropriate user.

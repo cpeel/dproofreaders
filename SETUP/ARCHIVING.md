@@ -51,7 +51,7 @@ project directory.
 
 Now that the archive database and filesystem directory are set up, you can
 enable periodic archiving by calling `crontab/archive_projects.php` via cron.
-The `dp.cron` crontab file includes a commented-out example.
+The `dp.cron.template` crontab file includes a commented-out example.
 
 [`crontab/archive_projects.php`](../crontab/archive_projects.php) controls
 which projects are archived (and when), and the logic to do the archiving is in

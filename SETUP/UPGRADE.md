@@ -189,8 +189,8 @@ Run the scripts in the following directories in order
 
 * c/SETUP/upgrade/23/
 
-## Install the modified `dp.cron`
-Install the modified `dp.cron`.
+## Update the DP cron jobs
+Update your set of DP cron jobs based on those in `dp.cron.template`.
 
 ## Re-enable the site and cron jobs
 Edit `pinc/site_vars.php` and set `$maintenance = false;` to bring the site

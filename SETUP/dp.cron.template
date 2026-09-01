@@ -1,23 +1,23 @@
 # multiple times per hour:
-10,25,40,55 * * * * JOB=AutoModify; <<PHP_CLI_EXECUTABLE>> <<CODE_DIR>>/crontab/run_background_job.php $JOB
+10,25,40,55 * * * * JOB=AutoModify; /usr/bin/php <<CODE_DIR>>/crontab/run_background_job.php $JOB
 
 # hourly:
-03 * * * * JOB=RecordUserCounts; <<PHP_CLI_EXECUTABLE>> <<CODE_DIR>>/crontab/run_background_job.php $JOB
-05 * * * * JOB=SendSmoothreadingNotifications; <<PHP_CLI_EXECUTABLE>> <<CODE_DIR>>/crontab/run_background_job.php $JOB
+03 * * * * JOB=RecordUserCounts; /usr/bin/php <<CODE_DIR>>/crontab/run_background_job.php $JOB
+05 * * * * JOB=SendSmoothreadingNotifications; /usr/bin/php <<CODE_DIR>>/crontab/run_background_job.php $JOB
 
 # daily:
-01  0 * * * JOB=TakeTallySnapshots; <<PHP_CLI_EXECUTABLE>> <<CODE_DIR>>/crontab/run_background_job.php $JOB
-01  0 * * * JOB=RecordProjectStateCounts; <<PHP_CLI_EXECUTABLE>> <<CODE_DIR>>/crontab/run_background_job.php $JOB
+01  0 * * * JOB=TakeTallySnapshots; /usr/bin/php <<CODE_DIR>>/crontab/run_background_job.php $JOB
+01  0 * * * JOB=RecordProjectStateCounts; /usr/bin/php <<CODE_DIR>>/crontab/run_background_job.php $JOB
 # See SETUP/ARCHIVING.md to set up archiving before enabling the line below
-#10  0 * * * JOB=ArchiveProjects; <<PHP_CLI_EXECUTABLE>> <<CODE_DIR>>/crontab/run_background_job.php $JOB
-30  0 * * * JOB=PrunePageData; <<PHP_CLI_EXECUTABLE>> <<CODE_DIR>>/crontab/run_background_job.php $JOB
-45  0 * * * JOB=CleanDownloadTemp; <<PHP_CLI_EXECUTABLE>> <<CODE_DIR>>/crontab/run_background_job.php $JOB
-50  0 * * * JOB=CleanUploadsTrash; <<PHP_CLI_EXECUTABLE>> <<CODE_DIR>>/crontab/run_background_job.php $JOB
-55  0 * * * JOB=ExtendSiteTallyGoals; <<PHP_CLI_EXECUTABLE>> <<CODE_DIR>>/crontab/run_background_job.php $JOB
-00  4 * * * JOB=ToggleSpecialDayQueues; <<PHP_CLI_EXECUTABLE>> <<CODE_DIR>>/crontab/run_background_job.php $JOB
+#10  0 * * * JOB=ArchiveProjects; /usr/bin/php <<CODE_DIR>>/crontab/run_background_job.php $JOB
+30  0 * * * JOB=PrunePageData; /usr/bin/php <<CODE_DIR>>/crontab/run_background_job.php $JOB
+45  0 * * * JOB=CleanDownloadTemp; /usr/bin/php <<CODE_DIR>>/crontab/run_background_job.php $JOB
+50  0 * * * JOB=CleanUploadsTrash; /usr/bin/php <<CODE_DIR>>/crontab/run_background_job.php $JOB
+55  0 * * * JOB=ExtendSiteTallyGoals; /usr/bin/php <<CODE_DIR>>/crontab/run_background_job.php $JOB
+00  4 * * * JOB=ToggleSpecialDayQueues; /usr/bin/php <<CODE_DIR>>/crontab/run_background_job.php $JOB
 
 # monthly:
-50 0 1 * * JOB=NotifyOldPP; <<PHP_CLI_EXECUTABLE>> <<CODE_DIR>>/crontab/run_background_job.php $JOB
-50 0 15 * * JOB=NotifyOldPP; <<PHP_CLI_EXECUTABLE>> <<CODE_DIR>>/crontab/run_background_job.php $JOB
-50 0 28 * * JOB=PruneJobLogs; <<PHP_CLI_EXECUTABLE>> <<CODE_DIR>>/crontab/run_background_job.php $JOB
-50 0 28 * * JOB=PruneNonActivatedUsers; <<PHP_CLI_EXECUTABLE>> <<CODE_DIR>>/crontab/run_background_job.php $JOB
+50 0 1 * * JOB=NotifyOldPP; /usr/bin/php <<CODE_DIR>>/crontab/run_background_job.php $JOB
+50 0 15 * * JOB=NotifyOldPP; /usr/bin/php <<CODE_DIR>>/crontab/run_background_job.php $JOB
+50 0 28 * * JOB=PruneJobLogs; /usr/bin/php <<CODE_DIR>>/crontab/run_background_job.php $JOB
+50 0 28 * * JOB=PruneNonActivatedUsers; /usr/bin/php <<CODE_DIR>>/crontab/run_background_job.php $JOB

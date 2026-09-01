@@ -1,8 +1,9 @@
 # Background Jobs
 
 Files in this directory are used to run regular maintenance jobs. It is
-expected that they will be run regularly via cron. The `SETUP/dp.cron`
-file provides an example crontab indicating suggested run frequency.
+expected that they will be run regularly via cron. The `SETUP/dp.cron.template`
+file provides an example crontab indicating suggested run frequency. You'll
+need to set `<<CODE_DIR>>` to where the code is installed.
 
 All jobs use a common entrypoint, `run_background_job.php`, that is expected
 to be run from the PHP CLI. Most jobs are executed directly from within the
